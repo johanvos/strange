@@ -76,8 +76,8 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         for (Step step: steps) {
             simpleSteps.addAll(decomposeStep(step, nQubits));
         }
-       System.out.println("stepsize "+steps.size()+" and simplestepsize = "+simpleSteps.size());
-       printProbs(probs);
+   //    System.out.println("stepsize "+steps.size()+" and simplestepsize = "+simpleSteps.size());
+       //printProbs(probs);
        Result result = new Result(nQubits, steps.size());
      //  int idx = 0;
         for (Step step: simpleSteps) {
@@ -266,8 +266,8 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
     private Complex[]  applyStep (Step step, Complex[] vector, Qubit[] qubits) {
         List<Gate> gates = step.getGates();
         Complex[][] a = calculateStepMatrix(gates, qubits.length);
-        System.out.println("applystep, gates = "+gates);
- printMatrix(a);
+       // System.out.println("applystep, gates = "+gates);
+  // printMatrix(a);
         Complex[] result = new Complex[vector.length];
         for (int i = 0; i < vector.length; i++) {
             result[i] = Complex.ZERO;
@@ -290,7 +290,7 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
             if (myGateOpt.isPresent()) {
                 myGate = myGateOpt.get();
             }
-            System.out.println("idx = "+idx+", gate = "+myGate);
+         //   System.out.println("idx = "+idx+", gate = "+myGate);
             if (myGate instanceof SingleQubitGate) {
                 SingleQubitGate sqg = (SingleQubitGate)myGate;
                 a = tensor(a, sqg.getMatrix());
