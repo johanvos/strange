@@ -64,6 +64,7 @@ public class ControlledBlockGate<T> extends BlockGate {
      */
     public ControlledBlockGate(BlockGate bg, int idx, int control) {
         this (bg.getBlock(), idx, control);
+        System.err.println("[CONSTRUCTOR] controllblockgate created: "+this);
     }
     
     /**
@@ -198,27 +199,58 @@ public class ControlledBlockGate<T> extends BlockGate {
     }
     @Override
     public Complex[] applyOptimize(Complex[] v) {
-        long l0 = System.currentTimeMillis();
-        System.err.println("APPLYOPTIMIZE ON " + this);
-        int size = v.length;
-        Complex[][] part = block.getMatrix();
-        long l1 = System.currentTimeMillis();
-        int dim = part.length;
-        if (dim != size / 2) {
-            throw new IllegalArgumentException("Wrong dimensions");
-        }
-        Complex[] answer = new Complex[size];
-        System.err.println("Dim = "+dim);
-        for (int i = 0; i < dim; i++) {
-            answer[i] = v[i];
-            answer[dim + i] = Complex.ZERO;
-            for (int j = 0; j < dim; j++) {
-                answer[dim + i] = answer[dim + i].add(part[i][j].mul(v[dim + j]));
+        boolean newa = false;
+
+        if (newa) {
+            long l0 = System.currentTimeMillis();
+            System.err.println("APPLYOPTIMIZE ON " + this + ", v = ");
+            Complex.printArray(v);
+            int size = v.length;
+            Complex[] answer = new Complex[size];
+            int dim = size / 2;
+            Complex[] oldv = new Complex[dim];
+            for (int i = 0; i < dim; i++) {
+                oldv[i] = v[i + dim];
             }
+            Complex[] p2 = block.applyOptimize(oldv);
+            for (int i = 0; i < dim; i++) {
+                answer[i] = v[i];
+                answer[dim + i] = p2[i];
+            }
+            System.err.println("RESULT OF APPLYOPT:");
+            Complex.printArray(answer);
+            System.err.println("\n");
+            return answer;
+        } else {
+
+            long l0 = System.currentTimeMillis();
+            System.err.println("NOAPPLYOPTIMIZE ON " + this + ", v = ");
+                        Complex.printArray(v);
+
+            int size = v.length;
+            Complex[] answer = new Complex[size];
+            Complex[][] part = block.getMatrix();
+            long l1 = System.currentTimeMillis();
+            int dim = part.length;
+            if (dim != size / 2) {
+                throw new IllegalArgumentException("Wrong dimensions");
+            }
+            System.err.println("Dim = " + dim);
+            for (int i = 0; i < dim; i++) {
+                answer[i] = v[i];
+                answer[dim + i] = Complex.ZERO;
+                for (int j = 0; j < dim; j++) {
+                    answer[dim + i] = answer[dim + i].add(part[i][j].mul(v[dim + j]));
+                }
+            }
+            long l2 = System.currentTimeMillis();
+            System.err.println("RESULT OF APPLYOPT:");
+            Complex.printArray(answer);
+            System.err.println("\n");
+            //      System.err.println("CBG: blockmatrix took "+ (l1 - l0)+" and mult took "+ (l2-l1));
+            return answer;
         }
-long l2 = System.currentTimeMillis();
-        System.err.println("CBG: blockmatrix took "+ (l1 - l0)+" and mult took "+ (l2-l1));
-        return answer;
+
     }
 
     public int getSize() {

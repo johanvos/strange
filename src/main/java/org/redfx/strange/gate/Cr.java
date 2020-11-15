@@ -83,6 +83,9 @@ public class Cr extends TwoQubitGate {
     
     @Override
     public Complex[][] getMatrix() {
+        System.err.println("CR matrix asked, return this: ");
+        Complex.printMatrix(matrix);
+        System.err.println("(-----)");
         return matrix;
     }
 

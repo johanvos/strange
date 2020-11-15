@@ -356,7 +356,7 @@ public class Computations {
          */
     }
 
-    static Complex[] permutateVector(Complex[] vector, int a, int b) {
+    public static Complex[] permutateVector(Complex[] vector, int a, int b) {
         int amask = 1 << a;
         int bmask = 1 << b;
         int dim = vector.length;
@@ -374,12 +374,14 @@ public class Computations {
         return answer;
     }
 
-    static Complex[] calculateNewState(List<Gate> gates, Complex[] vector, int length) {
+    public static Complex[] calculateNewState(List<Gate> gates, Complex[] vector, int length) {
         System.err.println("CNS for gates: " + gates);
         long c0 = System.currentTimeMillis();
         Complex[] answer = getNextProbability(getAllGates(gates, length), vector);
         long c1 = System.currentTimeMillis();
-        System.err.println("CNS took " + (c1 - c0) + " for gates " + gates);
+        System.err.println("CNS took " + (c1 - c0) + " for gates " + gates+", result below");
+        Complex.printArray(answer);
+        System.err.println("\n");
         return answer;
     }
 

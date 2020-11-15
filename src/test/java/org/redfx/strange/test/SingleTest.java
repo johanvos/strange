@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.redfx.strange.Block;
 import org.redfx.strange.BlockGate;
+import org.redfx.strange.Complex;
 import org.redfx.strange.ControlledBlockGate;
 import org.redfx.strange.Program;
 import org.redfx.strange.Qubit;
@@ -55,6 +56,65 @@ import org.redfx.strange.local.Computations;
  * @author johan
  */
 public class SingleTest extends BaseGateTests {
+    
+        
+  //  @Test
+    public void controlledAdd001() {
+        Program p = new Program(3);
+        Step s = new Step();
+        Add add = new Add(0,0,1,1);
+        ControlledBlockGate cbg = new ControlledBlockGate(add, 1,0);
+       Complex[][] m = cbg.getMatrix();
+        Complex.printMatrix(m, System.err);
+        System.err.println("THAT WAS CBG");
+        Step prep = new Step();
+        prep.addGates(new X(0));
+        p.addStep(prep);
+        Step cg = new Step(cbg);
+        p.addStep(cg);
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        assertEquals(3, q.length);
+        assertEquals(1, q[0].measure());
+        assertEquals(0, q[1].measure());
+        assertEquals(0, q[2].measure());
+    }
+    
+    @Test
+    public void addmod2() {
+        int n = 2;
+        int N = 3;
+        int dim = 2 * (n+1)+1;
+        Program p = new Program(dim);
+        Step prep = new Step();
+        prep.addGates(new X(0));
+        p.addStep(prep);
+        Add add = new Add(0,2,3,5);
+        p.addStep(new Step(add));
+        
+        AddInteger min = new AddInteger(0,2,N).inverse();
+        p.addStep(new Step(min));
+        p.addStep(new Step(new Cnot(2,dim-1)));
+        AddInteger addN = new AddInteger(0,2,N);
+        ControlledBlockGate cbg = new ControlledBlockGate(addN, 0,dim-1);
+        System.err.println("CBG created: "+cbg);
+        p.addStep(new Step(cbg));
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        for (int i =0; i < 7; i++) {
+            System.err.println("Q["+i+"]: "+q[i].measure());
+        }
+        assertEquals(7, q.length);
+        assertEquals(1, q[0].measure());
+        assertEquals(0, q[1].measure());
+        assertEquals(0, q[2].measure());
+        assertEquals(0, q[3].measure());
+        assertEquals(0, q[4].measure());
+        assertEquals(0, q[5].measure());
+        assertEquals(1, q[6].measure());
+        System.err.println("DONE");
+    }
+
   // @Test
     public void add01() {
         Program p = new Program(2);
@@ -108,7 +168,7 @@ public class SingleTest extends BaseGateTests {
         assertEquals(0, q[9].measure());  
     }
     
-    @Test // 
+   // ja  @Test // 
     public void expmul3p4mod7() { // 3^4 = 81 -> mod 7 = 4
         int length = 3; 
         // q0 -> q2: 4
@@ -126,14 +186,11 @@ public class SingleTest extends BaseGateTests {
             for (int j = 0; j < 1 << i; j++) {
                 m = m*a %mod;
             }
-//            int m = (int) Math.pow(a, 1 << i);
             System.err.println("M = "+m);
             MulModulus mul = new MulModulus(length, 2 * length, m, mod);
             ControlledBlockGate cbg = new ControlledBlockGate(mul, length, i);
             p.addStep(new Step(cbg));
         }
-          //          MulModulus mul = new MulModulus(3, 6, 2, 7);
-//p.addStep(new Step(mul));
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
         assertEquals(12, q.length);
@@ -156,7 +213,7 @@ public class SingleTest extends BaseGateTests {
     }
     
     
-  //  @Test // 
+ //  @Test // 
     public void expmul() {
         int length = 2;
         int a = 3;
