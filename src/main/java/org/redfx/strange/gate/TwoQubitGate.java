@@ -104,7 +104,11 @@ public abstract class TwoQubitGate implements Gate {
     public String getGroup() {
         return "TwoQubit";
     }
-    
+     
+    @Override
+    public int getSize() {
+        return 2;
+    }
     
     @Override public String toString() {
         return "Gate acting on qubits "+first+" and "+second+" and caption "+getCaption();

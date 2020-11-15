@@ -92,6 +92,11 @@ public abstract class SingleQubitGate implements Gate {
         return "SingleQubit";
     }
     
+    @Override
+    public int getSize() {
+        return 1;
+    }
+    
     public abstract Complex[][] getMatrix();
     
     @Override public String toString() {

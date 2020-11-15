@@ -42,7 +42,12 @@ public class ProbabilitiesGate extends InformalGate {
     public String getCaption() {
         return "P";
     }
-
+ 
+    @Override
+    public int getSize() {
+        return -1;
+    }
+    
     @Override
     public String getName() {
         return "Probabilities";

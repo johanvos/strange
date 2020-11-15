@@ -55,7 +55,7 @@ import org.redfx.strange.local.Computations;
  * @author johan
  */
 public class SingleTest extends BaseGateTests {
-  @Test
+  // @Test
     public void add01() {
         Program p = new Program(2);
         Step prep = new Step();
@@ -108,7 +108,7 @@ public class SingleTest extends BaseGateTests {
         assertEquals(0, q[9].measure());  
     }
     
-  //  @Test // 
+    @Test // 
     public void expmul3p4mod7() { // 3^4 = 81 -> mod 7 = 4
         int length = 3; 
         // q0 -> q2: 4
@@ -156,7 +156,7 @@ public class SingleTest extends BaseGateTests {
     }
     
     
-//    @Test // 
+  //  @Test // 
     public void expmul() {
         int length = 2;
         int a = 3;

@@ -118,6 +118,11 @@ public class PermutationGate implements Gate {
     }
     
     @Override
+    public int getSize() {
+        return 2;
+    }
+    
+    @Override
     public String toString() {
         return "Perm "+a+", "+b;
     }

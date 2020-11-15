@@ -60,7 +60,12 @@ public class Oracle implements Gate {
             setAdditionalQubit(i,i);
         }
     }
-
+ 
+    @Override
+    public int getSize() {
+        return span;
+    }
+    
     public void setCaption(String c) {
         this.caption = c;
     }

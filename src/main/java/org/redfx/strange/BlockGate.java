@@ -132,10 +132,31 @@ public class BlockGate<T> implements Gate {
         return (T)this;
     }
     
+    @Override
     public int getSize() {
         return block.getNQubits();
     }
-    
+        
+    @Override
+    public boolean hasOptimization() {
+        return true;
+    }
+
+    @Override
+    public Complex[] applyOptimize(Complex[] v) {
+        System.err.println("APPLYOPT on blockgate ");
+        Complex[][] matrix = getMatrix();
+        int size = v.length;
+        Complex[] answer = new Complex[size];
+        for (int i = 0; i < size; i++) {
+            answer[i] = Complex.ZERO;
+            for (int j = 0; j < size; j++) {
+                answer[i] = answer[i].add(matrix[i][j].mul(v[j]));
+            }
+        }
+        return answer;
+    }
+
     @Override public String toString() {
         return "Gate for block "+block+", size = "+getSize();
     }

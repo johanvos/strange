@@ -101,8 +101,22 @@ public interface Gate {
     
     public Complex[][] getMatrix();
     
+    /**
+     * Return the number of qubits that are affected by this gate
+     * @return 
+     */
+    public int getSize();
+    
     default public Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
         return getMatrix();
+    }
+    
+    default public boolean hasOptimization() {
+        return false;
+    }
+    
+    default public Complex[] applyOptimize(Complex[] v) {
+        return null;
     }
 
     

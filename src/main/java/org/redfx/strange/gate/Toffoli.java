@@ -64,7 +64,12 @@ public class Toffoli extends ThreeQubitGate {
     public Complex[][] getMatrix() {
         return matrix;
     }
-
+ 
+    @Override
+    public int getSize() {
+        return 3;
+    }
+    
     @Override public String getCaption() {
         return "CCnot";
     }
