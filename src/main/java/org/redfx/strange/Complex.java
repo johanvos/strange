@@ -391,7 +391,7 @@ public final class Complex {
         printMatrix(cm, System.err);
     }
 
-    static final boolean debug = true;
+    static final boolean debug = false;
     
     public static void dbg (String s) {
         if (debug) {

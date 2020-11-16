@@ -192,7 +192,7 @@ public class ControlledBlockGate<T> extends BlockGate {
         return matrix;
     }
     
-        @Override
+    @Override
     public boolean hasOptimization() {
             System.err.println("HASOPT for "+this+"!");
         return true;

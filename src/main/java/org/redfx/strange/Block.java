@@ -125,20 +125,23 @@ public class Block {
     }
 
     public Complex[] applyOptimize(Complex[] probs) {
-        System.err.println("APPLYOPT on BLOCK "+this+" with steps "+steps);
+        System.err.println("APPLYOPT on BLOCK " + this + " with steps " + steps);
         int dim = probs.length;
-       // Complex[] probs = new Complex[dim];
-       
+        // Complex[] probs = new Complex[dim];
+
         List<Step> simpleSteps = new ArrayList<>();
         for (Step step : steps) {
             simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
         }
-            Collections.reverse(simpleSteps);
-            System.err.println("simplesteps = "+simpleSteps);
+        Collections.reverse(simpleSteps);
+        System.err.println("simplesteps = " + simpleSteps);
         for (Step step : simpleSteps) {
             if (!step.getGates().isEmpty()) {
                 probs = applyStep(step, probs);
             }
+            System.err.println("APPLYBLOCK, done with step "+step+", probs = ");
+            Complex.printArray(probs);
+            System.err.println("-=-=-");
         }
         return probs;
     }

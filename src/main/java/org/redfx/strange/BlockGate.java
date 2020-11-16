@@ -32,9 +32,12 @@
  */
 package org.redfx.strange;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.redfx.strange.local.Computations;
 
 /**
  *
@@ -144,17 +147,19 @@ public class BlockGate<T> implements Gate {
 
     @Override
     public Complex[] applyOptimize(Complex[] v) {
-        System.err.println("APPLYOPT on blockgate ");
-        Complex[][] matrix = getMatrix();
-        int size = v.length;
-        Complex[] answer = new Complex[size];
-        for (int i = 0; i < size; i++) {
-            answer[i] = Complex.ZERO;
-            for (int j = 0; j < size; j++) {
-                answer[i] = answer[i].add(matrix[i][j].mul(v[j]));
-            }
-        }
-        return answer;
+        return block.applyOptimize(v);
+//        System.err.println("APPLYOPT on blockgate ");
+//        Complex[][] matrix = getMatrix();
+//        int size = v.length;
+//        Complex[] answer = new Complex[size];
+//        for (int i = 0; i < size; i++) {
+//            answer[i] = Complex.ZERO;
+//            for (int j = 0; j < size; j++) {
+//                answer[i] = answer[i].add(matrix[i][j].mul(v[j]));
+//            }
+//        }
+//        return answer;
+//        
     }
 
     @Override public String toString() {
