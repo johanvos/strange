@@ -87,5 +87,9 @@ public class Add extends BlockGate<Add> {
         answer.addStep(new Step(new InvFourier(m, 0)));
         return answer;
     }
-
+        
+    @Override
+    public boolean hasOptimization() {
+        return !inverse;
+    }
 }

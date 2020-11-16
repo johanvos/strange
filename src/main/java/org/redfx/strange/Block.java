@@ -107,6 +107,8 @@ public class Block {
 
                 } else {
                     Complex[][] m = Computations.calculateStepMatrix(step.getGates(), nqubits, qee);
+                    System.err.println("matrix in this step: ");
+                    Complex.printMatrix(m);
                     if (matrix == null) {
                         matrix = m;
                     } else {
@@ -124,7 +126,7 @@ public class Block {
         return matrix;
     }
 
-    public Complex[] applyOptimize(Complex[] probs) {
+    public Complex[] applyOptimize(Complex[] probs, boolean inverse) {
         System.err.println("APPLYOPT on BLOCK " + this + " with steps " + steps);
         int dim = probs.length;
         // Complex[] probs = new Complex[dim];
@@ -133,7 +135,7 @@ public class Block {
         for (Step step : steps) {
             simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
         }
-        Collections.reverse(simpleSteps);
+      if (inverse)  Collections.reverse(simpleSteps);
         System.err.println("simplesteps = " + simpleSteps);
         for (Step step : simpleSteps) {
             if (!step.getGates().isEmpty()) {

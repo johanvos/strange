@@ -48,7 +48,7 @@ public class BlockGate<T> implements Gate {
 
     protected Block block;
     protected int idx;
-    private boolean inverse = false;
+    protected boolean inverse = false;
     
     protected BlockGate() {
     }
@@ -142,24 +142,34 @@ public class BlockGate<T> implements Gate {
         
     @Override
     public boolean hasOptimization() {
-        return true;
+        System.err.println("HASOPTIM asked for "+this);
+        return !inverse;
     }
 
     @Override
     public Complex[] applyOptimize(Complex[] v) {
-        return block.applyOptimize(v);
-//        System.err.println("APPLYOPT on blockgate ");
-//        Complex[][] matrix = getMatrix();
-//        int size = v.length;
-//        Complex[] answer = new Complex[size];
-//        for (int i = 0; i < size; i++) {
-//            answer[i] = Complex.ZERO;
-//            for (int j = 0; j < size; j++) {
-//                answer[i] = answer[i].add(matrix[i][j].mul(v[j]));
-//            }
-//        }
-//        return answer;
-//        
+        boolean fast = true;
+        if (fast) {
+            System.err.println("APPLYOPT on blackgate");
+        return block.applyOptimize(v, inverse);
+        }
+        else {
+        System.err.println("APPLYOPTMatrix on blockgate ");
+        Complex[][] matrix = getMatrix();
+        int size = v.length;
+        Complex[] answer = new Complex[size];
+        for (int i = 0; i < size; i++) {
+            answer[i] = Complex.ZERO;
+            for (int j = 0; j < size; j++) {
+                answer[i] = answer[i].add(matrix[i][j].mul(v[j]));
+            }
+        }
+            System.err.println("Matrix = ");
+            Complex.printMatrix(matrix);
+            System.err.println("Hence answer = ");
+            Complex.printArray(answer);
+        return answer;
+        }
     }
 
     @Override public String toString() {

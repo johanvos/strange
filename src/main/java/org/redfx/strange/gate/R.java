@@ -53,6 +53,7 @@ public class R extends SingleQubitGate {
     public R(int base, int pow, int idx) {
         this(Math.PI*2/Math.pow(base, pow), idx);
         this.pow = pow;
+        System.err.println("Created R with pow = "+pow+" and idx = "+idx+" and this = "+this);
     }
 
     @Override

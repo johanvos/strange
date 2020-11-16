@@ -199,7 +199,7 @@ public class ControlledBlockGate<T> extends BlockGate {
     }
     @Override
     public Complex[] applyOptimize(Complex[] v) {
-        boolean newa = false;
+        boolean newa = true;
 
         if (newa) {
             long l0 = System.currentTimeMillis();
@@ -212,7 +212,7 @@ public class ControlledBlockGate<T> extends BlockGate {
             for (int i = 0; i < dim; i++) {
                 oldv[i] = v[i + dim];
             }
-            Complex[] p2 = block.applyOptimize(oldv);
+            Complex[] p2 = block.applyOptimize(oldv, false);
             for (int i = 0; i < dim; i++) {
                 answer[i] = v[i];
                 answer[dim + i] = p2[i];

@@ -45,8 +45,11 @@ import org.redfx.strange.Step;
 import org.redfx.strange.gate.Add;
 import org.redfx.strange.gate.AddInteger;
 import org.redfx.strange.gate.Cnot;
+import org.redfx.strange.gate.Fourier;
+import org.redfx.strange.gate.InvFourier;
 import org.redfx.strange.gate.Mul;
 import org.redfx.strange.gate.MulModulus;
+import org.redfx.strange.gate.R;
 import org.redfx.strange.gate.Swap;
 import org.redfx.strange.gate.X;
 import org.redfx.strange.local.Computations;
@@ -56,76 +59,54 @@ import org.redfx.strange.local.Computations;
  * @author johan
  */
 public class SingleTest extends BaseGateTests {
-    
-        
-  //  @Test
-    public void controlledAdd001() {
-        Program p = new Program(3);
-        Step s = new Step();
-        Add add = new Add(0,0,1,1);
-        ControlledBlockGate cbg = new ControlledBlockGate(add, 1,0);
-       Complex[][] m = cbg.getMatrix();
-        Complex.printMatrix(m, System.err);
-        System.err.println("THAT WAS CBG");
+@Test 
+    public void mul13() { // 0100 -> 1100
+        Program p = new Program(4);
+        Step prep = new Step();
+        prep.addGates(new X(2));
+        Step s = new Step(new Mul(0,1,3));
+        p.addStep(prep);
+        p.addStep(s);
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        assertEquals(4, q.length);
+        System.err.println("results: ");
+        for (int i = 0; i < 4; i++) {
+            System.err.println("m["+i+"]: "+q[i].measure());
+        }
+        assertEquals(0, q[0].measure());
+        assertEquals(0, q[1].measure());
+        assertEquals(1, q[2].measure());
+        assertEquals(1, q[3].measure());
+    }
+      
+// @Test
+    public void addmod1() {
+        int n = 2;
+        int N = 3;
+        int dim = 2 * (n+1)+1;
+        Program p = new Program(dim);
         Step prep = new Step();
         prep.addGates(new X(0));
         p.addStep(prep);
-        Step cg = new Step(cbg);
-        p.addStep(cg);
+        Add add = new Add(0,2,3,5);
+        p.addStep(new Step(add));
+        
+        AddInteger min = new AddInteger(0,2,N).inverse();
+        p.addStep(new Step(min));
+        p.addStep(new Step(new Cnot(2,dim-1)));
+
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
-        assertEquals(3, q.length);
-        assertEquals(1, q[0].measure());
-        assertEquals(0, q[1].measure());
-        assertEquals(0, q[2].measure());
-    }
-     
- // @Test 
-    public void difference0() {
-        Program p = new Program(4);
-        Step p0 = new Step(new X(1), new X(2), new X(3));
-        AddInteger addN = new AddInteger(0,2,1);
-        ControlledBlockGate cbg = new ControlledBlockGate(addN, 0,3);
-//        Complex[][] matrix = cbg.getMatrix();
-//        System.err.println("CBG matrix: ");
-//        Complex.printMatrix(matrix);
-        System.err.println("\n");
-        Step p1 = new Step(addN);
-        p.addSteps(p0, p1);
-        Result result = runProgram(p);
-        Qubit[] q = result.getQubits();
-        for (int i =0; i < 4; i++) {
-            System.err.println("Q["+i+"]: "+q[i].measure());
-        }
-        assertEquals(1, q[0].measure());
+        assertEquals(7, q.length);
+        assertEquals(0, q[0].measure());
         assertEquals(1, q[1].measure());
         assertEquals(1, q[2].measure());
-        assertEquals(1, q[3].measure());
+        assertEquals(0, q[3].measure());
+        assertEquals(0, q[4].measure());
+        assertEquals(0, q[5].measure());
+        assertEquals(1, q[6].measure());
     }
-    
-    @Test 
-    public void difference1() {
-        Program p = new Program(4);
-        Step p0 = new Step(new X(1), new X(2), new X(3));
-        AddInteger addN = new AddInteger(0,2,1);
-        ControlledBlockGate cbg = new ControlledBlockGate(addN, 0,3);
-        Complex[][] matrix = cbg.getMatrix();
-        System.err.println("CBG matrix: ");
-        Complex.printMatrix(matrix);
-        System.err.println("\n");
-        Step p1 = new Step(cbg);
-        p.addSteps(p0, p1);
-        Result result = runProgram(p);
-        Qubit[] q = result.getQubits();
-        for (int i =0; i < 4; i++) {
-            System.err.println("Q["+i+"]: "+q[i].measure());
-        }
-        assertEquals(1, q[0].measure());
-        assertEquals(1, q[1].measure());
-        assertEquals(1, q[2].measure());
-        assertEquals(1, q[3].measure());
-    }
-    
   //  @Test
     public void addmod2() {
         int n = 2;
@@ -161,20 +142,6 @@ public class SingleTest extends BaseGateTests {
         System.err.println("DONE");
     }
 
-  // @Test
-    public void add01() {
-        Program p = new Program(2);
-        Step prep = new Step();
-        prep.addGate(new X(1));
-        p.addStep(prep);
-        Add add = new Add(0,0,1,1);
-        p.addStep(new Step(add));
-        Result result = runProgram(p);
-        Qubit[] q = result.getQubits();
-        assertEquals(2, q.length);
-        assertEquals(1, q[0].measure());
-        assertEquals(1, q[1].measure());   
-    }
 //    @Test
     public void cf () {
         double d = 340./1024;

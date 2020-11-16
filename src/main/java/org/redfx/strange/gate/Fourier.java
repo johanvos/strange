@@ -59,6 +59,7 @@ public class Fourier extends BlockGate {
     }
     
     
+    
     @Override
     public Complex[][] getMatrix() {
         return getMatrix(null);
@@ -94,5 +95,10 @@ public class Fourier extends BlockGate {
     @Override
     public int getHighestAffectedQubitIndex() {
         return dim+idx-1;
+    }
+    
+        @Override
+    public boolean hasOptimization() {
+        return false;
     }
 }

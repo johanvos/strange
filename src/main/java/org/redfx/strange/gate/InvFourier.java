@@ -90,4 +90,9 @@ public class InvFourier extends Fourier {
         Complex.printMatrix(matrix);
         return matrix;
     }
+    
+            @Override
+    public boolean hasOptimization() {
+        return false;
+    }
 }
