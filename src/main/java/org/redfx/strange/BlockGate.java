@@ -44,7 +44,7 @@ import org.redfx.strange.local.Computations;
  * A Gate describes an operation on one or more qubits.
  * @author johan
  */
-public class BlockGate<T> implements Gate {
+public class BlockGate<T extends Gate> implements Gate {
 
     protected Block block;
     protected int idx;
@@ -143,33 +143,12 @@ public class BlockGate<T> implements Gate {
     @Override
     public boolean hasOptimization() {
         System.err.println("HASOPTIM asked for "+this);
-        return !inverse;
+        return true;
     }
 
     @Override
     public Complex[] applyOptimize(Complex[] v) {
-        boolean fast = true;
-        if (fast) {
-            System.err.println("APPLYOPT on blackgate");
         return block.applyOptimize(v, inverse);
-        }
-        else {
-        System.err.println("APPLYOPTMatrix on blockgate ");
-        Complex[][] matrix = getMatrix();
-        int size = v.length;
-        Complex[] answer = new Complex[size];
-        for (int i = 0; i < size; i++) {
-            answer[i] = Complex.ZERO;
-            for (int j = 0; j < size; j++) {
-                answer[i] = answer[i].add(matrix[i][j].mul(v[j]));
-            }
-        }
-            System.err.println("Matrix = ");
-            Complex.printMatrix(matrix);
-            System.err.println("Hence answer = ");
-            Complex.printArray(answer);
-        return answer;
-        }
     }
 
     @Override public String toString() {
