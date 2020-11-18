@@ -118,6 +118,10 @@ public interface Gate {
     default public Complex[] applyOptimize(Complex[] v) {
         return null;
     }
+    
+    default Gate inverse() {
+        return this;
+    }
 
     
 }

@@ -87,6 +87,12 @@ public class Fourier extends BlockGate {
         return matrix;
     }
 
+    @Override public Fourier inverse() {
+        Complex[][] m = getMatrix();
+        this.matrix = Complex.conjugateTranspose(m);
+        return this;
+    }
+    
     @Override
     public List<Integer> getAffectedQubitIndexes() {
         return IntStream.range(idx, idx+dim).boxed().collect(Collectors.toList());

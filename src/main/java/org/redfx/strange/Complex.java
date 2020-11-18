@@ -281,7 +281,7 @@ public final class Complex {
         throw new RuntimeException ("Fast multiplication not available");
     }
 
-    static Complex[][] conjugateTranspose(Complex[][] src) {
+    public static Complex[][] conjugateTranspose(Complex[][] src) {
         int d0 = src.length;
         int d1 = src[0].length;
         Complex[][] answer = new Complex[d1][d0];

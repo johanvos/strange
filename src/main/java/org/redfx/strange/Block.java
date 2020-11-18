@@ -135,7 +135,12 @@ public class Block {
         for (Step step : steps) {
             simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
         }
-      if (inverse)  Collections.reverse(simpleSteps);
+        if (inverse) {
+            Collections.reverse(simpleSteps);
+            for (Step step : simpleSteps) {
+             //   step.inverse();
+            }
+        }
         System.err.println("simplesteps = " + simpleSteps);
         for (Step step : simpleSteps) {
             if (!step.getGates().isEmpty()) {
