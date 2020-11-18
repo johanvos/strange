@@ -165,6 +165,20 @@ public class ArithmeticTests extends BaseGateTests {
     }
     
     @Test
+    public void addmodp0() {
+        int N = 1;
+        int dim = 2;
+        Program p = new Program(dim);
+        AddInteger min = new AddInteger(0,1,N).inverse();
+        p.addStep(new Step(min));
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        assertEquals(2, q.length);
+        assertEquals(1, q[0].measure());
+        assertEquals(1, q[1].measure());
+    }
+    
+    @Test
     public void add0num0() {
         Program p = new Program(1);
         Step prep = new Step();
@@ -1041,6 +1055,7 @@ public class ArithmeticTests extends BaseGateTests {
     
     @Test
     public void multiplyMod5x3andswapandcleans1() { // 5 x 3 mod 6 = 3
+        System.err.println("C1");
         Program p = new Program(9);
         Step prep = new Step();
         int mul = 5;
@@ -1067,6 +1082,7 @@ public class ArithmeticTests extends BaseGateTests {
     
     @Test
     public void multiplyMod5x3andswapandcleans2() { // 5 x 3 mod 6 = 3
+        System.err.println("C2");
         // |A00110000> -> 
         Program p = new Program(9);
         Step prep = new Step();

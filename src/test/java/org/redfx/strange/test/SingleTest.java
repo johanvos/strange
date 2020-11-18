@@ -44,6 +44,7 @@ import org.redfx.strange.Result;
 import org.redfx.strange.Step;
 import org.redfx.strange.gate.Add;
 import org.redfx.strange.gate.AddInteger;
+import org.redfx.strange.gate.AddModulus;
 import org.redfx.strange.gate.Cnot;
 import org.redfx.strange.gate.Fourier;
 import org.redfx.strange.gate.InvFourier;
@@ -59,6 +60,73 @@ import org.redfx.strange.local.Computations;
  * @author johan
  */
 public class SingleTest extends BaseGateTests {
+       @Test
+    public void multiplyMod5x3andswapandcleans2() { // 5 x 3 mod 6 = 3
+        System.err.println("C2");
+        // |A00110000> -> 
+        Program p = new Program(9);
+        Step prep = new Step();
+        int mul = 5;
+        int N = 6;
+        prep.addGates(new X(4), new X(5)); // 3 in high register
+        p.addStep(prep);
+        for (int i = 0; i < 1; i++) {
+            AddModulus add = new AddModulus(0, 3, 4, 7, N);
+            p.addStep(new Step(add));
+        }
+        p.addStep(new Step( new Swap(0,4)));
+        p.addStep(new Step( new Swap(1,5)));
+        p.addStep(new Step( new Swap(2,6)));
+        p.addStep(new Step( new Swap(3,7)));
+
+        int invsteps = Computations.getInverseModulus(mul,N);
+        System.err.println("INVSTEPS = "+invsteps);
+        for (int i = 0; i < invsteps; i++) {
+            AddModulus addModulus = new AddModulus(0, 3, 4, 7, N).inverse();
+            p.addStep(new Step(addModulus));
+        }
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        System.err.println("Results: ");
+        for (int i = 0; i < 9; i++) {
+            System.err.println("m["+i+"]: "+q[i].measure());
+        }
+        assertEquals(9, q.length);
+        assertEquals(0, q[0].measure()); // q2,q1,q0,q3 should be clean
+        assertEquals(0, q[1].measure());  
+        assertEquals(0, q[2].measure());
+        assertEquals(0, q[3].measure());
+        assertEquals(1, q[4].measure()); // result in q4,q5,q6,q7
+        assertEquals(1, q[5].measure());
+        assertEquals(0, q[6].measure());  
+        assertEquals(0, q[7].measure());  
+        assertEquals(0, q[8].measure());  
+    }
+//    @Test
+    public void multiplyMod5x3andswapandcleans1() { // 5 x 3 mod 6 = 3
+        Program p = new Program(9);
+        Step prep = new Step();
+        int mul = 5;
+        int N = 6;
+        prep.addGates(new X(4), new X(5)); // 3 in high register
+        p.addStep(prep);
+        for (int i = 0; i < mul; i++) {
+            AddModulus add = new AddModulus(0, 3, 4, 7, N);
+            p.addStep(new Step(add));
+        }
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        assertEquals(9, q.length);
+        assertEquals(1, q[0].measure()); // q2,q1,q0,q3 should be clean
+        assertEquals(1, q[1].measure());  
+        assertEquals(0, q[2].measure());
+        assertEquals(0, q[3].measure());
+        assertEquals(1, q[4].measure()); // result in q4,q5,q6,q7
+        assertEquals(1, q[5].measure());
+        assertEquals(0, q[6].measure());  
+        assertEquals(0, q[7].measure());  
+        assertEquals(0, q[8].measure());  
+    }
 //@Test 
     public void mul13() { // 0100 -> 1100
         Program p = new Program(4);
@@ -100,7 +168,7 @@ public class SingleTest extends BaseGateTests {
         assertEquals(1, q[1].measure());
     }
     
- @Test
+// @Test
     public void addmod1() {
         int n = 2;
         int N = 3;
