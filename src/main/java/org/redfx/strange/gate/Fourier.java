@@ -52,13 +52,17 @@ public class Fourier extends BlockGate {
      * @param idx the index of the first qubit in the circuit affected by this gate
      */
     public Fourier(int dim, int idx) {
-        super(new Block("Fourier", dim), idx);
-        this.dim = dim;
-        this.size = 1 <<dim;
-      //  System.err.println("Created a fourier block");
+        this("Fourier", dim, idx);
+//        super(new Block("Fourier", dim), idx);
+//        this.dim = dim;
+//        this.size = 1 <<dim;
     }
     
-    
+    public Fourier(String name, int dim, int idx) {
+         super(new Block(name, dim), idx);
+        this.dim = dim;
+        this.size = 1 <<dim;
+    }
     
     @Override
     public Complex[][] getMatrix() {

@@ -125,7 +125,10 @@ public class BlockGate<T extends Gate> implements Gate {
     public Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
         Complex[][] answer = block.getMatrix(qee);
         if (inverse) {
+            System.err.println("Need to take ccj");
             answer = Complex.conjugateTranspose(answer);
+            System.err.println("result of ccj = ");
+            Complex.printMatrix(answer);
         }
         return answer;
     }

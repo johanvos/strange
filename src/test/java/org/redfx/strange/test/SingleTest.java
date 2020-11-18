@@ -79,7 +79,27 @@ public class SingleTest extends BaseGateTests {
         assertEquals(1, q[2].measure());
         assertEquals(1, q[3].measure());
     }
-      
+    
+   // @Test
+    public void addmodp0() {
+        int N = 1;
+        int dim = 2;
+        Program p = new Program(dim);
+    //            AddInteger min = new AddInteger(0,1,N);
+
+        AddInteger min = new AddInteger(0,1,N).inverse();
+        p.addStep(new Step(min));
+
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        for (int i = 0; i < q.length; i++) {
+            System.err.println("q["+i+"] = "+q[i].measure());
+        }
+        assertEquals(2, q.length);
+        assertEquals(1, q[0].measure());
+        assertEquals(1, q[1].measure());
+    }
+    
  @Test
     public void addmod1() {
         int n = 2;

@@ -138,7 +138,7 @@ public class Block {
         if (inverse) {
             Collections.reverse(simpleSteps);
             for (Step step : simpleSteps) {
-             //   step.inverse();
+                step.inverse();
             }
         }
         System.err.println("simplesteps = " + simpleSteps);
