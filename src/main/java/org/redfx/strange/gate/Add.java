@@ -90,6 +90,7 @@ public class Add extends BlockGate<Add> {
         
     @Override
     public boolean hasOptimization() {
-        return !inverse;
+        return true;
+      //  return !inverse;
     }
 }

@@ -88,6 +88,13 @@ public class Cr extends TwoQubitGate {
         System.err.println("(-----)");
         return matrix;
     }
+    
+    @Override 
+    public Cr inverse() {
+        Complex[][] m = getMatrix();
+        this.matrix = Complex.conjugateTranspose(m);
+        return this;
+    }
 
     @Override public String getCaption() {
         return "Cr" + ((pow> -1)? Integer.toString(pow): "th");

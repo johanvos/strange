@@ -60,7 +60,41 @@ import org.redfx.strange.local.Computations;
  * @author johan
  */
 public class SingleTest extends BaseGateTests {
+    
        @Test
+    public void adjoint() {
+        int dim = 4;
+        Program p = new Program(dim);
+        Step prep = new Step();
+        prep.addGates(new X(1), new X(2));//, new X(0));
+        p.addStep(prep);
+        Add add = new Add(0,1,2,3);
+        
+           System.err.println("ADDMATRIX = ");
+           Complex.printMatrix(add.getMatrix());
+           System.err.println("ADDMATRIX-----\n");
+        p.addStep(new Step(add));
+        Add min = new Add(0,1,2,3).inverse();
+        
+           System.err.println("ADDMINMATRIX = ");
+           Complex.printMatrix(min.getMatrix());
+           System.err.println("ADDMINMATRIX-----\n");
+
+        p.addStep(new Step(min));
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+                for (int i = 0; i < dim; i++) {
+            System.err.println("m["+i+"]: "+q[i].measure());
+        }
+        assertEquals(dim, q.length);
+        assertEquals(0, q[0].measure());
+        assertEquals(1, q[1].measure());  
+        assertEquals(1, q[2].measure());
+        assertEquals(0, q[3].measure()); 
+    
+    }
+    
+    //   @Test
     public void multiplyMod5x3andswapandcleans2() { // 5 x 3 mod 6 = 3
         System.err.println("C2");
         // |A00110000> -> 
