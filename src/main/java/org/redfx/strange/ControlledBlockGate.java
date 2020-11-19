@@ -147,7 +147,7 @@ public class ControlledBlockGate<T> extends BlockGate {
     public Complex[][] getMatrix() {
         return getMatrix(null);
     }
-    
+
     @Override
     public Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
         if (matrix == null) {
@@ -212,12 +212,11 @@ public class ControlledBlockGate<T> extends BlockGate {
             for (int i = 0; i < dim; i++) {
                 oldv[i] = v[i + dim];
             }
-            Complex[] p2 = block.applyOptimize(oldv, false);
+            Complex[] p2 = block.applyOptimize(oldv, inverse);
             for (int i = 0; i < dim; i++) {
                 answer[i] = v[i];
                 answer[dim + i] = p2[i];
             }
-            System.err.println("RESULT OF APPLYOPT:");
             Complex.printArray(answer);
             System.err.println("\n");
             return answer;
