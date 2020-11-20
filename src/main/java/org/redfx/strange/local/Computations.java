@@ -375,25 +375,21 @@ public class Computations {
     }
 
     public static Complex[] calculateNewState(List<Gate> gates, Complex[] vector, int length) {
-        System.err.println("CNS for gates: " + gates);
+      //  System.err.println("CNS for gates: " + gates);
         long c0 = System.currentTimeMillis();
         Complex[] answer = getNextProbability(getAllGates(gates, length), vector);
         long c1 = System.currentTimeMillis();
-        System.err.println("CNS took " + (c1 - c0) + " for gates " + gates+", result below");
-        Complex.printArray(answer);
-        System.err.println("\n");
+       // System.err.println("CNS took " + (c1 - c0) + " for gates " + gates+", result below");
+        //Complex.printArray(answer);
+        //System.err.println("\n");
         return answer;
-    }
-
-    static void md(String t) {
-        System.err.println("LOG["+System.currentTimeMillis()%100000+"] "+t);
     }
     private static Complex[] getNextProbability(List<Gate> gates, Complex[] v) {
         Gate gate = gates.get(0);
         int nqubits = gate.getSize();
         int gatedim = 1 << nqubits;
         int size = v.length;
-        md("GETNEXTPROBABILITY asked for size = " + size + " and gates = " + gates);
+        dbg("GETNEXTPROBABILITY asked for size = " + size + " and gates = " + gates);
         if (gates.size() > 1) {
 
             int partdim = size / gatedim;
@@ -404,11 +400,11 @@ public class Computations {
                 id = id && (g instanceof Identity);
             }
             if (id) {
-                md("ONLY IDENTITY!! partdim = "+partdim);
+                dbg("ONLY IDENTITY!! partdim = "+partdim);
                 long s0 = System.currentTimeMillis();
                 long s1 = s0;
                 for (int j = 0; j < partdim; j++) {
-                    md("do part "+j+" from "+partdim);
+                    dbg("do part "+j+" from "+partdim);
                     Complex[] oldv = new Complex[gatedim];
                     Complex[] newv = new Complex[gatedim];
                     for (int i = 0; i < gatedim; i++) {
@@ -417,10 +413,10 @@ public class Computations {
                     }
 
                     if (gate.hasOptimization()) {
-                        md("OPTPART!");
+                        dbg("OPTPART!");
                         newv = gate.applyOptimize(oldv);
                     } else {
-                        md("GET MATRIX for  "+gate);
+                        dbg("GET MATRIX for  "+gate);
                         Complex[][] matrix = gate.getMatrix();
                         s1 = System.currentTimeMillis();
                         for (int i = 0; i < gatedim; i++) {
@@ -432,12 +428,12 @@ public class Computations {
                     for (int i = 0; i < gatedim; i++) {
                         answer[i * partdim + j] = newv[i];
                     }
-                    md("done part");
+                    dbg("done part");
                 }
                 long s2 = System.currentTimeMillis();
-                System.err.println("[PERF] gatedim = " + gatedim + " and partdim = " + partdim + " and no prep ");
-                System.err.println("[PERF] matrix created in " + (s1 - s0));
-                System.err.println("[PERF] matrix multiplied " + (s2 - s1));
+//                System.err.println("[PERF] gatedim = " + gatedim + " and partdim = " + partdim + " and no prep ");
+//                System.err.println("[PERF] matrix created in " + (s1 - s0));
+//                System.err.println("[PERF] matrix multiplied " + (s2 - s1));
                 return answer;
             }
             long sm0 = System.currentTimeMillis();
@@ -462,18 +458,18 @@ public class Computations {
                 }
             }
             long s2 = System.currentTimeMillis();
-            System.err.println("[PERF] gatedim = " + gatedim + " and partdim = " + partdim + " and prep in " + (s0 - sm0));
-            System.err.println("[PERF] matrix created in " + (s1 - s0));
-            System.err.println("[PERF] matrix multiplied " + (s2 - s1));
+//            System.err.println("[PERF] gatedim = " + gatedim + " and partdim = " + partdim + " and prep in " + (s0 - sm0));
+//            System.err.println("[PERF] matrix created in " + (s1 - s0));
+//            System.err.println("[PERF] matrix multiplied " + (s2 - s1));
             return answer;
         } else {
             if (gatedim != size) {
                 System.err.println("problem with matrix for gate " + gate);
                 throw new IllegalArgumentException("wrong matrix size " + gatedim + " vs vector size " + v.length);
             }
-            System.err.println("Deal with matrix sized " + size + " and gate = " + gate);
+        //    System.err.println("Deal with matrix sized " + size + " and gate = " + gate);
             if (gate.hasOptimization()) {
-                System.err.println("OPT!");
+          //      System.err.println("OPT!");
                 return gate.applyOptimize(v);
             } else {
                 Complex[][] matrix = gate.getMatrix();

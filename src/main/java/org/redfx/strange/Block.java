@@ -90,25 +90,19 @@ public class Block {
 
     Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
         if (matrix == null) {
-            System.err.println("[JVDBG] need to get Matrix for "+nqubits+" qubits for block " +this);
             matrix = Complex.identityMatrix(1 << nqubits);
             List<Step> simpleSteps = new ArrayList<>();
             for (Step step : steps) {
                 simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
             }
             Collections.reverse(simpleSteps);
-            System.err.println("simplesteps = "+simpleSteps);
 
             for (Step step : simpleSteps) {
-                System.err.println("apply step: "+step);
                 List<Gate> gates = step.getGates();
                 if ((matrix != null) && (gates.size() == 1) && (gates.get(0) instanceof PermutationGate)) {
                     matrix = Complex.permutate((PermutationGate) gates.get(0), matrix);
-
                 } else {
                     Complex[][] m = Computations.calculateStepMatrix(step.getGates(), nqubits, qee);
-                    System.err.println("matrix in this step: ");
-                    Complex.printMatrix(m);
                     if (matrix == null) {
                         matrix = m;
                     } else {
@@ -119,41 +113,29 @@ public class Block {
                         }
                     }
                 }
-                System.err.println("After this step ("+step+"), matrix = ");
-                Complex.printMatrix(matrix);
             }
         }
         return matrix;
     }
 
     public Complex[] applyOptimize(Complex[] probs, boolean inverse) {
-        System.err.println("APPLYOPT on BLOCK " + this + " with steps " + steps+
-                " and inverse = "+inverse);
         int dim = probs.length;
         // Complex[] probs = new Complex[dim];
 
         List<Step> simpleSteps = new ArrayList<>();
         for (Step step : steps) {
-            System.err.println("APPOPT, decomposeStep for "+step);
             simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
-            System.err.println("APPOPT, decomposeStep done for "+step);
         }
         if (inverse) {
             Collections.reverse(simpleSteps);
             for (Step step : simpleSteps) {
-                System.err.println("APPOPT, inverseStep "+step);
                 step.setInverse(true);
-                System.err.println("APPOPT, inverseStep done for "+step);
             }
         }
-        System.err.println("simplesteps = " + simpleSteps);
         for (Step step : simpleSteps) {
             if (!step.getGates().isEmpty()) {
                 probs = applyStep(step, probs);
             }
-            System.err.println("APPLYBLOCK, done with step "+step+", probs = ");
-            Complex.printArray(probs);
-            System.err.println("-=-=-");
         }
         return probs;
     }

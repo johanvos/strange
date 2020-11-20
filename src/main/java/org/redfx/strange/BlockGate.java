@@ -32,12 +32,9 @@
  */
 package org.redfx.strange;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.redfx.strange.local.Computations;
 
 /**
  *
@@ -126,9 +123,7 @@ public class BlockGate<T extends Gate> implements Gate {
     public Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
         Complex[][] answer = block.getMatrix(qee);
         if (inverse) {
-            System.err.println("Need to take ccj");
             answer = Complex.conjugateTranspose(answer);
-            System.err.println("result of ccj = ");
             Complex.printMatrix(answer);
         }
         return answer;
@@ -151,7 +146,6 @@ public class BlockGate<T extends Gate> implements Gate {
         
     @Override
     public boolean hasOptimization() {
-        System.err.println("HASOPTIM asked for "+this);
         return true;
     }
 

@@ -64,7 +64,6 @@ public class ControlledBlockGate<T> extends BlockGate {
      */
     public ControlledBlockGate(BlockGate bg, int idx, int control) {
         this (bg.getBlock(), idx, control);
-        System.err.println("[CONSTRUCTOR] controllblockgate created: "+this);
     }
     
     /**
@@ -194,17 +193,15 @@ public class ControlledBlockGate<T> extends BlockGate {
     
     @Override
     public boolean hasOptimization() {
-            System.err.println("HASOPT for "+this+"!");
         return true;
     }
+
     @Override
     public Complex[] applyOptimize(Complex[] v) {
         boolean newa = true;
 
         if (newa) {
             long l0 = System.currentTimeMillis();
-            System.err.println("APPLYOPTIMIZE ON " + this + ", v = ");
-            Complex.printArray(v);
             int size = v.length;
             Complex[] answer = new Complex[size];
             int dim = size / 2;
@@ -217,8 +214,8 @@ public class ControlledBlockGate<T> extends BlockGate {
                 answer[i] = v[i];
                 answer[dim + i] = p2[i];
             }
-            Complex.printArray(answer);
-            System.err.println("\n");
+//            Complex.printArray(answer);
+//            System.err.println("\n");
             return answer;
         } else {
 
@@ -243,9 +240,9 @@ public class ControlledBlockGate<T> extends BlockGate {
                 }
             }
             long l2 = System.currentTimeMillis();
-            System.err.println("RESULT OF APPLYOPT:");
-            Complex.printArray(answer);
-            System.err.println("\n");
+//            System.err.println("RESULT OF APPLYOPT:");
+//            Complex.printArray(answer);
+//            System.err.println("\n");
             //      System.err.println("CBG: blockmatrix took "+ (l1 - l0)+" and mult took "+ (l2-l1));
             return answer;
         }
