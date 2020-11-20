@@ -119,9 +119,6 @@ public interface Gate {
         return null;
     }
     
-    default Gate inverse() {
-        return this;
-    }
-
+    void setInverse(boolean inv);
     
 }

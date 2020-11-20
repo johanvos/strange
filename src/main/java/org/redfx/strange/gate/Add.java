@@ -64,7 +64,7 @@ public class Add extends BlockGate<Add> {
         this.block = cache.get(hash);
         if (this.block == null) {
             this.block = createBlock(x0, x1, y0, y1);
-            cache.put(hash, block);
+        //    cache.put(hash, block);
         } 
         setBlock(block);
        

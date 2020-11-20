@@ -90,10 +90,11 @@ public class Cr extends TwoQubitGate {
     }
     
     @Override 
-    public Cr inverse() {
-        Complex[][] m = getMatrix();
-        this.matrix = Complex.conjugateTranspose(m);
-        return this;
+    public void setInverse(boolean inv) {
+        if (inv) {
+            Complex[][] m = getMatrix();
+            this.matrix = Complex.conjugateTranspose(m);
+        }
     }
 
     @Override public String getCaption() {

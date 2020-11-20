@@ -70,6 +70,11 @@ public class Toffoli extends ThreeQubitGate {
         return 3;
     }
     
+        
+    @Override public void setInverse(boolean v) {
+        // NOP
+    }
+    
     @Override public String getCaption() {
         return "CCnot";
     }

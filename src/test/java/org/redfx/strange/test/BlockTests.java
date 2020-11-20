@@ -65,7 +65,7 @@ public class BlockTests extends BaseGateTests {
     public void empty() {
     }
 
- //   @Test
+    @Test
     public void createBlock() {
         Block block = new Block(1);
         block.addStep(new Step(Gate.identity(0)));
@@ -122,7 +122,7 @@ public class BlockTests extends BaseGateTests {
         assertEquals(0, qubits[0].measure());
     }
 
-  //  @Test
+    @Test
     public void createManyXBlockInProgramAddPos2() {
         Block block = new Block(1);
         block.addStep(new Step(Gate.x(0)));
@@ -150,7 +150,7 @@ public class BlockTests extends BaseGateTests {
         assertEquals(0, qubits[0].measure());
     }
 
- //   @Test
+    @Test
     public void createXXBlockInProgramAddPos2() {
         Block block = new Block(1);
         block.addStep(new Step(Gate.x(0)));

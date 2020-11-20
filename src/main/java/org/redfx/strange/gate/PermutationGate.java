@@ -122,6 +122,10 @@ public class PermutationGate implements Gate {
         return 2;
     }
     
+    @Override public void setInverse(boolean v) {
+        // NOP
+    }
+    
     @Override
     public String toString() {
         return "Perm "+a+", "+b;

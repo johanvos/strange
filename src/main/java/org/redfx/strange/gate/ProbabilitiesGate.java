@@ -52,5 +52,8 @@ public class ProbabilitiesGate extends InformalGate {
     public String getName() {
         return "Probabilities";
     }
-
+    
+    @Override public void setInverse(boolean v) {
+        // NOP
+    }
 }

@@ -1125,6 +1125,7 @@ public class ArithmeticTests extends BaseGateTests {
     
     @Test
     public void multiplyModGate5x3mod6() { // 5 x 3 mod 6 = 3
+        System.err.println("TESTMULMOD");
         Program p = new Program(9);
         int mul = 5;
         int N = 6;

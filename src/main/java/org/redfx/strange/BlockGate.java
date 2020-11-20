@@ -43,6 +43,7 @@ import org.redfx.strange.local.Computations;
  *
  * A Gate describes an operation on one or more qubits.
  * @author johan
+ * @param <T> Type of the Gate
  */
 public class BlockGate<T extends Gate> implements Gate {
 
@@ -133,9 +134,14 @@ public class BlockGate<T extends Gate> implements Gate {
         return answer;
     }
     
+    @Override
+    public void setInverse(boolean inv) {
+        this.inverse = inv;
+    }
+    
     public T inverse() {
-        this.inverse = !inverse;
-        return (T)this;
+        setInverse(true);
+        return (T) this;
     }
     
     @Override
@@ -155,7 +161,7 @@ public class BlockGate<T extends Gate> implements Gate {
     }
 
     @Override public String toString() {
-        return "Gate for block "+block+", size = "+getSize();
+        return "Gate for block "+block+", size = "+getSize()+", inv = "+inverse;
     }
 
     

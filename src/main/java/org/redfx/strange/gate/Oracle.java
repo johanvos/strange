@@ -131,4 +131,11 @@ public class Oracle implements Gate {
             }
         }
     }
+
+    @Override
+    public void setInverse(boolean inv) {
+        if (inv) {
+            this.matrix = Complex.conjugateTranspose(matrix);
+        }
+    }
 }

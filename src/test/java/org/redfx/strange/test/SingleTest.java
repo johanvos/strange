@@ -61,38 +61,33 @@ import org.redfx.strange.local.Computations;
  */
 public class SingleTest extends BaseGateTests {
     
-       @Test
-    public void adjoint() {
-        int dim = 4;
-        Program p = new Program(dim);
+    @Test
+    public void multiplyMod5x3andswapandcleans1a0() { // 5 x 3 mod 6 = 3
+        System.err.println("C1");
+        Program p = new Program(9);
         Step prep = new Step();
-        prep.addGates(new X(1), new X(2));//, new X(0));
+        int mul = 5;
+        int N = 6;
+        prep.addGates(new X(4), new X(5)); // 3 in high register
         p.addStep(prep);
-        Add add = new Add(0,1,2,3);
-        
-           System.err.println("ADDMATRIX = ");
-           Complex.printMatrix(add.getMatrix());
-           System.err.println("ADDMATRIX-----\n");
-        p.addStep(new Step(add));
-        Add min = new Add(0,1,2,3).inverse();
-        
-           System.err.println("ADDMINMATRIX = ");
-           Complex.printMatrix(min.getMatrix());
-           System.err.println("ADDMINMATRIX-----\n");
-
-        p.addStep(new Step(min));
+        for (int i = 0; i < mul; i++) {
+            AddModulus add = new AddModulus(0, 3, 4, 7, N);
+            p.addStep(new Step(add));
+        }
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
-                for (int i = 0; i < dim; i++) {
-            System.err.println("m["+i+"]: "+q[i].measure());
-        }
-        assertEquals(dim, q.length);
-        assertEquals(0, q[0].measure());
+        assertEquals(9, q.length);
+        assertEquals(1, q[0].measure()); // q2,q1,q0,q3 should be clean
         assertEquals(1, q[1].measure());  
-        assertEquals(1, q[2].measure());
-        assertEquals(0, q[3].measure()); 
-    
+        assertEquals(0, q[2].measure());
+        assertEquals(0, q[3].measure());
+        assertEquals(1, q[4].measure()); // result in q4,q5,q6,q7
+        assertEquals(1, q[5].measure());
+        assertEquals(0, q[6].measure());  
+        assertEquals(0, q[7].measure());  
+        assertEquals(0, q[8].measure());  
     }
+      
     
     //   @Test
     public void multiplyMod5x3andswapandcleans2() { // 5 x 3 mod 6 = 3

@@ -136,9 +136,9 @@ public class Step {
         return this.program;
     }
 
-    public void inverse() {
+    public void setInverse(boolean val) {
         for (Gate g: gates) {
-            g.inverse();
+            g.setInverse(val);
         }
     }
     

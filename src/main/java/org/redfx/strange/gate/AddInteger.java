@@ -65,7 +65,7 @@ public class AddInteger extends BlockGate<AddInteger> {
         this.block = cache.get(hash);
         if (this.block == null) {
             this.block = createBlock(x0, x1, num);
-            cache.put(hash, block);
+   //         cache.put(hash, block);
         }
         setBlock(block);
        

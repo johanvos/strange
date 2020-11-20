@@ -54,6 +54,7 @@ public class R extends SingleQubitGate {
         this(Math.PI*2/Math.pow(base, pow), idx);
         this.pow = pow;
         System.err.println("Created R with pow = "+pow+" and idx = "+idx+" and this = "+this);
+//        Thread.dumpStack();
     }
 
     @Override
@@ -62,9 +63,9 @@ public class R extends SingleQubitGate {
     }
     
     @Override
-    public R inverse() {
+    public void setInverse(boolean v) {
+        super.setInverse(v);
         matrix = Complex.conjugateTranspose(matrix);
-        return this;
     }
 
     @Override public String getCaption() { 

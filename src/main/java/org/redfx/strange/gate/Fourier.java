@@ -91,6 +91,12 @@ public class Fourier extends BlockGate {
         return matrix;
     }
 
+    @Override public void setInverse(boolean v) {
+        if (v) {
+                    Complex[][] m = getMatrix();
+        this.matrix = Complex.conjugateTranspose(m);
+        }
+    }
     @Override public Fourier inverse() {
         Complex[][] m = getMatrix();
         this.matrix = Complex.conjugateTranspose(m);
