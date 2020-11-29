@@ -40,29 +40,29 @@ import org.redfx.strange.Step;
 import org.redfx.strange.local.Computations;
 import java.util.HashMap;
 import java.util.List;
+import org.redfx.strange.ControlledBlockGate;
 
 /**
  *
  * @author johan
  */
-public class MulModulus extends BlockGate<MulModulus> {
+public class Mul2Modulus extends BlockGate<Mul2Modulus> {
 
     Block block;
-// disable cache for now
-   // static HashMap<Integer, Block> cache = new HashMap<>();
+    static HashMap<Integer, Block> cache = new HashMap<>();
 
     /**
      * Multiply the qubit in the x register with an integer mul
      * @param x0 start idx x register
      * @param x1 end idx x register
-     * x_0 ----- y_0 + x_0
-     * x_1 ----- y+1 + x_1
-     * y_0 ----- 0
-     * y_1 ----- 0
+     * x_0 ----- x_0
+     * x_1 ----- x_1
+     * b_0 ----- (b + ax) mod N
+     * b_1 ----- 0
      * ANC ----- ANC (0) 
-     * x_1 and y_1 are overflow bits (initially 0, final 0)
+     * b_1 is an overflow bit (initially 0, final 0)
      */
-    public MulModulus(int x0, int x1, int mul, int mod) {
+    public Mul2Modulus(int x0, int x1, int mul, int mod) {
         super();
         this.setIndex(x0);
         x1 = x1-x0;
@@ -73,20 +73,27 @@ public class MulModulus extends BlockGate<MulModulus> {
     }
     
     public Block createBlock(int y0, int y1, int mul, int mod) {
+        int n = y1 - y0;
         System.err.println("Need to create block with mul = "+mul+" and mod = "+mod);
         int hash = 1000000 * y0 + 10000*y1+ 100*mul + mod;
-//        this.block = cache.get(hash);
-//        if (block != null) {
-//            return block;
-//        }
+        this.block = cache.get(hash);
+        if (block != null) {
+            System.err.println("mulblock cached!");
+            return block;
+        }
 
         int x0 = y0;
         int x1 = y1-y0;
         int size = 1 + x1-x0;
         Block answer = new Block("MulModulus", 2 * size+1);
-        for (int i = 0; i < mul; i++) {
-            AddModulus add = new AddModulus(x0, x1, x1+1, x1 + size, mod);
-            answer.addStep(new Step(add));
+        for (int i = 0; i < n; i++) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * mul % mod;
+            }
+            AddIntegerModulus add = new AddIntegerModulus(x0, x1, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(add, n, i);
+            answer.addStep(new Step(cbg));
         }
 
         for (int i = x0; i < x1; i++) {
@@ -95,10 +102,16 @@ public class MulModulus extends BlockGate<MulModulus> {
 
         int invsteps = Computations.getInverseModulus(mul,mod);
         for (int i = 0; i < invsteps; i++) {
-            AddModulus add = new AddModulus(x0, x1, x1+1, x1 + size, mod).inverse();
-            answer.addStep(new Step(add));
+                        int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * mul % mod;
+            }
+            AddIntegerModulus add = new AddIntegerModulus(x0, x1, m, mod).inverse();
+            ControlledBlockGate cbg = new ControlledBlockGate(add, n, i);
+            answer.addStep(new Step(cbg));
         }
-        //cache.put(hash, answer);
+        cache.put(hash, answer);
+        System.err.println("Number of steps in mulblock: " + answer.getSteps().size());
         return answer;
     }
   

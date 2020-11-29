@@ -61,7 +61,11 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
     static void dbg (String s) {
         Complex.dbg(s);
     }
-
+    static void mdbg (String s) {
+        long t = System.currentTimeMillis()%1000000;
+        System.err.println("[mdbg] "+ t+": "+s);
+    }
+    
     @Override
     public Result runProgram(Program p) {
         dbg("runProgram ");
@@ -104,7 +108,14 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         dbg("START RUN, number of steps = " + simpleSteps.size());
         for (Step step : simpleSteps) {
             if (!step.getGates().isEmpty()) {
-                dbg("RUN STEP " + step + ", cnt = " + cnt);
+                mdbg("RUN STEP " + step + ", cnt = " + cnt);
+                for (Gate g : step.getGates()) {
+                    System.err.println("Gate: "+g);
+                    if (g instanceof BlockGate){
+                        BlockGate bg = (BlockGate)g;
+                        System.err.println("steps for this blockgate: "+bg.getSteps());
+                    }
+                }
                 cnt++;
                 dbg("before this step, probs = ");
           //      printProbs(probs);

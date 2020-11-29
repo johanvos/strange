@@ -156,6 +156,9 @@ public class BlockGate<T extends Gate> implements Gate {
     @Override public String toString() {
         return "Gate for block "+block+", size = "+getSize()+", inv = "+inverse;
     }
-
+    
+    public List<Step> getSteps() {
+        return block.getSteps();
+    }
     
 }

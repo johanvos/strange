@@ -69,6 +69,7 @@ public class AddModulus extends BlockGate<AddModulus> {
      */
     public AddModulus(int x0, int x1, int y0, int y1, int N) {
         super();
+        System.err.println("asked for addmodulus, x0 = "+x0+", x1 = "+x1+", y0 = "+y0+", y1 = "+y1+", N = "+N);
         setIndex(x0);
         y1 = y1-x0;
         y0 = y0-x0;
@@ -79,12 +80,6 @@ public class AddModulus extends BlockGate<AddModulus> {
         this.block = cache.get(hash);
         if (this.block == null) {
             this.block = createBlock(x0, x1, y0, y1, N);
-       //     cache.put(hash, block);
-//            System.err.println("ADDMODULUS CREATED for hash = "+hash+
-//                    "x0 = "+x0+", x1 = "+x1+", y0 = "+y0+", y1 = "+y1+", N = "+N);
-        } else {
-//            System.err.println("ADDMODULUS CACHED for hash = "+hash+
-//                    "x0 = "+x0+", x1 = "+x1+", y0 = "+y0+", y1 = "+y1+", N = "+N);
         }
         setBlock(block);
     }
