@@ -39,6 +39,7 @@ import org.redfx.strange.Block;
 import org.redfx.strange.Complex;
 import org.redfx.strange.ControlledBlockGate;
 import org.redfx.strange.Program;
+import org.redfx.strange.QuantumExecutionEnvironment;
 import org.redfx.strange.Qubit;
 import org.redfx.strange.Result;
 import org.redfx.strange.Step;
@@ -47,11 +48,14 @@ import org.redfx.strange.gate.AddInteger;
 import org.redfx.strange.gate.AddIntegerModulus;
 import org.redfx.strange.gate.AddModulus;
 import org.redfx.strange.gate.Cnot;
+import org.redfx.strange.gate.Hadamard;
+import org.redfx.strange.gate.InvFourier;
 import org.redfx.strange.gate.Mul;
 import org.redfx.strange.gate.MulModulus;
 import org.redfx.strange.gate.Swap;
 import org.redfx.strange.gate.X;
 import org.redfx.strange.local.Computations;
+import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
 
 
 /**
@@ -62,7 +66,7 @@ public class ArithmeticTests4 extends BaseGateTests {
 
     static final double D = 0.000000001d;
 
-    @Test
+   // @Test
     public void addmodgate() {
         int a = 3;
         int n = 3;
@@ -88,4 +92,427 @@ public class ArithmeticTests4 extends BaseGateTests {
         assertEquals(0, q[4].measure());
     }
     
+    
+    @Test
+    public void testexpmodHHHHnoinv() {
+        // 0 H H H { 1 x 7 ^ A mod 15}
+        int mod = 15;
+        int a = 7;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = length;
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+        for (int i = 0; i < offset; i++) {
+            prep.addGate(new Hadamard(i));
+        }
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = length - 1; i > length - 1 - offset; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+    //    p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[16];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%16] = amps[i%16] + probs[i].abssqr();
+        }
+        for (int i = 0; i < 16; i ++) {
+            System.err.println("AMP["+i+"] = "+amps[i]);
+            assertEquals(amps[i], 1./16, 0.001);
+        }
+    }
+    
+    
+    @Test
+    public void testexpmodHHHH() {
+        // 0 H H H { 1 x 7 ^ A mod 15}
+        int mod = 15;
+        int a = 7;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = length;
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+        for (int i = 0; i < offset; i++) {
+            prep.addGate(new Hadamard(i));
+        }
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = length - 1; i > length - 1 - offset; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[16];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%16] = amps[i%16] + probs[i].abssqr();
+        }
+        for (int i = 0; i < 16; i ++) {
+            System.err.println("AMP["+i+"] = "+amps[i]);
+            if (i%4 == 0) {
+                assertEquals(amps[i], .25, 0.001);
+            } else {
+                assertEquals(amps[i], 0, 0.001);
+            }
+        }
+    }
+    
+   // @Test
+    public void testexpmod0HHH() {
+        // 0 H H H { 1 x 7 ^ A mod 15}
+        int mod = 15;
+        int a = 7;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = length;
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+        for (int i = 1; i < offset; i++) {
+            prep.addGate(new Hadamard(i));
+        }
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = length - 1; i > length - 1 - offset; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[16];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%16] = amps[i%16] + probs[i].abssqr();
+        }
+        for (int i = 0; i < 16; i ++) {
+            System.err.println("AMP["+i+"] = "+amps[i]);
+            if (i%4 == 0) {
+                assertEquals(amps[i], .25, 0.001);
+            } else {
+                assertEquals(amps[i], 0, 0.001);
+            }
+        }
+    }
+    
+   // @Test
+    public void testexpmod00HH() {
+        // 0 0 H H { 1 x 7 ^ A mod 15}
+        int mod = 15;
+        int a = 7;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = length;
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+        for (int i = 2; i < offset; i++) {
+            prep.addGate(new Hadamard(i));
+        }
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = length - 1; i > length - 1 - offset; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[16];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%16] = amps[i%16] + probs[i].abssqr();
+        }
+        for (int i = 0; i < 16; i ++) {
+            System.err.println("AMP["+i+"] = "+amps[i]);
+            if (i%4 == 0) {
+                assertEquals(amps[i], .25, 0.001);
+            } else {
+                assertEquals(amps[i], 0, 0.001);
+            }
+        }
+    }
+    
+    //@Test
+    public void testexpmod1() {
+        // 1 0 0 0 { 1 x 7 ^ A mod 15}
+        int mod = 15;
+        int a = 7;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = length;
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+        prep.addGates(new X(0));
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = length - 1; i > length - 1 - offset; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[16];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%16] = amps[i%16] + probs[i].abssqr();
+        }
+        for (int i = 0; i < 16; i ++) {
+            assertEquals(amps[i], 1./16, 0.001);
+        }
+        
+    }
+
+   // @Test
+    public void testexpmodH() {
+        // H 0 0 0 { 1 x 7 ^ A mod 15}
+        int mod = 15;
+        int a = 7;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = length;
+
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+
+        prep.addGate(new Hadamard(0));
+        
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = offset - 1; i > - 1; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            System.err.println("Create MulModulus, i = "+i+", m = "+m+", a = "+a+", MOD = "+mod);
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[16];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%16] = amps[i%16] + probs[i].abssqr();
+        }
+        for (int i = 0; i < 16; i ++) {
+            System.err.println("AMP["+i+"] = "+amps[i]);
+            assertEquals(amps[i], 1./16, 0.001);
+        }
+    }
+    
+   // @Test
+    public void testexpmod000H() {
+        // 0 0 0 H { 1 x 7 ^ A mod 15}
+        int mod = 15;
+        int a = 7;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = length;
+
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+
+        prep.addGate(new Hadamard(3));
+        
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = offset - 1; i > - 1; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            System.err.println("Create MulModulus, i = "+i+", m = "+m+", a = "+a+", MOD = "+mod);
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[16];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%16] = amps[i%16] + probs[i].abssqr();
+        }
+        for (int i = 0; i < 16; i ++) {
+            System.err.println("AMP["+i+"] = "+amps[i]);
+            if (i%2 == 0) {
+                assertEquals(amps[i], .125, 0.001);
+            } else {
+                assertEquals(amps[i], 0, 0.001);
+            }
+        }
+    }
+
+  //  @Test
+    public void testexpmod00H() {
+        // 0 0  H { 1 x 7 ^ A mod 15}
+        int mod = 15;
+        int a = 7;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = length -1 ;
+        int dim0 = 1 << offset;
+        assertEquals(dim0, 8);
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+
+        prep.addGate(new Hadamard(2));
+        
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = offset - 1; i > - 1; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            System.err.println("Create MulModulus, i = "+i+", m = "+m+", a = "+a+", MOD = "+mod);
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[dim0];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%dim0] = amps[i%dim0] + probs[i].abssqr();
+        }
+        for (int i = 0; i < dim0; i ++) {
+            System.err.println("AMP["+i+"] = "+amps[i]);
+            if (i%2 == 0) {
+                assertEquals(amps[i], .25, 0.001);
+            } else {
+                assertEquals(amps[i], 0, 0.001);
+            }
+        }
+    }
+  
+   // @Test
+    public void testexpmodH37() {
+        //  H { 1 x 3 ^ A mod 7}
+        int mod = 7;
+        int a = 3;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = 1 ;
+        int dim0 = 1 << offset;
+        assertEquals(dim0, 2);
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+
+        prep.addGate(new X(3));
+        
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = offset - 1; i > - 1; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            System.err.println("Create MulModulus, i = "+i+", m = "+m+", a = "+a+", MOD = "+mod);
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[dim0];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%dim0] = amps[i%dim0] + probs[i].abssqr();
+        }
+        for (int i = 0; i < dim0; i ++) {
+            System.err.println("AMP["+i+"] = "+amps[i]);
+            assertEquals(amps[i], .5, 0.001);
+        }
+    }
+    
+   // @Test
+    public void testexpmodHH37() {
+        //  H { 1 x 3 ^ A mod 7}
+        int mod = 7;
+        int a = 3;
+        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
+        int offset = 2 ;
+        int dim0 = 1 << offset;
+        assertEquals(dim0, 4);
+        Program p = new Program(2 * length + 3 + offset);
+        Step prep = new Step();
+        for (int i = 0; i < offset; i++) {
+            prep.addGate(new Hadamard(i));
+        }
+        
+        Step prepAnc = new Step(new X(length + 1 + offset));
+        p.addStep(prep);
+        p.addStep(prepAnc);
+        for (int i = offset - 1; i > - 1; i--) {
+            int m = 1;
+            for (int j = 0; j < 1 << i; j++) {
+                m = m * a % mod;
+            }
+            System.err.println("Create MulModulus, i = "+i+", m = "+m+", a = "+a+", MOD = "+mod);
+            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
+            p.addStep(new Step(cbg));
+        }
+        p.addStep(new Step(new InvFourier(offset, 0)));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        Qubit[] q = result.getQubits();
+        int answer = 0;
+        double[] amps = new double[dim0];
+        for (int i = 0; i < probs.length; i++) {
+            amps[i%dim0] = amps[i%dim0] + probs[i].abssqr();
+        }
+        for (int i = 0; i < dim0; i ++) {
+         //   System.err.println("AMP["+i+"] = "+amps[i]);
+            assertEquals(amps[i], .25, 0.001);
+        }
+    }
 }

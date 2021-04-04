@@ -232,7 +232,7 @@ public class Classic {
         return factor;
     }
     
-    private static int measurePeriod(int a, int mod) {
+    public static int measurePeriod(int a, int mod) {
             
         int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
         int offset = length+1;
@@ -274,7 +274,7 @@ public class Classic {
         return answer;
     } 
     
-    private static int measurePeriodold(int a, int mod) {
+    public static int measurePeriodold(int a, int mod) {
             
         int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
         int offset = length;

@@ -1172,7 +1172,7 @@ public class ArithmeticTests extends BaseGateTests {
         int mul = 5;
         int N = 6;
         Step prep = new Step();
-        prep.addGates(new X(0), new X(4), new X(5)); // 3 in high register
+        prep.addGates(new X(4), new X(5)); // 3 in high register
         Step s = new Step(new MulModulus(0,3,mul, N));
         p.addStep(prep);
         p.addStep(s);
@@ -1180,11 +1180,11 @@ public class ArithmeticTests extends BaseGateTests {
         Qubit[] q = result.getQubits();
 
         assertEquals(9, q.length);
-        assertEquals(1, q[0].measure()); // q2,q1,q0,q3 should be clean
+        assertEquals(0, q[0].measure()); // q2,q1,q0,q3 should be clean
         assertEquals(0, q[1].measure());  
         assertEquals(0, q[2].measure());
         assertEquals(0, q[3].measure());
-        assertEquals(0, q[4].measure()); // result in q4,q5,q6,q7
+        assertEquals(1, q[4].measure()); // result in q4,q5,q6,q7
         assertEquals(1, q[5].measure());
         assertEquals(0, q[6].measure());  
         assertEquals(0, q[7].measure());  
