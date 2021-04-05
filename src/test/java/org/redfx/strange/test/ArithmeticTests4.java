@@ -35,27 +35,17 @@ package org.redfx.strange.test;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import org.redfx.strange.Block;
 import org.redfx.strange.Complex;
 import org.redfx.strange.ControlledBlockGate;
 import org.redfx.strange.Program;
-import org.redfx.strange.QuantumExecutionEnvironment;
 import org.redfx.strange.Qubit;
 import org.redfx.strange.Result;
 import org.redfx.strange.Step;
-import org.redfx.strange.gate.Add;
-import org.redfx.strange.gate.AddInteger;
 import org.redfx.strange.gate.AddIntegerModulus;
-import org.redfx.strange.gate.AddModulus;
-import org.redfx.strange.gate.Cnot;
 import org.redfx.strange.gate.Hadamard;
 import org.redfx.strange.gate.InvFourier;
-import org.redfx.strange.gate.Mul;
 import org.redfx.strange.gate.MulModulus;
-import org.redfx.strange.gate.Swap;
 import org.redfx.strange.gate.X;
-import org.redfx.strange.local.Computations;
-import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
 
 
 /**
@@ -108,7 +98,8 @@ public class ArithmeticTests4 extends BaseGateTests {
         Step prepAnc = new Step(new X(length + 1 + offset));
         p.addStep(prep);
         p.addStep(prepAnc);
-        for (int i = length - 1; i > length - 1 - offset; i--) {
+       // for (int i = length - 1; i > length - 1 - offset; i--) {
+        for (int i = length - 1; i > length - 2; i--) {
             int m = 1;
             for (int j = 0; j < 1 << i; j++) {
                 m = m * a % mod;
@@ -117,23 +108,29 @@ public class ArithmeticTests4 extends BaseGateTests {
             ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
             p.addStep(new Step(cbg));
         }
-    //    p.addStep(new Step(new InvFourier(offset, 0)));
         Result result = runProgram(p);
         Complex[] probs = result.getProbability();
         Qubit[] q = result.getQubits();
         int answer = 0;
         double[] amps = new double[16];
         for (int i = 0; i < probs.length; i++) {
+            if (probs[i].abssqr() > 0.000001) 
+            System.err.println("prob["+i+"]  = "+probs[i]);
             amps[i%16] = amps[i%16] + probs[i].abssqr();
         }
         for (int i = 0; i < 16; i ++) {
             System.err.println("AMP["+i+"] = "+amps[i]);
             assertEquals(amps[i], 1./16, 0.001);
         }
+        Qubit[] qubits = result.getQubits();
+        for (int i = 0; i < qubits.length; i++) {
+            System.err.println("q["+i+"] = "+qubits[i].getProbability());
+//            System.err.println("q["+i+"] = "+qubits[i].measure());
+        }
     }
     
     
-    @Test
+  //  @Test
     public void testexpmodHHHH() {
         // 0 H H H { 1 x 7 ^ A mod 15}
         int mod = 15;

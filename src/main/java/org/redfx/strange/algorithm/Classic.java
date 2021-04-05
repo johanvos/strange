@@ -275,7 +275,6 @@ public class Classic {
     } 
     
     public static int measurePeriodold(int a, int mod) {
-            
         int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
         int offset = length;
         Program p = new Program(2 * length + 3 + offset);

@@ -44,7 +44,7 @@ import java.util.HashMap;
 public class Add extends BlockGate<Add> {
 
     Block block;
-    static HashMap<Integer, Block> cache = new HashMap<>();
+    //static HashMap<Integer, Block> cache = new HashMap<>();
     
     /**
      * Add the qubit in the x register and the y register, result is in x
@@ -61,7 +61,7 @@ public class Add extends BlockGate<Add> {
         super();
         this.setIndex(x0);
         int hash = 1000000 * x0 + 10000*x1+ 100*y0 + y1;
-        this.block = cache.get(hash);
+     //   this.block = cache.get(hash);
         if (this.block == null) {
             this.block = createBlock(x0, x1, y0, y1);
         //    cache.put(hash, block);

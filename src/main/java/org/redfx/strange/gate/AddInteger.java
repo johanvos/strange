@@ -35,10 +35,8 @@ package org.redfx.strange.gate;
 import org.redfx.strange.Block;
 import org.redfx.strange.BlockGate;
 import org.redfx.strange.Step;
-import static org.redfx.strange.gate.Add.cache;
 import java.util.HashMap;
 import org.redfx.strange.Complex;
-import org.redfx.strange.Gate;
 
 /**
  *

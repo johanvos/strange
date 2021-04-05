@@ -198,7 +198,11 @@ public class ControlledBlockGate<T> extends BlockGate {
 
     @Override
     public Complex[] applyOptimize(Complex[] v) {
+  //       System.err.println("APTOPTIMIZE CBG");
+      //  Thread.dumpStack();
         int size = v.length;
+        
+        System.err.println("APTOPTIMIZE CBG, size = "+size);
         Complex[] answer = new Complex[size];
         int dim = size / 2;
         Complex[] oldv = new Complex[dim];

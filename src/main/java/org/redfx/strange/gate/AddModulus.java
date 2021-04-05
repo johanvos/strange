@@ -34,14 +34,8 @@ package org.redfx.strange.gate;
 
 import org.redfx.strange.Block;
 import org.redfx.strange.BlockGate;
-import org.redfx.strange.Complex;
 import org.redfx.strange.ControlledBlockGate;
-import org.redfx.strange.Gate;
-import org.redfx.strange.Program;
 import org.redfx.strange.Step;
-import static org.redfx.strange.gate.Add.cache;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  *
@@ -50,7 +44,7 @@ import java.util.List;
 public class AddModulus extends BlockGate<AddModulus> {
 
     Block block;
-    static HashMap<Integer, Block> cache = new HashMap<>();
+   // static HashMap<Integer, Block> cache = new HashMap<>();
 
     
     /**
@@ -75,14 +69,23 @@ public class AddModulus extends BlockGate<AddModulus> {
         y0 = y0-x0;
         x1 = x1 - x0;
         x0 = 0;
+        if (y0 != (x1+1)) throw new IllegalArgumentException("Addmodulus requires terms to be next to each other");
+        if (N > (1 << x1)) throw new IllegalArgumentException("Addmodulus has mod N = "+N+" while size = "+x1);
         assert(y0 == x1+1);
         int hash = 1000000 * x0 + 10000*x1+ 100*y0 + 10 * y1 + N;
-        this.block = cache.get(hash);
+    //    this.block = cache.get(hash);
         if (this.block == null) {
             this.block = createBlock(x0, x1, y0, y1, N);
         }
         setBlock(block);
     }
+    
+//    @Override
+//    public String toString() {
+//        int rx0 = getMainQubitIndex();
+//        int rx1 = 
+//        return "AddModules, x0 = "+getIndex();
+//    }
     
     public Block createBlock(int x0, int x1, int y0, int y1, int N) {
         Block answer = new Block("AddModulus", y1-x0+2);

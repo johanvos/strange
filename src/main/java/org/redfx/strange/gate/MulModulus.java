@@ -86,17 +86,25 @@ public class MulModulus extends BlockGate<MulModulus> {
         Block answer = new Block("MulModulus", 2 * size+1);
         for (int i = 0; i < mul; i++) {
             AddModulus add = new AddModulus(x0, x1, x1+1, x1 + size, mod);
+            System.err.println("[MULBLOCK] add step "+add);
             answer.addStep(new Step(add));
+       //     answer.addStep(new Step(Step.Type.PSEUDO));
         }
 
         for (int i = x0; i < x1; i++) {
-            answer.addStep(new Step (new Swap(i, i + size)));
+            Swap swap = new Swap(i, i + size);
+            System.err.println("[MULBLOCK] addswap step "+swap);
+            answer.addStep(new Step (swap));
+       //     answer.addStep(new Step(Step.Type.PSEUDO));
         }
 
         int invsteps = Computations.getInverseModulus(mul,mod);
+        System.err.println("[MULBLOCK] invsteps = "+invsteps);
         for (int i = 0; i < invsteps; i++) {
             AddModulus add = new AddModulus(x0, x1, x1+1, x1 + size, mod).inverse();
+            System.err.println("[MULBLOCK] add istep "+add);
             answer.addStep(new Step(add));
+        //    answer.addStep(new Step(Step.Type.PSEUDO));
         }
         //cache.put(hash, answer);
         return answer;

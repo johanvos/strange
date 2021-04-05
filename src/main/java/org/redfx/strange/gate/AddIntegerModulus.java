@@ -34,14 +34,9 @@ package org.redfx.strange.gate;
 
 import org.redfx.strange.Block;
 import org.redfx.strange.BlockGate;
-import org.redfx.strange.Complex;
 import org.redfx.strange.ControlledBlockGate;
-import org.redfx.strange.Gate;
-import org.redfx.strange.Program;
 import org.redfx.strange.Step;
-import static org.redfx.strange.gate.Add.cache;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  *
@@ -50,7 +45,7 @@ import java.util.List;
 public class AddIntegerModulus extends BlockGate<AddIntegerModulus> {
 
     Block block;
-    static HashMap<Integer, Block> cache = new HashMap<>();
+    //static HashMap<Integer, Block> cache = new HashMap<>();
 
     
     /**
@@ -68,7 +63,7 @@ public class AddIntegerModulus extends BlockGate<AddIntegerModulus> {
         x1 = x1 - x0;
         x0 = 0;
         int hash = 1000000 * x0 + 10000*x1 + 100 * a + N;
-        this.block = cache.get(hash);
+ //       this.block = cache.get(hash);
         if (this.block == null) {
             this.block = createBlock(x0, x1, a, N);
         }
