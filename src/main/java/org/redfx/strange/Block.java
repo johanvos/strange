@@ -125,8 +125,6 @@ public class Block {
     }
 
     public Complex[] applyOptimize(Complex[] probs, boolean inverse) {
-        int dim = probs.length;
-        System.err.println("[BLOCK] applyOptimize asked, dim = "+dim+" and block = "+this);
         List<Step> simpleSteps = new ArrayList<>();
         for (Step step : steps) {
             simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
@@ -142,7 +140,13 @@ public class Block {
                 probs = applyStep(step, probs);
             }
         }
-        System.err.println("[BLOCK] applyOptimize DONE, dim = "+dim);
+
+        if (inverse) {
+            for (Step step : simpleSteps) {
+                step.setInverse(true);
+            }
+        }
+
         return probs;
     }
 
