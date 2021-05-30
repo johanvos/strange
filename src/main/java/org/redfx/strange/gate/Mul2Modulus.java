@@ -49,7 +49,8 @@ import org.redfx.strange.ControlledBlockGate;
 public class Mul2Modulus extends BlockGate<Mul2Modulus> {
 
     Block block;
-    static HashMap<Integer, Block> cache = new HashMap<>();
+// disable cache for now
+   // static HashMap<Integer, Block> cache = new HashMap<>();
 
     /**
      * Multiply the qubit in the x register with an integer mul
@@ -76,11 +77,10 @@ public class Mul2Modulus extends BlockGate<Mul2Modulus> {
         int n = y1 - y0;
         System.err.println("Need to create block with mul = "+mul+" and mod = "+mod);
         int hash = 1000000 * y0 + 10000*y1+ 100*mul + mod;
-        this.block = cache.get(hash);
-        if (block != null) {
-            System.err.println("mulblock cached!");
-            return block;
-        }
+//        this.block = cache.get(hash);
+//        if (block != null) {
+//            return block;
+//        }
 
         int x0 = y0;
         int x1 = y1-y0;
@@ -110,7 +110,7 @@ public class Mul2Modulus extends BlockGate<Mul2Modulus> {
             ControlledBlockGate cbg = new ControlledBlockGate(add, n, i);
             answer.addStep(new Step(cbg));
         }
-        cache.put(hash, answer);
+        //cache.put(hash, answer);
         System.err.println("Number of steps in mulblock: " + answer.getSteps().size());
         return answer;
     }

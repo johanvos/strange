@@ -46,6 +46,7 @@ import org.redfx.strange.Step;
 import org.redfx.strange.gate.AddModulus;
 import org.redfx.strange.gate.Hadamard;
 import org.redfx.strange.gate.InvFourier;
+import org.redfx.strange.gate.Mul2Modulus;
 import org.redfx.strange.gate.MulModulus;
 import org.redfx.strange.gate.X;
 import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
@@ -93,7 +94,7 @@ public class Arithmetic4Tests extends BaseGateTests {
         int a = 7;
         int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
         int offset = length;
-        Program p = new Program(2 * length + 3 + offset);
+        Program p = new Program(2 * length + 2 + offset);
         Step prep = new Step();
         for (int i = 0; i < offset; i++) {
             prep.addGate(new Hadamard(i));
@@ -107,7 +108,7 @@ public class Arithmetic4Tests extends BaseGateTests {
             for (int j = 0; j < 1 << i; j++) {
                 m = m * a % mod;
             }
-            MulModulus mul = new MulModulus(length, 2 * length, m, mod);
+            Mul2Modulus mul = new Mul2Modulus(length, 2 * length, m, mod);
             ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);
             p.addStep(new Step(cbg));
         }
