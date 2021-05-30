@@ -47,6 +47,8 @@ public final class Complex {
     public static final Complex ZERO = new Complex(0.d, 0.d);
     public static final Complex ONE = new Complex(1.d, 0.d);
     public static final Complex I = new Complex(0.d, 1.d);
+    
+    static final boolean DEBUG = false;
 
     private static final double HV = 1. / Math.sqrt(2.);
 
@@ -85,8 +87,8 @@ public final class Complex {
     /**
      * Add and replace
      *
-     * @param b
-     * @return
+     * @param b complex number to add
+     * @return the modified complex number
      */
     public Complex addr(Complex b) {
         this.r = this.r + b.r;
@@ -97,6 +99,7 @@ public final class Complex {
     /**
      * AddMul and replace
      *
+     * @param a
      * @param b
      * @return
      */
@@ -131,6 +134,7 @@ public final class Complex {
     /**
      * return an identity matrix 
      * @param dim 
+     * @return  identity matrix
      */
     public static Complex[][] identityMatrix (int dim) {
         Complex[][] answer = new Complex[dim][dim];
@@ -295,7 +299,7 @@ public final class Complex {
     }
 
     public static void printArray(Complex[] ca) {
-        if (debug) {
+        if (DEBUG) {
             printArray(ca, System.err);
         }
     }
@@ -310,18 +314,16 @@ public final class Complex {
     public static void printMatrix(Complex[][] cm) {
         printMatrix(cm, System.err);
     }
-
-    static final boolean debug = false;
     
     public static void dbg (String s) {
-        if (debug) {
+        if (DEBUG) {
         System.err.println("[DBG] " + System.currentTimeMillis()%1000000+": "+s);
         }
     }
 
 
     public static void printMatrix(Complex[][] cm, PrintStream ps) {
-        if (!debug) {
+        if (!DEBUG) {
             return;
         }
        // Thread.dumpStack();
@@ -337,11 +339,10 @@ public final class Complex {
         }
     }
 
- 
     @Override
     public String toString() {
-        double mr = this.r;
-        double mi = this.i;
+        float mr = this.r;
+        float mi = this.i;
         if (Math.abs(mr) < 1e-7) mr = 0;
         if (Math.abs(mi) < 1e-7) mi = 0;
         if (Math.abs(mr) > .999999) mr = 1;

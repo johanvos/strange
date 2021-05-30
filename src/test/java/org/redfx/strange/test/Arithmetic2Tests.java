@@ -448,10 +448,6 @@ public class Arithmetic2Tests extends BaseGateTests {
 
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
-                System.err.println("Results: ");
-        for (int i = 0; i < 7; i++) {
-            System.err.println("m["+i+"]: "+q[i].measure());
-        }
         assertEquals(7, q.length);
         assertEquals(1, q[0].measure());
         assertEquals(1, q[1].measure());
@@ -476,10 +472,6 @@ public class Arithmetic2Tests extends BaseGateTests {
         p.addStep(mod);
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
-        System.err.println("Results: ");
-        for (int i = 0; i < 7; i++) {
-            System.err.println("m["+i+"]: "+q[i].measure());
-        }
         assertEquals(7, q.length);
         assertEquals(1, q[0].measure());
         assertEquals(0, q[1].measure());
@@ -535,17 +527,12 @@ public class Arithmetic2Tests extends BaseGateTests {
         p.addStep(new Step( new Swap(3,7)));
 
         int invsteps = Computations.getInverseModulus(mul,N);
-        System.err.println("INVSTEPS = "+invsteps);
         for (int i = 0; i < invsteps; i++) {
             AddModulus addModulus = new AddModulus(0, 3, 4, 7, N).inverse();
             p.addStep(new Step(addModulus));
         }
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
-        System.err.println("Results: ");
-        for (int i = 0; i < 9; i++) {
-            System.err.println("m["+i+"]: "+q[i].measure());
-        }
         assertEquals(9, q.length);
         assertEquals(0, q[0].measure()); // q2,q1,q0,q3 should be clean
         assertEquals(0, q[1].measure());  
@@ -570,10 +557,6 @@ public class Arithmetic2Tests extends BaseGateTests {
         p.addStep(s);
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
-        System.err.println("results: ");
-        for (int i = 0; i < 9; i++) {
-            System.err.println("m["+i+"]: "+q[i].measure());
-        }
         assertEquals(9, q.length);
         assertEquals(0, q[0].measure()); // q2,q1,q0,q3 should be clean
         assertEquals(0, q[1].measure());  

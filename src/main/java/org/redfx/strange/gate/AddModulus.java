@@ -53,6 +53,7 @@ public class AddModulus extends BlockGate<AddModulus> {
      * @param x1 end idx x register
      * @param y0 start idx y register
      * @param y1 end idx y register
+     * @param N
      * x_0 ----- y_0 + x_0 
      * x_1 ----- y+1 + x_1
      * y_0 ----- y_0

@@ -4,7 +4,7 @@
   <groupId>org.redfx</groupId>
   <artifactId>strange</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.21-SNAPSHOT</version>
+  <version>0.1.2-SNAPSHOT</version>
   <name>Strange</name>
   <description>Strange Quantum Simulator</description>
   <url>http://maven.apache.org</url>
@@ -143,7 +143,7 @@
         <organizationName>Johan Vos</organizationName>
           <inceptionYear>2020</inceptionYear>
           <licenseName>bsd_3</licenseName>
-          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>`
+          <addJavaLicenseAfterPackage>false</addJavaLicenseAfterPackage>
         </configuration>
       </plugin>
     </plugins>

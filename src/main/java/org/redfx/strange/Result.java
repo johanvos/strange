@@ -116,7 +116,9 @@ public class Result {
     }
 
     public Complex[] getIntermediateProbability(int step) {
-        return intermediateProps[step];
+        int ret = step;
+        while ((ret > 0) && (intermediateProps[ret] == null)) ret--;
+        return intermediateProps[ret];
     }
 
     private double[] calculateQubitStatesFromVector(Complex[] vectorresult) {

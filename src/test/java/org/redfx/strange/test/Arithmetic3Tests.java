@@ -52,7 +52,7 @@ public class Arithmetic3Tests extends BaseGateTests {
     static final double D = 0.000000001d;
         
     
-   @Test // 
+    @Test // 
     public void expmul3p3() { // 3^3 = 27 -> mod 8 = 3
         int length = 3;
         int N = 8;
@@ -71,7 +71,6 @@ public class Arithmetic3Tests extends BaseGateTests {
             for (int j = 0; j < 1 << i; j++) {
                 m = m*a %N;
             }
-            System.err.println("M = " + m);
             Mul mul = new Mul(length, 2 * length - 1, m);
             ControlledBlockGate cbg = new ControlledBlockGate(mul, length, i);
             p.addStep(new Step(cbg));
@@ -79,10 +78,6 @@ public class Arithmetic3Tests extends BaseGateTests {
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
         assertEquals(9, q.length);
-        System.err.println("results: ");
-        for (int j = 0; j < 9; j++) {
-            System.err.println("m[" + j + "]: " + q[j].measure());
-        }
         assertEquals(1, q[0].measure());
         assertEquals(1, q[1].measure());
         assertEquals(0, q[2].measure());
@@ -114,10 +109,6 @@ public class Arithmetic3Tests extends BaseGateTests {
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
         assertEquals(9, q.length);
-        System.err.println("results: ");
-        for (int j = 0; j < 9; j++) {
-            System.err.println("m[" + j + "]: " + q[j].measure());
-        }
         assertEquals(1, q[0].measure());
         assertEquals(1, q[1].measure());
         assertEquals(0, q[2].measure());
@@ -166,7 +157,6 @@ public class Arithmetic3Tests extends BaseGateTests {
         p.addStep(prepAnc);
         for (int i = length - 1; i > -1; i--) {
             int m = (int) Math.pow(a, 1 << i);
-            System.err.println("M = " + m);
             Mul mul = new Mul(length, 2 * length - 1, m);
             ControlledBlockGate cbg = new ControlledBlockGate(mul, length, i);
             p.addStep(new Step(cbg));
@@ -174,10 +164,6 @@ public class Arithmetic3Tests extends BaseGateTests {
         Result result = runProgram(p);
         Qubit[] q = result.getQubits();
         assertEquals(9, q.length);
-        System.err.println("results: ");
-        for (int i = 0; i < 9; i++) {
-            System.err.println("m["+i+"]: "+q[i].measure());
-        }
         assertEquals(0, q[0].measure());
         assertEquals(0, q[1].measure());
         assertEquals(1, q[2].measure());
@@ -271,7 +257,6 @@ public class Arithmetic3Tests extends BaseGateTests {
             for (int j = 0; j < 1 << i; j++) {
                 m = m*a %mod;
             }
-            System.err.println("M = "+m);
             MulModulus mul = new MulModulus(length, 2 * length, m, mod);
             ControlledBlockGate cbg = new ControlledBlockGate(mul, length, i);
             p.addStep(new Step(cbg));

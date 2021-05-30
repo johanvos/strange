@@ -118,18 +118,12 @@ public class Arithmetic4Tests extends BaseGateTests {
         double[] amps = new double[16];
         for (int i = 0; i < probs.length; i++) {
             if (probs[i].abssqr() > 0.000001) 
-            System.err.println("prob["+i+"]  = "+probs[i]);
             amps[i%16] = amps[i%16] + probs[i].abssqr();
         }
         for (int i = 0; i < 16; i ++) {
-            System.err.println("AMP["+i+"] = "+amps[i]);
             assertEquals(amps[i], 1./16, 0.001);
         }
         Qubit[] qubits = result.getQubits();
-        for (int i = 0; i < qubits.length; i++) {
-            System.err.println("q["+i+"] = "+qubits[i].getProbability());
-//            System.err.println("q["+i+"] = "+qubits[i].measure());
-        }
     }
     
     
@@ -167,7 +161,6 @@ public class Arithmetic4Tests extends BaseGateTests {
             amps[i%16] = amps[i%16] + probs[i].abssqr();
         }
         for (int i = 0; i < 16; i ++) {
-            System.err.println("AMP["+i+"] = "+amps[i]);
             if (i%4 == 0) {
                 assertEquals(amps[i], .25, 0.001);
             } else {
@@ -210,7 +203,6 @@ public class Arithmetic4Tests extends BaseGateTests {
             amps[i%16] = amps[i%16] + probs[i].abssqr();
         }
         for (int i = 0; i < 16; i ++) {
-            System.err.println("AMP["+i+"] = "+amps[i]);
             if (i%4 == 0) {
                 assertEquals(amps[i], .25, 0.001);
             } else {
@@ -253,7 +245,6 @@ public class Arithmetic4Tests extends BaseGateTests {
             amps[i%16] = amps[i%16] + probs[i].abssqr();
         }
         for (int i = 0; i < 16; i ++) {
-            System.err.println("AMP["+i+"] = "+amps[i]);
             if (i%4 == 0) {
                 assertEquals(amps[i], .25, 0.001);
             } else {

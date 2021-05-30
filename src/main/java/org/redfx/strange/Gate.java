@@ -36,7 +36,6 @@ import org.redfx.strange.gate.Cnot;
 import org.redfx.strange.gate.Cz;
 import org.redfx.strange.gate.Hadamard;
 import org.redfx.strange.gate.Identity;
-import org.redfx.strange.gate.InformalGate;
 import org.redfx.strange.gate.Measurement;
 import org.redfx.strange.gate.Oracle;
 import org.redfx.strange.gate.PermutationGate;
@@ -103,7 +102,7 @@ public interface Gate {
     
     /**
      * Return the number of qubits that are affected by this gate
-     * @return 
+     * @return the number of qubits that are affected by this gate
      */
     public int getSize();
     
@@ -121,7 +120,7 @@ public interface Gate {
     
     /** 
      * Defines whether or not this gate should be inversed
-     * @param inv 
+     * @param inv the boolean to check if this gate should be inversed or not
      */
     void setInverse(boolean inv);
     

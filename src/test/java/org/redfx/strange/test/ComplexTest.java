@@ -34,7 +34,7 @@ package org.redfx.strange.test;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import org.redfx.strange.Complex;
 public class ComplexTest {
 
@@ -48,6 +48,13 @@ public class ComplexTest {
         assertTrue(zero.r == 1);
         Complex z2 = new Complex(0.,0.);
         assertTrue(z2.r == 0);
+    }
+
+    @Test
+    public void toStringTest() {
+        Complex neg = new Complex(-.1, -.2);
+        String negString = neg.toString();
+        assertEquals(negString, "(-0.1, -0.2)");
     }
 
 }

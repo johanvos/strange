@@ -317,11 +317,12 @@ public class Classic {
           
     private static<T> Oracle createGroverOracle(int n, List<T> list, Function<T, Integer> function) {
         int N = 1 << n;
+        int listSize = list.size();
         Complex[][] matrix = new Complex[N][N];
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
                 matrix[i][j] = (i!=j) ? Complex.ZERO : 
-                        function.apply(list.get(i)) == 0 ? 
+                        ((i >= listSize) || function.apply(list.get(i)) == 0 )? 
                         Complex.ONE : Complex.ONE.mul(-1);
             }
         }

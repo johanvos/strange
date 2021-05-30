@@ -118,6 +118,7 @@ public class Computations {
      * decompose a Step into steps that can be processed without permutations
      *
      * @param s
+     * @param nqubit
      * @return
      */
     public static List<Step> decomposeStep(Step s, int nqubit) {

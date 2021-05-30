@@ -57,7 +57,8 @@ public class Step {
      */
     public enum Type {
         NORMAL,
-        PSEUDO
+        PSEUDO,
+        PROBABILITY
     }
     
     private final Type type;

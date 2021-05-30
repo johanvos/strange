@@ -55,6 +55,8 @@ public class MulModulus extends BlockGate<MulModulus> {
      * Multiply the qubit in the x register with an integer mul
      * @param x0 start idx x register
      * @param x1 end idx x register
+     * @param mul
+     * @param mod
      * x_0 ----- y_0 + x_0
      * x_1 ----- y+1 + x_1
      * y_0 ----- 0

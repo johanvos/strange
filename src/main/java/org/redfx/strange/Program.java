@@ -110,7 +110,7 @@ public class Program {
     }
 
     /**
-     * Adds muliple steps with one or more gates to the existing program.
+     * Adds multiple steps with one or more gates to the existing program.
      * In case the Step contains an operation that would put a measured qubit into a potential superposition
      * again, an IllegalArgumentException is thrown.
      * @param moreSteps steps to be added to the program
