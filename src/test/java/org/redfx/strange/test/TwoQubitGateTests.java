@@ -68,6 +68,35 @@ public class TwoQubitGateTests extends BaseGateTests {
     }
 
     @Test
+    public void oneXGate1() {
+        Program p = new Program(2, new Step(new X(0)));
+        Result res = runProgram(p);
+        Qubit[] qubits = res.getQubits();
+        assertEquals(2, qubits.length);
+        assertEquals(1, qubits[0].measure());
+        assertEquals(0, qubits[1].measure());
+    }
+
+    @Test
+    public void oneXGate2() {
+        Program p = new Program(2, new Step(new X(1)));
+        Result res = runProgram(p);
+        Qubit[] qubits = res.getQubits();
+        assertEquals(2, qubits.length);
+        assertEquals(0, qubits[0].measure());
+        assertEquals(1, qubits[1].measure());
+    }
+
+    @Test
+    public void oneXGate3() {
+        Program p = new Program(2, new Step(new X(0), new X(1)));
+        Result res = runProgram(p);
+        Qubit[] qubits = res.getQubits();
+        assertEquals(2, qubits.length);
+        assertEquals(1, qubits[0].measure());
+        assertEquals(1, qubits[1].measure());
+    }
+    @Test
     public void swapGate00() {
         Program p = new Program(2,
             new Step(new Identity(0),new Identity(1)),

@@ -74,6 +74,7 @@ public class SingleQubitGateTests extends BaseGateTests {
         Result res = runProgram(p);
         Qubit[] qubits = res.getQubits();
         assertEquals(1, qubits[0].measure());
+        assertEquals(0, qubits[1].measure());
     }    
             
     @Test
@@ -81,14 +82,26 @@ public class SingleQubitGateTests extends BaseGateTests {
         Program p = new Program(2, new Step(new X(1)));
         Result res = runProgram(p);
         Qubit[] qubits = res.getQubits();
+        assertEquals(0, qubits[0].measure());
         assertEquals(1, qubits[1].measure());
     }    
-               
+                            
+    @Test
+    public void simpleIXIGate() {
+        Program p = new Program(3, new Step(new X(1)));
+        Result res = runProgram(p);
+        Qubit[] qubits = res.getQubits();
+        assertEquals(0, qubits[0].measure());
+        assertEquals(1, qubits[1].measure());
+        assertEquals(0, qubits[2].measure());
+    }     
     @Test
     public void simpleXIIGate() {
         Program p = new Program(3, new Step(new X(2)));
         Result res = runProgram(p);
         Qubit[] qubits = res.getQubits();
+        assertEquals(0, qubits[0].measure());
+        assertEquals(0, qubits[1].measure());
         assertEquals(1, qubits[2].measure());
     }    
     @Test
@@ -128,6 +141,11 @@ public class SingleQubitGateTests extends BaseGateTests {
             new Z(2),
             new Identity(3))
         );
+//        Program p = new Program(4,
+//            new Step(new X(0),new Y(1)),
+//            new Step(new Z(2)),
+//            new Step(new Identity(3))
+//        );
         Result res = runProgram(p);
         Qubit[] qubits = res.getQubits();
         assertEquals(1, qubits[0].measure());

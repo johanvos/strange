@@ -41,6 +41,7 @@ import org.redfx.strange.gate.Swap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -63,6 +64,10 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
     @Override
     public Result runProgram(Program p) {
         LOG.info("runProgram ");
+        LOG.info("LogLevel: " + LOG.getLevel());
+        LOG.info("Logname: " + LOG.getName());
+        LOG.info("LOG = "+LOG);
+        LOG.info("FINE LOGGER? " + LOG.isLoggable(Level.FINE));
         int nQubits = p.getNumberQubits();
         Qubit[] qubit = new Qubit[nQubits];
         for (int i = 0; i < nQubits; i++) {
@@ -98,7 +103,10 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         int cnt = 0;
         result.setIntermediateProbability(0, probs);
         LOG.fine("START RUN, number of steps = " + simpleSteps.size());
+        int cntr = 0;
         for (Step step : simpleSteps) {
+                            long s0 = System.currentTimeMillis();
+
             if (!step.getGates().isEmpty()) {
                 LOG.finer("RUN STEP " + step + ", cnt = " + cnt);
                 cnt++;
@@ -113,6 +121,9 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
                     result.setIntermediateProbability(idx, probs);
                 }
             }
+                long s1 = System.currentTimeMillis();
+                System.err.println("STEP "+ cntr+"("+step+") took "+ (s1 -s0));
+                cntr++;
         }
         LOG.info("DONE RUN, probability vector = " + probs);
         printProbs(probs);

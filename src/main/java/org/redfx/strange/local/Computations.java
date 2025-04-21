@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 
 import static org.redfx.strange.Complex.tensor;
 
@@ -51,6 +52,7 @@ import static org.redfx.strange.Complex.tensor;
 public class Computations {
 
     private static final boolean debug = false;
+    static final Logger LOG = Logger.getLogger(Computations.class.getName());
 
     static void dbg(String s) {
         SimpleQuantumExecutionEnvironment.LOG.finer(s);
@@ -446,6 +448,7 @@ public class Computations {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[] calculateNewState(List<Gate> gates, Complex[] vector, int length) {
+//        LOG.info("Calculate new states for "+ gates);
         if (containsImmediateMeasurementOnly(gates)) {
             return doImmediateMeasurement(gates, vector, length);
         }
@@ -455,12 +458,74 @@ public class Computations {
         return answer;
     }
     
+    private static Complex[] simpleNextProb(Gate gate, Complex[] v) {
+        LOG.info("Simple prob should work");
+        int size = v.length;
+        Complex[] answer = new Complex[size];
+        int nqubits = gate.getSize();
+        int index = gate.getMainQubitIndex();
+        int gatedim = 1 << nqubits;
+        int partdim = size / gatedim;
+        long s0 = System.currentTimeMillis();
+        long s1 = s0;
+        int length = (int) Math.ceil(Math.log(size) / Math.log(2));
+        int ngroups = 1 << (length-index -1);
+        int qdelta = 1 << index;
+//        LOG.info("ngroups = "+ngroups+" and qd = "+qdelta+" and nqubits = "+nqubits+" and index = "+index);
+        for (int group = 0; group < ngroups; group++) {
+//            LOG.info("group = "+group);
+            for (int j = 2 * group * qdelta; j < (2 * group + 1) * qdelta; j++) {
+//                LOG.info("j = "+j);
+                Complex[] work = new Complex[2];
+                Complex[] tmp = new Complex[2];
+                tmp[0] = Complex.ZERO;
+                tmp[1] = Complex.ZERO;
+                work[0] = v[j];
+                work[1] = v[j + qdelta];
+//LOG.info("Reorg "+j+" and "+ j + qdelta);
+                if (gate.hasOptimization()) {
+//                    LOG.info("Hasopt");
+                    tmp = gate.applyOptimize(work);
+                } else {
+//                    LOG.info("Noopt");
+                    dbg("GET MATRIX for  " + gate);
+                    Complex[][] matrix = gate.getMatrix();
+                    s1 = System.currentTimeMillis();
+                    for (int i = 0; i < gatedim; i++) {
+                        for (int k = 0; k < gatedim; k++) {
+                            tmp[i] = tmp[i].add(matrix[i][k].mul(work[k]));
+//                            LOG.info("i = " + i + ", k = " + k + ", newv[i] = " + tmp[i] + " and oldvk = " + work[k]);
+                        }
+                    }
+                }
+                answer[j] = tmp[0];
+                answer[j + qdelta] = tmp[1];
+            }
+        }
+//LOG.info("ANSWER = " + List.of(answer));
+        return answer;
+    }
+
     private static Complex[] getNextProbability(List<Gate> gates, Complex[] v) {
+        List<Gate> nonIdentityGates = gates.stream().filter(gate -> !(gate instanceof Identity)).toList();
+        if (nonIdentityGates.size() == 0) return v;
+//        if ((nonIdentityGates.size() == 1) && (nonIdentityGates.get(0).getSize() == 1)) {
+          if (1 < 2)  {
+              Complex[] answer = v;
+              for (Gate gate : gates) {
+                  if (!(gate instanceof Identity)) answer = simpleNextProb(gate, answer);
+              }
+              return answer;
+          }
+//        }
+     
+        LOG.info("Complex prob needed");
         Gate gate = gates.get(0);
         int nqubits = gate.getSize();
         int gatedim = 1 << nqubits;
         int size = v.length;
-     dbg("GETNEXTPROBABILITY asked for size = " + size + " and gates = " + gates+", gatedim = "+gatedim);
+//        LOG.info("gates = "+gates);
+//     dbg("GETNEXTPROBABILITY asked for size = " + size + " and gates = " + gates+", gatedim = "+gatedim);
         if (gates.size() > 1) {
 
             int partdim = size / gatedim;
@@ -471,11 +536,11 @@ public class Computations {
                 id = id && (g instanceof Identity);
             }
             if (id) {
-                dbg("ONLY IDENTITY!! partdim = "+partdim);
+//                dbg("ONLY IDENTITY!! partdim = "+partdim);
                 long s0 = System.currentTimeMillis();
                 long s1 = s0;
                 for (int j = 0; j < partdim; j++) {
-                    dbg("do part "+j+" from "+partdim);
+//                    dbg("do part "+j+" from "+partdim);
                     Complex[] oldv = new Complex[gatedim];
                     Complex[] newv = new Complex[gatedim];
                     for (int i = 0; i < gatedim; i++) {
@@ -484,10 +549,10 @@ public class Computations {
                     }
 
                     if (gate.hasOptimization()) {
-                        dbg("OPTPART!");
+//                        dbg("OPTPART!");
                         newv = gate.applyOptimize(oldv);
                     } else {
-                        dbg("GET MATRIX for  "+gate);
+//                        dbg("GET MATRIX for  "+gate);
                         Complex[][] matrix = gate.getMatrix();
                         s1 = System.currentTimeMillis();
                         for (int i = 0; i < gatedim; i++) {
@@ -499,7 +564,7 @@ public class Computations {
                     for (int i = 0; i < gatedim; i++) {
                         answer[i * partdim + j] = newv[i];
                     }
-                    dbg("done part");
+//                    dbg("done part");
                 }
                 long s2 = System.currentTimeMillis();
                 return answer;
