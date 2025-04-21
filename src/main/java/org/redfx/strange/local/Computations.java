@@ -164,6 +164,7 @@ public class Computations {
                 TwoQubitGate tqg = (TwoQubitGate) gate;
                 int first = tqg.getMainQubitIndex();
                 int second = tqg.getSecondQubitIndex();
+                LOG.info("Decompose 2qg with first = "+first+" and second = "+second);
                 if ((first >= nqubit) || (second >= nqubit)) {
                     throw new IllegalArgumentException("Step " + s + " uses a gate with invalid index " + first + " or " + second);
                 }
@@ -174,31 +175,31 @@ public class Computations {
                         throw new RuntimeException("Wrong gate, first == second for " + gate);
                     }
                     if (first > second) {
-                        PermutationGate pg = new PermutationGate(first - 1, second, nqubit);
-                        Step prePermutation = new Step(pg);
-                        Step postPermutation = new Step(pg);
-                        answer.add(0, prePermutation);
-                        answer.add(postPermutation);
-                        postPermutation.setComplexStep(s.getIndex());
-                        s.setComplexStep(-1);
+//                        PermutationGate pg = new PermutationGate(first - 1, second, nqubit);
+//                        Step prePermutation = new Step(pg);
+//                        Step postPermutation = new Step(pg);
+//                        answer.add(0, prePermutation);
+//                        answer.add(postPermutation);
+//                        postPermutation.setComplexStep(s.getIndex());
+//                        s.setComplexStep(-1);
                     } else {
-                        PermutationGate pg = new PermutationGate(first, second, nqubit);
-                        Step prePermutation = new Step(pg);
-                        Step prePermutationInv = new Step(pg);
-                        int realStep = s.getIndex();
-                        s.setComplexStep(-1);
-                        answer.add(0, prePermutation);
-                        answer.add(prePermutationInv);
-                        Step postPermutation = new Step();
-                        Step postPermutationInv = new Step();
-                        if (first != second - 1) {
-                            PermutationGate pg2 = new PermutationGate(second - 1, first, nqubit);
-                            postPermutation.addGate(pg2);
-                            postPermutationInv.addGate(pg2);
-                            answer.add(1, postPermutation);
-                            answer.add(3, postPermutationInv);
-                        }
-                        prePermutationInv.setComplexStep(realStep);
+//                        PermutationGate pg = new PermutationGate(first, second, nqubit);
+//                        Step prePermutation = new Step(pg);
+//                        Step prePermutationInv = new Step(pg);
+//                        int realStep = s.getIndex();
+//                        s.setComplexStep(-1);
+//                        answer.add(0, prePermutation);
+//                        answer.add(prePermutationInv);
+//                        Step postPermutation = new Step();
+//                        Step postPermutationInv = new Step();
+//                        if (first != second - 1) {
+//                            PermutationGate pg2 = new PermutationGate(second - 1, first, nqubit);
+//                            postPermutation.addGate(pg2);
+//                            postPermutationInv.addGate(pg2);
+//                            answer.add(1, postPermutation);
+//                            answer.add(3, postPermutationInv);
+//                        }
+//                        prePermutationInv.setComplexStep(realStep);
                     }
                 }
             } else if (gate instanceof ThreeQubitGate) {
@@ -458,12 +459,29 @@ public class Computations {
         return answer;
     }
     
-    private static Complex[] simpleNextProb(Gate gate, Complex[] v) {
+    private static Complex[] simpleNextProb(Gate targetGate, Complex[] v) {
         LOG.info("Simple prob should work");
         int size = v.length;
         Complex[] answer = new Complex[size];
-        int nqubits = gate.getSize();
+        Gate gate = targetGate;
+        int controlQubit = -1;
         int index = gate.getMainQubitIndex();
+        if (targetGate instanceof Swap) {
+            Swap swap = (Swap)targetGate;
+            int b0 = swap.getMainQubitIndex();
+            int b1 = swap.getSecondQubitIndex();
+            for (int i = 0 ; i < size; i++) {
+                answer[i] = v[swapBits(i, b0, b1)];
+            }
+            return answer;
+        }
+        if (targetGate instanceof ControlledGate) {
+            LOG.info("CONTROLLEDGATE");
+            gate = ((ControlledGate) targetGate).getRootGate();
+            controlQubit = ((ControlledGate) targetGate).getControllQubitIndex();
+            index = ((ControlledGate) targetGate).getRootGateIndex();
+        }
+        int nqubits = gate.getSize();
         int gatedim = 1 << nqubits;
         int partdim = size / gatedim;
         long s0 = System.currentTimeMillis();
@@ -471,6 +489,7 @@ public class Computations {
         int length = (int) Math.ceil(Math.log(size) / Math.log(2));
         int ngroups = 1 << (length-index -1);
         int qdelta = 1 << index;
+        LOG.info("index = "+index+" and controlqbit = "+controlQubit + " and qd = "+qdelta);
 //        LOG.info("ngroups = "+ngroups+" and qd = "+qdelta+" and nqubits = "+nqubits+" and index = "+index);
         for (int group = 0; group < ngroups; group++) {
 //            LOG.info("group = "+group);
@@ -482,13 +501,18 @@ public class Computations {
                 tmp[1] = Complex.ZERO;
                 work[0] = v[j];
                 work[1] = v[j + qdelta];
+                if (hasZeroBit(j, controlQubit)) {
+//                    LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
+                    tmp[0] = v[j];
+                    tmp[1] = v[j + qdelta];
+                } else {
 //LOG.info("Reorg "+j+" and "+ j + qdelta);
                 if (gate.hasOptimization()) {
 //                    LOG.info("Hasopt");
                     tmp = gate.applyOptimize(work);
                 } else {
 //                    LOG.info("Noopt");
-                    dbg("GET MATRIX for  " + gate);
+//                    dbg("GET MATRIX for  " + gate);
                     Complex[][] matrix = gate.getMatrix();
                     s1 = System.currentTimeMillis();
                     for (int i = 0; i < gatedim; i++) {
@@ -497,6 +521,7 @@ public class Computations {
 //                            LOG.info("i = " + i + ", k = " + k + ", newv[i] = " + tmp[i] + " and oldvk = " + work[k]);
                         }
                     }
+                }
                 }
                 answer[j] = tmp[0];
                 answer[j + qdelta] = tmp[1];
@@ -509,8 +534,11 @@ public class Computations {
     private static Complex[] getNextProbability(List<Gate> gates, Complex[] v) {
         List<Gate> nonIdentityGates = gates.stream().filter(gate -> !(gate instanceof Identity)).toList();
         if (nonIdentityGates.size() == 0) return v;
-//        if ((nonIdentityGates.size() == 1) && (nonIdentityGates.get(0).getSize() == 1)) {
-          if (1 < 2)  {
+//        LOG.info("nonIdentityGates = " + nonIdentityGates);
+        long blocks = nonIdentityGates.stream().filter(g -> (g instanceof BlockGate)).count();
+//        LOG.info("nonIdentityGates = " + nonIdentityGates+" and blockCount = "+blocks);
+        if ((blocks == 0) && (nonIdentityGates.size() == 1) && (nonIdentityGates.get(0).getSize() < 3) ) {
+//          if (1 < 2)  {
               Complex[] answer = v;
               for (Gate gate : gates) {
                   if (!(gate instanceof Identity)) answer = simpleNextProb(gate, answer);
@@ -783,4 +811,34 @@ public class Computations {
         return gates.stream().anyMatch(g -> g instanceof ImmediateMeasurement) &&  
                gates.stream().allMatch(g -> g instanceof ImmediateMeasurement || g instanceof Identity);
     }
+
+    /**
+     * Check if bit at position b has value 1 in the integer a
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static boolean hasZeroBit(int a, int b) {
+       if (b < 0) return false;
+        int res = a & (1 << b);
+        return (res == 0);
+    }
+
+    /**
+     * Swap the value of bits b0 and b1 in the value val.
+     * @param val
+     * @param b0
+     * @param b1
+     * @return 
+     */
+    public static int swapBits(int val, int b0, int b1) {
+        int bit0Val = (val >> b0) & 1;
+        int bit1Val = (val >> b1) & 1;
+        if (bit0Val != bit1Val) {
+            int bitMask = (1 << b0) | (1 << b1);
+            val ^= bitMask;
+        }
+        return val;
+    }
+
 }

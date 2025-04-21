@@ -33,6 +33,8 @@
 package org.redfx.strange.gate;
 
 import org.redfx.strange.Complex;
+import org.redfx.strange.ControlledGate;
+import org.redfx.strange.Gate;
 
 /**
  * <p>Cr class.</p>
@@ -40,7 +42,11 @@ import org.redfx.strange.Complex;
  * @author johan
  * @version $Id: $Id
  */
-public class Cr extends TwoQubitGate {
+public class Cr extends TwoQubitGate implements ControlledGate  {
+        
+    final int controlQubit;
+    final int rootGateIndex;
+    final double expv;
     
     private Complex[][] matrix =  new Complex[][]{
         {Complex.ONE,Complex.ZERO,Complex.ZERO,Complex.ZERO},
@@ -53,9 +59,9 @@ public class Cr extends TwoQubitGate {
     /**
      * <p>Constructor for Cr.</p>
      */
-    public Cr() {    
-    }
-    
+//    public Cr() {    
+//    }
+//    
     /**
      * Control-R gate
      *
@@ -65,6 +71,9 @@ public class Cr extends TwoQubitGate {
      */
     public Cr (int a, int b, double exp) {
         super(a,b);
+                this.controlQubit = a;
+        this.rootGateIndex = b;
+        this.expv = exp;
         double ar = Math.cos(exp);
         double ai = Math.sin(exp);
         if (Math.abs(Math.PI -exp)  < 1e-6) {
@@ -112,5 +121,20 @@ public class Cr extends TwoQubitGate {
     /** {@inheritDoc} */
     @Override public String getCaption() {
         return "Cr" + ((pow> -1)? Integer.toString(pow): "th");
+    }
+    
+    @Override
+    public int getControllQubitIndex() {
+        return this.controlQubit;
+    }
+
+    @Override
+    public Gate getRootGate() {
+        return new R(expv, 0);
+    }
+
+    @Override
+    public int getRootGateIndex() {
+        return this.rootGateIndex;
     }
 }
