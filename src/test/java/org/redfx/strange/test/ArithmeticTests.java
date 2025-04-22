@@ -33,6 +33,7 @@
 package org.redfx.strange.test;
 
 
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.redfx.strange.Block;
@@ -300,7 +301,65 @@ public class ArithmeticTests extends BaseGateTests {
         assertEquals(0, q[2].measure());
         assertEquals(0, q[3].measure());
     }  
-         
+                              
+    @Test
+    public void admin1() {
+        Program p = new Program(2);
+        Step prep = new Step();
+        prep.addGates(new X(0));
+        p.addStep(prep);
+        Add add = new Add(0,0,1,1);
+        p.addStep(new Step(add));
+        Add min = new Add(0,0,1,1).inverse();
+        p.addStep(new Step(min));
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        assertEquals(2, q.length);
+        assertEquals(1, q[0].measure());
+        assertEquals(0, q[1].measure());  
+    }
+                    
+    @Test
+    public void admin2part1() {
+        Program p = new Program(4);
+        Step prep = new Step();
+        prep.addGates(new X(1), new X(2));
+        p.addStep(prep);
+        Add add = new Add(0,1,2,3);
+        p.addStep(new Step(add));
+//        Add min = new Add(0,1,2,3).inverse();
+//        p.addStep(new Step(min));
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        for (Qubit qq : q) {
+            System.err.println("QQ = "+qq.getProbability());
+        }
+        System.err.println("RES = "+Arrays.asList(q));
+        assertEquals(4, q.length);
+        assertEquals(1, q[0].measure());
+        assertEquals(1, q[1].measure());  
+        assertEquals(1, q[2].measure());
+        assertEquals(0, q[3].measure());  
+    }
+    @Test
+    public void admin2() {
+        Program p = new Program(4);
+        Step prep = new Step();
+        prep.addGates(new X(1), new X(2));
+        p.addStep(prep);
+        Add add = new Add(0,1,2,3);
+        p.addStep(new Step(add));
+        Add min = new Add(0,1,2,3).inverse();
+        p.addStep(new Step(min));
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        assertEquals(4, q.length);
+        assertEquals(0, q[0].measure());
+        assertEquals(1, q[1].measure());  
+        assertEquals(1, q[2].measure());
+        assertEquals(0, q[3].measure());  
+    }
+    
     @Test
     public void adjoint() {
            Program p = new Program(6);

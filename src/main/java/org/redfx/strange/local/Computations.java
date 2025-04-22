@@ -537,7 +537,7 @@ public class Computations {
 //        LOG.info("nonIdentityGates = " + nonIdentityGates);
         long blocks = nonIdentityGates.stream().filter(g -> (g instanceof BlockGate)).count();
 //        LOG.info("nonIdentityGates = " + nonIdentityGates+" and blockCount = "+blocks);
-        if ((blocks == 0) && (nonIdentityGates.size() == 1) && (nonIdentityGates.get(0).getSize() < 3) ) {
+        if ((blocks == 110) && (nonIdentityGates.size() == 1) && (nonIdentityGates.get(0).getSize() < 3) ) {
 //          if (1 < 2)  {
               Complex[] answer = v;
               for (Gate gate : gates) {
@@ -547,12 +547,14 @@ public class Computations {
           }
 //        }
      
-        LOG.info("Complex prob needed");
+        LOG.info("Complex prob needed for "+gates);
+        Complex.printArray(v);
+        LOG.info("Now apply " + gates);
         Gate gate = gates.get(0);
         int nqubits = gate.getSize();
         int gatedim = 1 << nqubits;
         int size = v.length;
-//        LOG.info("gates = "+gates);
+        LOG.info("gates = "+gates);
 //     dbg("GETNEXTPROBABILITY asked for size = " + size + " and gates = " + gates+", gatedim = "+gatedim);
         if (gates.size() > 1) {
 
@@ -580,6 +582,7 @@ public class Computations {
 //                        dbg("OPTPART!");
                         newv = gate.applyOptimize(oldv);
                     } else {
+                        LOG.info("Get matrix for "+gate);
 //                        dbg("GET MATRIX for  "+gate);
                         Complex[][] matrix = gate.getMatrix();
                         s1 = System.currentTimeMillis();
@@ -618,6 +621,8 @@ public class Computations {
                 }
             }
             long s2 = System.currentTimeMillis();
+            LOG.info("after "+gates+", probs changed to ");
+            Complex.printArray(answer);
             return answer;
         } else {
             if (gatedim != size) {
@@ -625,8 +630,10 @@ public class Computations {
                 throw new IllegalArgumentException("wrong matrix size " + gatedim + " vs vector size " + v.length);
             }
             if (gate.hasOptimization()) {
+                LOG.info("OPTIMIZE!");
                 return gate.applyOptimize(v);
             } else {
+                LOG.info("NO OPTMIZE");
                 Complex[][] matrix = gate.getMatrix();
                 Complex[] answer = new Complex[size];
                 for (int i = 0; i < size; i++) {
@@ -691,6 +698,7 @@ public class Computations {
     }
 
     private static void processBlockGate(ControlledBlockGate gate, ArrayList<Step> answer) {
+        LOG.info("PROCESS BLOCK GATE "+gate);
         Step master = answer.get(answer.size() -1);
         gate.calculateHighLow();
         int low = gate.getLow();
