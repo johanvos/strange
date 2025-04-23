@@ -34,6 +34,7 @@ package org.redfx.strange.gate;
 
 import org.redfx.strange.Complex;
 import org.redfx.strange.QuantumExecutionEnvironment;
+import org.redfx.strange.local.Computations;
 
 /**
  * <p>InvFourier class.</p>
@@ -101,6 +102,25 @@ public class InvFourier extends Fourier {
     /** {@inheritDoc} */
     @Override
     public boolean hasOptimization() {
-        return false;
+        return true;
+    }
+    
+    @Override
+    public Complex[] applyOptimize(Complex[] v) {
+        int length = (int) Math.ceil(Math.log(size) / Math.log(2));
+        System.err.println("INVVVV start with ");
+        Complex.printArray(v);
+        for (int i = dim - 1; i >= 0; i--) {
+            v = Computations.simpleNextProb(new Hadamard(i), v);
+            System.err.println("after a H, we have ");
+            Complex.printArray(v);
+            for (int j = 2; j <= i+1; j++) {
+                v = Computations.simpleNextProb(new Cr(i+1-j, i, 2,-j), v);
+            }
+        }
+        for (int i = 0; i < length/2;i++) {
+            v = Computations.simpleNextProb(new Swap(0,length-1-i), v);
+        }
+        return v;
     }
 }

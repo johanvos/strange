@@ -32,9 +32,11 @@
  */
 package org.redfx.strange;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.redfx.strange.local.Computations;
 
 /**
  *
@@ -121,6 +123,9 @@ public class BlockGate<T extends Gate> implements Gate {
     /** {@inheritDoc} */
     @Override
     public int getHighestAffectedQubitIndex() {
+        if (this.block == null) {
+            this.block = createBlock(inverse);
+        }
         int answer = block.getNQubits()+idx-1;
         return answer;
     }
@@ -187,15 +192,42 @@ public class BlockGate<T extends Gate> implements Gate {
         return true;
     }
 
+    public Block createBlock(boolean inverse) {
+        throw new RuntimeException();
+    }
     /** {@inheritDoc} */
     @Override
     public Complex[] applyOptimize(Complex[] v) {
-        return block.applyOptimize(v, inverse);
+        if (block == null) {
+            this.block = createBlock(inverse);
+        }
+        List<Step> steps = block.getSteps();
+//        if (inverse) {
+//            Collections.reverse(steps);
+//            for (Step step : steps) {
+//                step.setInverse(true);
+//            }
+//        }
+        for (Step step : block.getSteps()) {
+            System.err.println("STEP " + step+" and idx = "+this.getMainQubitIndex());
+            List<Gate> gates = step.getGates();
+            v = Computations.getNextProbability(gates, v, this.getMainQubitIndex());
+        }
+//        if (inverse) { // restore steps
+//            for (Step step : steps) {
+//                step.setInverse(true);
+//            }
+//        }
+        return v;
+        
+        
+//        return block.applyOptimize(v, inverse);
     }
 
     /** {@inheritDoc} */
     @Override public String toString() {
-        return "Gate for block "+block+", size = "+getSize()+", inv = "+inverse;
+        return "Gate for block "+block+", inv = "+inverse;
+//        return "Gate for block "+block+", size = "+getSize()+", inv = "+inverse;
     }
 
     

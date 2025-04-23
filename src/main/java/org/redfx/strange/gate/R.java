@@ -85,7 +85,7 @@ public class R extends SingleQubitGate {
 
     /** {@inheritDoc} */
     @Override public String getCaption() { 
-        return "R" + ((pow> -1)? Integer.toString(pow): "th");
+        return "R" + ((pow> -1)? Integer.toString(pow): "th"+Integer.toString(pow));
     }
     
 }

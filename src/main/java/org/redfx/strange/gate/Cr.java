@@ -71,7 +71,7 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
      */
     public Cr (int a, int b, double exp) {
         super(a,b);
-                this.controlQubit = a;
+        this.controlQubit = a;
         this.rootGateIndex = b;
         this.expv = exp;
         double ar = Math.cos(exp);

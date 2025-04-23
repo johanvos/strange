@@ -38,6 +38,7 @@ import org.redfx.strange.local.Computations;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.redfx.strange.gate.SingleQubitGate;
 
 /**
  *
@@ -233,6 +234,21 @@ public class ControlledBlockGate<T> extends BlockGate {
     /** {@inheritDoc} */
     @Override
     public Complex[] applyOptimize(Complex[] v) {
+        System.err.println("[CBG] appopt for v = ");
+        Thread.dumpStack();
+        Complex.printArray(v);
+        for (Step step : block.steps) {
+            System.err.println("STEP "+step);
+            List<Gate> gates = step.getGates();
+            for (Gate gate: gates) {
+                Gate singleGate = new SingleControlledGate(this.control, this.getMainQubitIndex()+ gate.getMainQubitIndex(), gate);
+                v = Computations.simpleNextProb(singleGate, v);
+                System.err.println("After this gate, probs = ");
+                Complex.printArray(v);
+            }
+        }
+        System.err.println("[CBG] done");
+        if (1 < 2) return v;
         int size = v.length;
         Complex[] answer = new Complex[size];
         int dim = size / 2;
@@ -248,6 +264,39 @@ public class ControlledBlockGate<T> extends BlockGate {
         return answer;
     }
 
+    static class SingleControlledGate extends SingleQubitGate implements ControlledGate {
+
+        private final int ctrl;
+        private final int index;
+        private final Gate root;
+
+        SingleControlledGate(int ctrl, int index, Gate root) {
+            System.err.println("Created SCG with ctr at "+ctrl+" and index = "+ index);
+            this.ctrl = ctrl;
+            this.index = index;
+            this.root = root;
+        }
+        @Override
+        public Complex[][] getMatrix() {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public int getControllQubitIndex() {
+            return ctrl;
+        }
+
+        @Override
+        public int getRootGateIndex() {
+            return index;
+        }
+
+        @Override
+        public Gate getRootGate() {
+            return root;
+        }
+        
+    }
     /**
      * <p>Getter for the field <code>size</code>.</p>
      *

@@ -36,6 +36,8 @@ import org.redfx.strange.Complex;
 
 import static org.redfx.strange.Complex.ONE;
 import static org.redfx.strange.Complex.ZERO;
+import org.redfx.strange.ControlledGate;
+import org.redfx.strange.Gate;
 
 /**
  * <p>Toffoli class.</p>
@@ -43,7 +45,11 @@ import static org.redfx.strange.Complex.ZERO;
  * @author johan
  * @version $Id: $Id
  */
-public class Toffoli extends ThreeQubitGate {
+public class Toffoli extends ThreeQubitGate implements ControlledGate {
+    
+    final int ctrl0;
+    final int ctrl1;
+    final int gateIndex;
     
     Complex[][] matrix =  new Complex[][]{
         {ONE,ZERO,ZERO,ZERO,ZERO,ZERO,ZERO,ZERO},
@@ -55,13 +61,13 @@ public class Toffoli extends ThreeQubitGate {
         {ZERO,ZERO,ZERO,ZERO,ZERO,ZERO,ZERO,ONE},
         {ZERO,ZERO,ZERO,ZERO,ZERO,ZERO,ONE,ZERO}
     };
-    
-    /**
-     * <p>Constructor for Toffoli.</p>
-     */
-    public Toffoli() {    
-    }
-    
+//    
+//    /**
+//     * <p>Constructor for Toffoli.</p>
+//     */
+//    public Toffoli() {    
+//    }
+//    
     /**
      * <p>Constructor for Toffoli.</p>
      *
@@ -71,6 +77,9 @@ public class Toffoli extends ThreeQubitGate {
      */
     public Toffoli (int a, int b, int c) {
         super(a,b,c);
+        ctrl0 = a;
+        ctrl1 = b;
+        gateIndex = c;
     }
 
     /** {@inheritDoc} */
@@ -94,5 +103,25 @@ public class Toffoli extends ThreeQubitGate {
     /** {@inheritDoc} */
     @Override public String getCaption() {
         return "CCnot";
+    }
+
+    @Override
+    public int getControllQubitIndex() {
+        return ctrl0;
+    }
+
+    @Override
+    public int getSecondControlQubitIndex() {
+        return ctrl1;
+    };
+
+    @Override
+    public int getRootGateIndex() {
+        return gateIndex;
+    }
+
+    @Override
+    public Gate getRootGate() {
+        return new X(0);
     }
 }

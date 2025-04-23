@@ -38,6 +38,7 @@ import org.redfx.strange.Complex;
 import org.redfx.strange.Step;
 
 import java.util.HashMap;
+import org.redfx.strange.Gate;
 
 /**
  * <p>AddInteger class.</p>
@@ -47,7 +48,9 @@ import java.util.HashMap;
  */
 public class AddInteger extends BlockGate<AddInteger> {
 
-    Block block;
+    final int x0;
+    final int x1;
+    final int num;
     static HashMap<Integer, Block> cache = new HashMap<>();
 
     
@@ -63,18 +66,23 @@ public class AddInteger extends BlockGate<AddInteger> {
     public AddInteger(int x0, int x1, int num) {
         super();
         setIndex(x0);
-        x1 = x1 - x0;
-        x0 = 0;
-        int hash = 1000000 * x0 + 10000*x1+ num;
-        this.block = cache.get(hash);
-        if (this.block == null) {
-            this.block = createBlock(x0, x1, num);
-   //         cache.put(hash, block);
-        }
-        setBlock(block);
+        this.x0 = x0;
+        this.x1 = x1;
+        this.num = num;
+//        x1 = x1 - x0;
+//        x0 = 0;
+//        int hash = 1000000 * x0 + 10000*x1+ num;
+//        this.block = cache.get(hash);
+//        if (this.block == null) {
+//            this.block = createBlock(x0, x1, num);
+//        }
+//        setBlock(block);
        
     }
     
+    public Block createBlock(boolean inverse) {
+        return createBlock(x0, x1, num, inverse);
+    }
     /**
      * <p>createBlock.</p>
      *
@@ -83,8 +91,9 @@ public class AddInteger extends BlockGate<AddInteger> {
      * @param num a int
      * @return a {@link org.redfx.strange.Block} object
      */
-    public Block createBlock(int x0, int x1, int num) {
-        boolean old = false;
+    public Block createBlock(int x0, int x1, int num, boolean inverse) {
+        System.err.println("CREATE addint with num = "+num+" and inv = "+inverse);
+        boolean old = true;
         int m = x1-x0+1;
         Block answer = new Block("AddInteger ", m);
         answer.addStep(new Step(new Fourier(m, 0)));
@@ -93,10 +102,20 @@ public class AddInteger extends BlockGate<AddInteger> {
             Complex[][] mat = Complex.identityMatrix(2);
             for (int j = 0; j < m-i ; j++) {
                 int cr0 = m-j-i-1;
+//                if (inverse) {
+//                    System.err.println("ADDINT inv");
+//                    cr0 = -1*cr0;
+//                }
                 if ((num >> cr0 & 1) == 1) {
                     mat = Complex.mmul(mat, new R(2, 1 + j, i).getMatrix());
                     if (old) {
-                        Step s = new Step(new R(2, 1 + j, i));
+                       int pow = j+1;// (inverse ? (-1 -j) : (1 + j));
+                       Gate g = new R(2, pow, i);
+                        System.err.println("CREATED addint subgate (pow = "+pow+"): "+g);
+                       if (inverse) {
+                           g.setInverse(true);
+                       }
+                        Step s = new Step(g);
                         answer.addStep(s);
                     }
                 }

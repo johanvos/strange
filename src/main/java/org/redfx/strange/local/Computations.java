@@ -129,7 +129,7 @@ public class Computations {
             s.setComplexStep(s.getIndex());
             return answer;
         }
-
+if ( 1< 2 ) return answer;
         List<Gate> gates = s.getGates();
 
         if (gates.isEmpty()) {
@@ -459,13 +459,19 @@ public class Computations {
         return answer;
     }
     
-    private static Complex[] simpleNextProb(Gate targetGate, Complex[] v) {
-        LOG.info("Simple prob should work");
+    public static Complex[] simpleNextProb(Gate targetGate, Complex[] v) {
+        return simpleNextProb(targetGate, v, 0);
+    }
+
+    public static Complex[] simpleNextProb(Gate targetGate, Complex[] v, int baseIndex) {
+        LOG.info("Simple prob should work with base = "+baseIndex+" and before we apply "+targetGate+" we have ");
+        Complex.printArray(v);
         int size = v.length;
         Complex[] answer = new Complex[size];
         Gate gate = targetGate;
         int controlQubit = -1;
-        int index = gate.getMainQubitIndex();
+        int controlQubit2 = -1;
+        int index = gate.getMainQubitIndex() + baseIndex;
         if (targetGate instanceof Swap) {
             Swap swap = (Swap)targetGate;
             int b0 = swap.getMainQubitIndex();
@@ -477,9 +483,13 @@ public class Computations {
         }
         if (targetGate instanceof ControlledGate) {
             LOG.info("CONTROLLEDGATE");
-            gate = ((ControlledGate) targetGate).getRootGate();
-            controlQubit = ((ControlledGate) targetGate).getControllQubitIndex();
-            index = ((ControlledGate) targetGate).getRootGateIndex();
+            ControlledGate cGate = (ControlledGate) targetGate;
+            gate = cGate.getRootGate();
+            controlQubit = baseIndex + cGate.getControllQubitIndex();
+            if (cGate.getSecondControlQubitIndex() > -1) {
+                controlQubit2 = baseIndex + cGate.getSecondControlQubitIndex();
+            }
+            index = baseIndex + cGate.getRootGateIndex();
         }
         int nqubits = gate.getSize();
         int gatedim = 1 << nqubits;
@@ -489,7 +499,7 @@ public class Computations {
         int length = (int) Math.ceil(Math.log(size) / Math.log(2));
         int ngroups = 1 << (length-index -1);
         int qdelta = 1 << index;
-        LOG.info("index = "+index+" and controlqbit = "+controlQubit + " and qd = "+qdelta);
+        LOG.info("index = "+index+" and controlqbit = "+controlQubit + " and cq2 = " + controlQubit2+" and qd = "+qdelta );
 //        LOG.info("ngroups = "+ngroups+" and qd = "+qdelta+" and nqubits = "+nqubits+" and index = "+index);
         for (int group = 0; group < ngroups; group++) {
 //            LOG.info("group = "+group);
@@ -501,17 +511,16 @@ public class Computations {
                 tmp[1] = Complex.ZERO;
                 work[0] = v[j];
                 work[1] = v[j + qdelta];
-                if (hasZeroBit(j, controlQubit)) {
-//                    LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
+                if ((hasZeroBit(j, controlQubit)) || ((controlQubit2 > -1) && (hasZeroBit(j, controlQubit2))) ) {
+                    LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
                     tmp[0] = v[j];
                     tmp[1] = v[j + qdelta];
                 } else {
-//LOG.info("Reorg "+j+" and "+ j + qdelta);
                 if (gate.hasOptimization()) {
-//                    LOG.info("Hasopt");
+                    LOG.info("Yes, gate "+gate+" has optimize");
                     tmp = gate.applyOptimize(work);
                 } else {
-//                    LOG.info("Noopt");
+                    LOG.info("Noopt");
 //                    dbg("GET MATRIX for  " + gate);
                     Complex[][] matrix = gate.getMatrix();
                     s1 = System.currentTimeMillis();
@@ -531,20 +540,38 @@ public class Computations {
         return answer;
     }
 
-    private static Complex[] getNextProbability(List<Gate> gates, Complex[] v) {
+    public static Complex[] getNextProbability(List<Gate> gates, Complex[] v) {
+        return getNextProbability(gates, v, 0);
+    }
+
+    public static Complex[] getNextProbability(List<Gate> gates, Complex[] v, int baseIndex) {
+        LOG.info("GNP for "+gates+" and base = " + baseIndex+" and probs = ");
+        Complex.printArray(v);
+//        Thread.dumpStack();
         List<Gate> nonIdentityGates = gates.stream().filter(gate -> !(gate instanceof Identity)).toList();
         if (nonIdentityGates.size() == 0) return v;
 //        LOG.info("nonIdentityGates = " + nonIdentityGates);
         long blocks = nonIdentityGates.stream().filter(g -> (g instanceof BlockGate)).count();
 //        LOG.info("nonIdentityGates = " + nonIdentityGates+" and blockCount = "+blocks);
-        if ((blocks == 110) && (nonIdentityGates.size() == 1) && (nonIdentityGates.get(0).getSize() < 3) ) {
+        if ((blocks != 10000) && (nonIdentityGates.size() == 1) && (nonIdentityGates.get(0).getSize() < 4) ) {
 //          if (1 < 2)  {
-              Complex[] answer = v;
-              for (Gate gate : gates) {
-                  if (!(gate instanceof Identity)) answer = simpleNextProb(gate, answer);
-              }
-              return answer;
-          }
+
+            Complex[] answer = v;
+            for (Gate gate : gates) {
+                if (!(gate instanceof Identity)) {
+                    if (gate instanceof ControlledBlockGate) {
+                        answer = gate.applyOptimize(answer);
+                    } else if (gate instanceof BlockGate) {
+                        LOG.info("BLOCKGATE: "+ gate);
+                        answer = gate.applyOptimize(answer);
+                    } else {
+                        answer = simpleNextProb(gate, answer, baseIndex);
+                    }
+                }
+
+            }
+            return answer;
+        }
 //        }
      
         LOG.info("Complex prob needed for "+gates);

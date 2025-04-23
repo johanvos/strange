@@ -150,6 +150,19 @@ public class Block {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public Complex[] applyOptimize(Complex[] probs, boolean inverse) {
+        for (Step step : steps) {
+            System.err.println("STEP " + step);
+            List<Gate> gates = step.getGates();
+            probs = Computations.getNextProbability(gates, probs);
+        }
+        if (1 < 2) return probs;
+
+        
+        
+        
+        
+        
+        
         List<Step> simpleSteps = new ArrayList<>();
         for (Step step : steps) {
             simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
