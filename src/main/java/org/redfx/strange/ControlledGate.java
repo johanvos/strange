@@ -13,4 +13,5 @@ public interface ControlledGate {
     public Gate getRootGate();
     
     default public int getSecondControlQubitIndex() {return -1;};
+    
 }

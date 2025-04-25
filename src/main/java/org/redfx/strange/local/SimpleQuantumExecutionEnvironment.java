@@ -68,6 +68,7 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         LOG.info("Logname: " + LOG.getName());
         LOG.info("LOG = "+LOG);
         LOG.info("FINE LOGGER? " + LOG.isLoggable(Level.FINE));
+        LOG.info("RUN p with steps = "+p.getSteps());
         int nQubits = p.getNumberQubits();
         Qubit[] qubit = new Qubit[nQubits];
         for (int i = 0; i < nQubits; i++) {
@@ -91,39 +92,40 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
             }
         }
         List<Step> steps = p.getSteps();
-        List<Step> simpleSteps = p.getDecomposedSteps();
+        LOG.info("Start with steps = "+steps);
+        List<Step> simpleSteps = null; // p.getDecomposedSteps();
         if (simpleSteps == null) {
             simpleSteps = new ArrayList<>();
             for (Step step : steps) {
-                simpleSteps.addAll(Computations.decomposeStep(step, nQubits));
+                simpleSteps.addAll(Computations.decomposeStep(step, nQubits,0));
             }
             p.setDecomposedSteps(simpleSteps);
         }
-        Result result = new Result(nQubits, steps.size());
+        Result result = new Result(nQubits, simpleSteps.size());
         int cnt = 0;
         result.setIntermediateProbability(0, probs);
-        LOG.fine("START RUN, number of steps = " + simpleSteps.size());
+        LOG.info("START RUN, number of steps = " + simpleSteps.size());
         int cntr = 0;
         for (Step step : simpleSteps) {
-                            long s0 = System.currentTimeMillis();
+            long s0 = System.currentTimeMillis();
 
             if (!step.getGates().isEmpty()) {
-                LOG.finer("RUN STEP " + step + ", cnt = " + cnt);
+                LOG.info("RUN STEP " + step + ", cnt = " + cnt+" and complex step = "+step.getComplexStep());
                 cnt++;
                 LOG.finest("before this step, probs = ");
-          //      printProbs(probs);
+                //      printProbs(probs);
                 probs = applyStep(step, probs, qubit);
-                LOG.finest("after this step, probs = "+probs);
-            //    printProbs(probs);
+                LOG.info("after this step, probs = " + probs);
+                    printProbs(probs);
                 int idx = step.getComplexStep();
                 // System.err.println("complex? "+idx);
                 if (idx > -1) {
                     result.setIntermediateProbability(idx, probs);
                 }
             }
-                long s1 = System.currentTimeMillis();
-                System.err.println("STEP "+ cntr+"("+step+") took "+ (s1 -s0));
-                cntr++;
+            long s1 = System.currentTimeMillis();
+            System.err.println("STEP " + cntr + "(" + step + ") took " + (s1 - s0));
+            cntr++;
         }
         LOG.info("DONE RUN, probability vector = " + probs);
         printProbs(probs);

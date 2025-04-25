@@ -76,6 +76,7 @@ public class SingleQubitGateTests extends BaseGateTests {
         Program p = new Program(2, new Step(new X(0)));
         Result res = runProgram(p);
         Qubit[] qubits = res.getQubits();
+        Complex.printArray(res.getProbability());
         assertEquals(1, qubits[0].measure());
         assertEquals(0, qubits[1].measure());
     }    
@@ -228,7 +229,7 @@ public class SingleQubitGateTests extends BaseGateTests {
         double exp = Math.PI*-1;
         System.err.println("WAAAAexp = "+exp+" and cpl = "+ new Complex(Math.cos(exp), Math.sin(exp)));
         Complex c = new Complex(Math.cos(exp), Math.sin(exp));
-        assertEquals(-2, c.r, DELTA);
+        assertEquals(-1, c.r, DELTA);
     }
         
 //    @Test

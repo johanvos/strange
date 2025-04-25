@@ -117,7 +117,7 @@ public class Block {
             matrix = Complex.identityMatrix(1 << nqubits);
             List<Step> simpleSteps = new ArrayList<>();
             for (Step step : steps) {
-                simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
+                simpleSteps.addAll(Computations.decomposeStep(step, nqubits,0));
             }
             Collections.reverse(simpleSteps);
 
@@ -165,7 +165,7 @@ public class Block {
         
         List<Step> simpleSteps = new ArrayList<>();
         for (Step step : steps) {
-            simpleSteps.addAll(Computations.decomposeStep(step, nqubits));
+            simpleSteps.addAll(Computations.decomposeStep(step, nqubits,0));
         }
         if (inverse) {
             Collections.reverse(simpleSteps);

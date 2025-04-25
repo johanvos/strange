@@ -34,6 +34,7 @@ package org.redfx.strange;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * <p>Result class.</p>
@@ -42,6 +43,8 @@ import java.util.Map;
  * @version $Id: $Id
  */
 public class Result {
+
+    static final Logger LOG = Logger.getLogger(Result.class.getName());
 
     private int nqubits;
     private int nsteps;
@@ -60,6 +63,7 @@ public class Result {
      */
     public Result(int nqubits, int steps) {
         assert(steps >= 0);
+        LOG.info("Create result for "+nsteps+" steps");
         this.nqubits = nqubits;
         this.nsteps = steps;
         intermediateProps = new Complex[steps > 0 ? steps : 1][];

@@ -86,6 +86,10 @@ public class BlockGate<T extends Gate> implements Gate {
      * @return a {@link org.redfx.strange.Block} object
      */
     public final Block getBlock() {
+        LOG.info("GetBlock asked for "+this+", and block = "+this.block);
+        if (this.block == null) {
+            this.block = createBlock(this.inverse);
+        }
         return this.block;
     }
     
@@ -192,6 +196,10 @@ public class BlockGate<T extends Gate> implements Gate {
     @Override
     public boolean hasOptimization() {
         return true;
+    }
+
+    public List<Step> getSubSteps() {
+        return List.of();
     }
 
     public Block createBlock(boolean inverse) {

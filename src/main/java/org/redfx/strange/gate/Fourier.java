@@ -32,14 +32,17 @@
  */
 package org.redfx.strange.gate;
 
+import java.util.ArrayList;
 import org.redfx.strange.Block;
 import org.redfx.strange.BlockGate;
 import org.redfx.strange.Complex;
 import org.redfx.strange.QuantumExecutionEnvironment;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.redfx.strange.Step;
 import org.redfx.strange.local.Computations;
 
 /**
@@ -50,6 +53,8 @@ import org.redfx.strange.local.Computations;
  */
 public class Fourier extends BlockGate {
 
+    static final Logger LOG = Logger.getLogger(Fourier.class.getName());
+    
     protected Complex[][] matrix = null;
     protected int dim;
     protected int size;
@@ -72,7 +77,7 @@ public class Fourier extends BlockGate {
      * @param idx a int
      */
     public Fourier(String name, int dim, int idx) {
-         super(new Block(name, dim), idx);
+        super(null, idx);
         this.dim = dim;
         this.size = 1 <<dim;
     }
@@ -137,6 +142,36 @@ public class Fourier extends BlockGate {
     @Override
     public boolean hasOptimization() {
         return true;
+    }
+
+    @Override
+    public Block createBlock(boolean inverse) {
+        LOG.info("Create block, size = "+size);
+        int length = (int) Math.ceil(Math.log(size) / Math.log(2));
+        Block answer = new Block("Fourier", length);
+        for (Step step : getSubSteps()) {
+            answer.addStep(step);
+        }
+        return answer;
+    }
+
+    @Override
+    public List<Step> getSubSteps() {
+        int length = (int) Math.ceil(Math.log(size) / Math.log(2));
+        List<Step> answer = new ArrayList<>();
+        for (int i = dim -1; i >=0; i--) {
+            Step step = new Step(new Hadamard(i));
+            answer.add(step);
+            for (int j = 2; j <= i+1; j++) {
+                step = new Step(new Cr(i+1-j, i, 2,j));
+                answer.add(step);
+            }
+        }
+        for (int i = 0; i < length/2;i++) {
+            Step step = new Step(new Swap(0,length-1-i));
+            answer.add(step);
+        }
+        return answer;
     }
 
     @Override

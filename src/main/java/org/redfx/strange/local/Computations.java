@@ -122,14 +122,49 @@ public class Computations {
      * @param nqubit a int
      * @return a {@link java.util.List} object
      */
-    public static List<Step> decomposeStep(Step s, int nqubit) {
+    public static List<Step> decomposeStep(Step s, int nqubit, int shift) {
+        LOG.info("decompose step "+s);
         ArrayList<Step> answer = new ArrayList<>();
-        answer.add(s);
-        if (s.getType() == Step.Type.PSEUDO) {
-            s.setComplexStep(s.getIndex());
+//        answer.add(s);
+//        if (s.getType() == Step.Type.PSEUDO) {
+//            s.setComplexStep(s.getIndex());
+//            return answer;
+//        }
+        if (1 < 2) {
+            int stepCount = 0;
+            answer = new ArrayList<>();
+            List<Gate> gates = s.getGates();
+            LOG.info("Gates for step "+s+" ARE "+gates);
+            for (Gate gate : gates) {
+                if (gate instanceof BlockGate blockGate) {
+                    LOG.info("Yes, blockgate with index at "+blockGate.getMainQubitIndex());
+                    List<Step> subSteps = blockGate.getSubSteps();
+                    LOG.info("and substeps dir = "+subSteps);
+                    Block block = blockGate.getBlock();
+                    subSteps = block.getSteps();
+                    LOG.info("And block = "+block+" with steps = "+block.getSteps());
+                    for (Step blockStep : subSteps) {
+                        LOG.info("Now decompose this step "+blockStep);
+                        List<Step> steps = decomposeStep(blockStep, nqubit, shift + blockGate.getMainQubitIndex());
+                        LOG.info("Decomposed step "+blockStep+" in steps "+steps);
+                        for (Step step : steps) {
+                            step.setComplexStep(stepCount++);
+                            answer.add(step);
+                        }
+                    }
+                } else {
+                    if (shift >0 ) {
+                        gate.setMainQubitIndex(gate.getMainQubitIndex() + shift);
+                    }
+                    Step step = new Step(gate);
+                    step.setComplexStep(stepCount++);
+                    answer.add(step);
+                };
+            }
+            LOG.info("Decomposed steps = "+answer);
             return answer;
+
         }
-if ( 1< 2 ) return answer;
         List<Gate> gates = s.getGates();
 
         if (gates.isEmpty()) {
