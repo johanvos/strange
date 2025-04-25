@@ -35,6 +35,7 @@ package org.redfx.strange.test;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
+import org.redfx.strange.Complex;
 import org.redfx.strange.Program;
 import org.redfx.strange.Qubit;
 import org.redfx.strange.Result;
@@ -42,11 +43,13 @@ import org.redfx.strange.Step;
 import org.redfx.strange.gate.Hadamard;
 import org.redfx.strange.gate.Identity;
 import org.redfx.strange.gate.Measurement;
+import org.redfx.strange.gate.R;
 import org.redfx.strange.gate.X;
 import org.redfx.strange.gate.Y;
 import org.redfx.strange.gate.Z;
 
 public class SingleQubitGateTests extends BaseGateTests {
+    static final double D = 0.000000001d;
 
     @Test
     public void empty() {
@@ -187,5 +190,55 @@ public class SingleQubitGateTests extends BaseGateTests {
                 () -> p.addStep(new Step(new Hadamard(0))));
     }
 
+    @Test
+    public void simpleRGate() {
+        Program p = new Program(1, new Step(new R(2, 1, 0)));
+        Result res = runProgram(p);
+        Complex[] probs = res.getProbability();
+        assertEquals(1, probs[0].r);
+        assertEquals(0, probs[0].i);
+        assertEquals(0, probs[1].r);
+        assertEquals(0, probs[1].i);
+    }    
+        
+    @Test
+    public void XR1Gate() {
+        Program p = new Program(1, new Step(new X(0)), new Step(new R(2, 1, 0)));
+        Result res = runProgram(p);
+        Complex[] probs = res.getProbability();
+        assertEquals(0, probs[0].r, D);
+        assertEquals(0, probs[0].i, D);
+        assertEquals(-1, probs[1].r, D);
+        assertEquals(0, probs[1].i, D);
+    }    
+        
+    @Test
+    public void XR2Gate() {
+        Program p = new Program(1, new Step(new X(0)), new Step(new R(2, 2, 0)));
+        Result res = runProgram(p);
+        Complex[] probs = res.getProbability();
+        assertEquals(0, probs[0].r, D);
+        assertEquals(0, probs[0].i, D);
+        assertEquals(0, probs[1].r, D);
+        assertEquals(1, probs[1].i, D);
+    }
 
+    @Test
+    public void singleR() {
+        double exp = Math.PI*-1;
+        System.err.println("WAAAAexp = "+exp+" and cpl = "+ new Complex(Math.cos(exp), Math.sin(exp)));
+        Complex c = new Complex(Math.cos(exp), Math.sin(exp));
+        assertEquals(-2, c.r, DELTA);
+    }
+        
+//    @Test
+//    public void XRinv2Gate() {
+//        Program p = new Program(1, new Step(new X(0)), new Step(new R(2, 2, 0)));
+//        Result res = runProgram(p);
+//        Complex[] probs = res.getProbability();
+//        assertEquals(0, probs[0].r, D);
+//        assertEquals(0, probs[0].i, D);
+//        assertEquals(0, probs[1].r, D);
+//        assertEquals(-1, probs[1].i, D);
+//    }   
 }

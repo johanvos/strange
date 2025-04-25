@@ -108,7 +108,7 @@ public class InvFourier extends Fourier {
     @Override
     public Complex[] applyOptimize(Complex[] v) {
         int length = (int) Math.ceil(Math.log(size) / Math.log(2));
-        System.err.println("INVVVV start with ");
+        System.err.println("[INVFOURIER] start, probs are now: ");
         Complex.printArray(v);
         for (int i = dim - 1; i >= 0; i--) {
             v = Computations.simpleNextProb(new Hadamard(i), v);
@@ -121,6 +121,8 @@ public class InvFourier extends Fourier {
         for (int i = 0; i < length/2;i++) {
             v = Computations.simpleNextProb(new Swap(0,length-1-i), v);
         }
+        System.err.println("[INVFOURIER] done, probs are now: ");
+        Complex.printArray(v);
         return v;
     }
 }

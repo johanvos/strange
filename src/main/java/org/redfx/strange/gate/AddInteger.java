@@ -99,7 +99,7 @@ public class AddInteger extends BlockGate<AddInteger> {
         answer.addStep(new Step(new Fourier(m, 0)));
         Step pstep = new Step();
         for (int i = 0; i < m; i++) {
-            Complex[][] mat = Complex.identityMatrix(2);
+//            Complex[][] mat = Complex.identityMatrix(2);
             for (int j = 0; j < m-i ; j++) {
                 int cr0 = m-j-i-1;
 //                if (inverse) {
@@ -107,27 +107,31 @@ public class AddInteger extends BlockGate<AddInteger> {
 //                    cr0 = -1*cr0;
 //                }
                 if ((num >> cr0 & 1) == 1) {
-                    mat = Complex.mmul(mat, new R(2, 1 + j, i).getMatrix());
+//                    mat = Complex.mmul(mat, new R(2, 1 + j, i).getMatrix());
                     if (old) {
-                       int pow = j+1;// (inverse ? (-1 -j) : (1 + j));
-                       Gate g = new R(2, pow, i);
-                        System.err.println("CREATED addint subgate (pow = "+pow+"): "+g);
-                       if (inverse) {
-                           g.setInverse(true);
-                       }
+                       int pow =  1 + j;
+                       double exp = Math.PI*2/Math.pow(2, pow);
+                       if (inverse) exp = -1 * exp;
+                       Gate g = new R(exp, i);
+                       System.err.println("CREATED addint subgate (pow = "+pow+", exp = " + exp+",): "+g);
+//                       if (inverse) {
+//                           g.setInverse(true);
+//                       }
                         Step s = new Step(g);
                         answer.addStep(s);
                     }
                 }
             }
-            if (!old) {
-                pstep.addGate(new SingleQubitMatrixGate(i, mat));
-            }
+//            if (!old) {
+//                pstep.addGate(new SingleQubitMatrixGate(i, mat));
+//            }
         }
         if (!old) {
             answer.addStep(pstep);
         }
         answer.addStep(new Step(new InvFourier(m, 0)));
+        System.err.println("CREATED addint with num = "+num+" and inv = "+inverse);
+
         return answer;
     }
 

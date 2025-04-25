@@ -432,9 +432,9 @@ public final class Complex {
      * @param ps a {@link java.io.PrintStream} object
      */
     public static void printMatrix(Complex[][] cm, PrintStream ps) {
-        if (!DEBUG) {
-            return;
-        }
+//        if (!DEBUG) {
+//            return;
+//        }
        // Thread.dumpStack();
         ps.println("complex[" + cm.length + "]: ");
         for (int idx = 0; idx < cm.length; idx++) {
@@ -455,8 +455,8 @@ public final class Complex {
         float mi = this.i;
         if (Math.abs(mr) < 1e-7) mr = 0;
         if (Math.abs(mi) < 1e-7) mi = 0;
-        if (Math.abs(mr) > .999999) mr = 1;
-        if (Math.abs(mi) > .999999) mi = 1;
+        if (Math.abs(mr) > .999999) mr = (mr > 0) ?1: -1;
+        if (Math.abs(mi) > .999999) mi = (mi > 0) ?1: -1;
         return "(" + mr + ", " + mi + ")";
     }
 

@@ -41,6 +41,8 @@ import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
 
 public class BaseGateTests {
 
+    static final double DELTA = 0.000000001d;
+
     private static boolean jfxIsSetup;
 
     public Result runProgram(Program program) throws RuntimeException {

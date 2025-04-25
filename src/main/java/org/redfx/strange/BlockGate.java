@@ -34,6 +34,7 @@ package org.redfx.strange;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.redfx.strange.local.Computations;
@@ -48,6 +49,7 @@ import org.redfx.strange.local.Computations;
  */
 public class BlockGate<T extends Gate> implements Gate {
 
+    static Logger LOG = Logger.getLogger(BlockGate.class.getName());
     protected Block block;
     protected int idx;
     protected boolean inverse = false;
@@ -198,6 +200,7 @@ public class BlockGate<T extends Gate> implements Gate {
     /** {@inheritDoc} */
     @Override
     public Complex[] applyOptimize(Complex[] v) {
+        LOG.info("apply optimize, block = "+this.block);
         if (block == null) {
             this.block = createBlock(inverse);
         }
@@ -218,6 +221,8 @@ public class BlockGate<T extends Gate> implements Gate {
 //                step.setInverse(true);
 //            }
 //        }
+        LOG.info("DONE apply optimize, block = "+this.block);
+
         return v;
         
         

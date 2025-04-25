@@ -141,6 +141,8 @@ public class Fourier extends BlockGate {
 
     @Override
     public Complex[] applyOptimize(Complex[] v) {
+        System.err.println("[FOURIER] start, probs are now: ");
+        Complex.printArray(v);
         int length = (int) Math.ceil(Math.log(size) / Math.log(2));
         for (int i = dim -1; i >=0; i--) {
             v = Computations.simpleNextProb(new Hadamard(i), v);
@@ -151,6 +153,8 @@ public class Fourier extends BlockGate {
         for (int i = 0; i < length/2;i++) {
             v = Computations.simpleNextProb(new Swap(0,length-1-i), v);
         }
+        System.err.println("[FOURIER] done, probs are now: ");
+        Complex.printArray(v);
         return v;
     }
     

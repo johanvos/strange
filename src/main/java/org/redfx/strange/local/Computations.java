@@ -520,9 +520,10 @@ if ( 1< 2 ) return answer;
                     LOG.info("Yes, gate "+gate+" has optimize");
                     tmp = gate.applyOptimize(work);
                 } else {
-                    LOG.info("Noopt");
+                    LOG.info("Noopt for gate "+gate);
 //                    dbg("GET MATRIX for  " + gate);
                     Complex[][] matrix = gate.getMatrix();
+               //     Complex.printMatrix(matrix);
                     s1 = System.currentTimeMillis();
                     for (int i = 0; i < gatedim; i++) {
                         for (int k = 0; k < gatedim; k++) {
