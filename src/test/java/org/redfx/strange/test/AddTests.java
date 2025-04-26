@@ -74,7 +74,9 @@ public class AddTests extends BaseGateTests {
         Qubit[] q = result.getQubits();
         assertEquals(2, q.length);
         assertEquals(1, q[0].measure());
-        assertEquals(1, q[1].measure());   
+        assertEquals(1, q[1].measure());  
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[3].abssqr(), DELTA);
     }
             
     @Test
@@ -262,6 +264,8 @@ public class AddTests extends BaseGateTests {
         AddInteger add = new AddInteger(0,2,2);
         p.addStep(new Step(add));
         Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[7].abssqr(), DELTA);
         Qubit[] q = result.getQubits();
         assertEquals(3, q.length);
         assertEquals(1, q[0].measure());

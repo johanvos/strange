@@ -127,7 +127,8 @@ public class InvFourier extends Fourier {
             Step step = new Step(new Hadamard(i));
             answer.add(step);
             for (int j = 2; j <= i+1; j++) {
-                step = new Step(new Cr(i+1-j, i, 2,-j));
+                double exp = -1* Math.PI*2/Math.pow(2, j);
+                step = new Step(new Cr(i+1-j, i, exp));
                 answer.add(step);
             }
         }

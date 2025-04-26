@@ -221,6 +221,8 @@ public interface Gate {
      */
     public int getHighestAffectedQubitIndex();
 
+    default void shift(int n) {};
+
     /**
      * <p>getCaption.</p>
      *

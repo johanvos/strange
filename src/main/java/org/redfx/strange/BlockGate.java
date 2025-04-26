@@ -34,6 +34,7 @@ package org.redfx.strange;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -239,7 +240,7 @@ public class BlockGate<T extends Gate> implements Gate {
 
     /** {@inheritDoc} */
     @Override public String toString() {
-        return "Gate for block "+block+", inv = "+inverse;
+        return "BlockGate "+ Objects.hashCode(this)+" for block "+block+", inv = "+inverse;
 //        return "Gate for block "+block+", size = "+getSize()+", inv = "+inverse;
     }
 

@@ -142,7 +142,7 @@ public class Computations {
                     LOG.info("and substeps dir = "+subSteps);
                     Block block = blockGate.getBlock();
                     subSteps = block.getSteps();
-                    LOG.info("And block = "+block+" with steps = "+block.getSteps());
+                    LOG.info("And block = "+block+" with steps = "+subSteps);
                     for (Step blockStep : subSteps) {
                         LOG.info("Now decompose this step "+blockStep);
                         List<Step> steps = decomposeStep(blockStep, nqubit, shift + blockGate.getMainQubitIndex());
@@ -154,7 +154,11 @@ public class Computations {
                     }
                 } else {
                     if (shift >0 ) {
-                        gate.setMainQubitIndex(gate.getMainQubitIndex() + shift);
+                        gate.shift(shift);
+//                        gate.setMainQubitIndex(gate.getMainQubitIndex() + shift);
+//                        if (gate instanceof ControlledGate cg) {
+//                            cg.getSecondControlQubitIndex();
+//                        }
                     }
                     Step step = new Step(gate);
                     step.setComplexStep(stepCount++);
@@ -484,7 +488,7 @@ public class Computations {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[] calculateNewState(List<Gate> gates, Complex[] vector, int length) {
-//        LOG.info("Calculate new states for "+ gates);
+        LOG.info("Calculate new states for "+ gates);
         if (containsImmediateMeasurementOnly(gates)) {
             return doImmediateMeasurement(gates, vector, length);
         }

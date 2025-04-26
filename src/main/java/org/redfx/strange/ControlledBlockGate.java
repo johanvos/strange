@@ -237,7 +237,7 @@ public class ControlledBlockGate<T> extends BlockGate {
         System.err.println("[CBG] appopt for v = ");
         Thread.dumpStack();
         Complex.printArray(v);
-        for (Step step : block.steps) {
+        for (Step step : block.getSteps()) {
             System.err.println("STEP "+step);
             List<Gate> gates = step.getGates();
             for (Gate gate: gates) {

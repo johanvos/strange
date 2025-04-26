@@ -48,7 +48,7 @@ import java.util.List;
  */
 public class Block {
 
-    List<Step> steps = new ArrayList<>();
+    private List<Step> steps = new ArrayList<>();
     private final int nqubits;
     private Complex[][] matrix = null;
     private final String name;
@@ -79,6 +79,7 @@ public class Block {
      * @param step a {@link org.redfx.strange.Step} object
      */
     public void addStep(Step step) {
+        Thread.dumpStack();
         this.steps.add(step);
         matrix = null;
     }

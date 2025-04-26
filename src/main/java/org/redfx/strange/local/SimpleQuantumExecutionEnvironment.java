@@ -94,10 +94,16 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         List<Step> steps = p.getSteps();
         LOG.info("Start with steps = "+steps);
         List<Step> simpleSteps = null; // p.getDecomposedSteps();
+        int scnt = 0;
         if (simpleSteps == null) {
             simpleSteps = new ArrayList<>();
             for (Step step : steps) {
-                simpleSteps.addAll(Computations.decomposeStep(step, nQubits,0));
+                LOG.info("Start decomposing step "+scnt);
+                List<Step> ms = Computations.decomposeStep(step, nQubits,0);
+                simpleSteps.addAll(ms);
+
+                LOG.info("Done decomposing step "+scnt+", steps = "+ms);
+                scnt++;
             }
             p.setDecomposedSteps(simpleSteps);
         }
@@ -105,6 +111,7 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         int cnt = 0;
         result.setIntermediateProbability(0, probs);
         LOG.info("START RUN, number of steps = " + simpleSteps.size());
+        LOG.info("And steps = "+simpleSteps);
         int cntr = 0;
         for (Step step : simpleSteps) {
             long s0 = System.currentTimeMillis();

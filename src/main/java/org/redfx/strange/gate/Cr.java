@@ -74,6 +74,8 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
         this.controlQubit = a;
         this.rootGateIndex = b;
         this.expv = exp;
+        Thread.dumpStack();
+        System.err.println("CR with expv = "+expv);
         double ar = Math.cos(exp);
         double ai = Math.sin(exp);
         if (Math.abs(Math.PI -exp)  < 1e-6) {

@@ -93,7 +93,11 @@ public abstract class SingleQubitGate implements Gate {
     public int getHighestAffectedQubitIndex() {
         return idx;
     }
-    
+
+    public void shift(int n) {
+        this.idx = idx + n;
+    }
+
     /** {@inheritDoc} */
     @Override
     public String getName() {

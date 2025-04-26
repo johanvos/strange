@@ -36,6 +36,7 @@ import org.redfx.strange.Gate;
 
 import java.util.Arrays;
 import java.util.List;
+import org.redfx.strange.ControlledGate;
 
 /**
  *
@@ -87,6 +88,14 @@ public abstract class TwoQubitGate implements Gate {
         this.second = idx;
     }
 
+    public void shift(int n) {
+        this.first = this.first + n;
+        this.second = this.second + n;
+        if (this instanceof ControlledGate) {
+            
+        } else {
+        }
+    }
 
     /**
      * <p>getSecondQubitIndex.</p>
