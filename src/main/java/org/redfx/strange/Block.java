@@ -79,7 +79,6 @@ public class Block {
      * @param step a {@link org.redfx.strange.Step} object
      */
     public void addStep(Step step) {
-        Thread.dumpStack();
         this.steps.add(step);
         matrix = null;
     }

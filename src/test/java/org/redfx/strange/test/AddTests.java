@@ -289,6 +289,8 @@ public class AddTests extends BaseGateTests {
         assertEquals(1, q[1].measure());
         assertEquals(1, q[2].measure());
         assertEquals(1, q[3].measure());
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[14].abssqr(), DELTA);
     }
     
     @Test

@@ -44,8 +44,8 @@ import org.redfx.strange.Gate;
  */
 public class Cr extends TwoQubitGate implements ControlledGate  {
         
-    final int controlQubit;
-    final int rootGateIndex;
+    int controlQubit;
+    int rootGateIndex;
     final double expv;
     
     private Complex[][] matrix =  new Complex[][]{
@@ -74,7 +74,6 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
         this.controlQubit = a;
         this.rootGateIndex = b;
         this.expv = exp;
-        Thread.dumpStack();
         System.err.println("CR with expv = "+expv);
         double ar = Math.cos(exp);
         double ai = Math.sin(exp);
@@ -104,8 +103,25 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
         this(a,b, Math.PI*2/Math.pow(base, pow));
         this.pow = pow;
     }
-    
-    /** {@inheritDoc} */
+
+    @Override
+    public Cr copy() {
+        System.err.println("NEEDTOCOPY pow = "+pow+" and expv = "+expv);
+        Cr answer = new Cr(controlQubit, rootGateIndex, expv);
+        answer.pow = pow;
+        return answer;
+    }
+
+    @Override
+    public void shift(int n) {
+        super.shift(n);
+        this.controlQubit = controlQubit +n;
+        this.rootGateIndex = rootGateIndex +n;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Complex[][] getMatrix() {
         return matrix;

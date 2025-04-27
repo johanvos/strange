@@ -159,6 +159,14 @@ public class Fourier extends BlockGate {
     public List<Step> getSubSteps() {
         int length = (int) Math.ceil(Math.log(size) / Math.log(2));
         List<Step> answer = new ArrayList<>();
+//        for (int i = 0; i < dim; i++) {
+//            Step step = new Step(new Hadamard(i));
+//            answer.add(step);
+//            for (int j = 2; j < dim-i+1; j++) {
+//                step = new Step(new Cr(j-i-1, i, 2,j));
+//                answer.add(step);
+//            }
+//        }
         for (int i = dim -1; i >=0; i--) {
             Step step = new Step(new Hadamard(i));
             answer.add(step);

@@ -153,14 +153,16 @@ public class Computations {
                         }
                     }
                 } else {
+                    Gate target = gate;
                     if (shift >0 ) {
-                        gate.shift(shift);
+                        target = gate.copy();
+                        target.shift(shift);
 //                        gate.setMainQubitIndex(gate.getMainQubitIndex() + shift);
 //                        if (gate instanceof ControlledGate cg) {
 //                            cg.getSecondControlQubitIndex();
 //                        }
                     }
-                    Step step = new Step(gate);
+                    Step step = new Step(target);
                     step.setComplexStep(stepCount++);
                     answer.add(step);
                 };
@@ -504,7 +506,7 @@ public class Computations {
 
     public static Complex[] simpleNextProb(Gate targetGate, Complex[] v, int baseIndex) {
         LOG.info("Simple prob should work with base = "+baseIndex+" and before we apply "+targetGate+" we have ");
-        Complex.printArray(v);
+  //      Complex.printArray(v);
         int size = v.length;
         Complex[] answer = new Complex[size];
         Gate gate = targetGate;
@@ -560,9 +562,8 @@ public class Computations {
                     tmp = gate.applyOptimize(work);
                 } else {
                     LOG.info("Noopt for gate "+gate);
-//                    dbg("GET MATRIX for  " + gate);
                     Complex[][] matrix = gate.getMatrix();
-               //     Complex.printMatrix(matrix);
+             //       printMatrix(matrix);
                     s1 = System.currentTimeMillis();
                     for (int i = 0; i < gatedim; i++) {
                         for (int k = 0; k < gatedim; k++) {
@@ -586,7 +587,7 @@ public class Computations {
 
     public static Complex[] getNextProbability(List<Gate> gates, Complex[] v, int baseIndex) {
         LOG.info("GNP for "+gates+" and base = " + baseIndex+" and probs = ");
-        Complex.printArray(v);
+  //      Complex.printArray(v);
 //        Thread.dumpStack();
         List<Gate> nonIdentityGates = gates.stream().filter(gate -> !(gate instanceof Identity)).toList();
         if (nonIdentityGates.size() == 0) return v;

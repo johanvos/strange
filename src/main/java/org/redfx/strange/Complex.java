@@ -386,9 +386,9 @@ public final class Complex {
      * @param ca an array of {@link org.redfx.strange.Complex} objects
      */
     public static void printArray(Complex[] ca) {
-        //if (DEBUG) {
+//        if (DEBUG) {
             printArray(ca, System.err);
-        //}
+//        }
     }
 
     /**

@@ -122,8 +122,8 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
                 LOG.finest("before this step, probs = ");
                 //      printProbs(probs);
                 probs = applyStep(step, probs, qubit);
-                LOG.info("after this step, probs = " + probs);
-                    printProbs(probs);
+                LOG.info("after this step, probs = COMMENT" + probs);
+            //        printProbs(probs);
                 int idx = step.getComplexStep();
                 // System.err.println("complex? "+idx);
                 if (idx > -1) {

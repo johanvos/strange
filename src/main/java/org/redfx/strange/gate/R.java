@@ -59,10 +59,14 @@ public class R extends SingleQubitGate {
         System.err.println("WAAAAexp = "+exp+" and cpl = "+ new Complex(Math.cos(exp), Math.sin(exp)));
         matrix =  new Complex[][]{{Complex.ONE,Complex.ZERO}, {Complex.ZERO,new Complex(Math.cos(exp), Math.sin(exp))}};
         System.err.println("[R] matrix created for exp = "+exp+" and idx = "+idx+" with el4 = "+matrix[1][1]+" and cos = "+Math.cos(exp));
-        Thread.dumpStack();
         Complex.printMatrix(matrix);
     }
-    
+
+    @Override
+    public R copy() {
+        return new R(expv, idx);
+    }
+
     /**
      * <p>Constructor for R.</p>
      *

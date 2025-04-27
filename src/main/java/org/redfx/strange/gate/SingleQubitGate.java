@@ -32,6 +32,9 @@
  */
 package org.redfx.strange.gate;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import org.redfx.strange.Complex;
 import org.redfx.strange.Gate;
 
@@ -64,6 +67,20 @@ public abstract class SingleQubitGate implements Gate {
         this.idx = idx;
     }
 
+    @Override
+    public <T extends Gate> T copy() {
+        try {
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            MethodHandle constructor = lookup.findConstructor(
+                    this.getClass(),
+                    MethodType.methodType(void.class, int.class)
+            );
+            return (T) constructor.invoke(this.getMainQubitIndex());
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed to copy gate using MethodHandles: " + this.getClass(), e);
+        }
+
+    }
     /** {@inheritDoc} */
     @Override
     public int getMainQubitIndex() {

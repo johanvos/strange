@@ -293,5 +293,8 @@ public interface Gate {
      * @param inv the boolean to check if this gate should be inversed or not
      */
     void setInverse(boolean inv);
-    
+
+    default public <T extends Gate> T copy() {
+        throw new UnsupportedOperationException("Can't copy gate "+this);
+    }
 }
