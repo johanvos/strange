@@ -106,6 +106,7 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
 
     @Override
     public Cr copy() {
+        Thread.dumpStack();
         System.err.println("NEEDTOCOPY pow = "+pow+" and expv = "+expv);
         Cr answer = new Cr(controlQubit, rootGateIndex, expv);
         answer.pow = pow;
@@ -126,10 +127,11 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
     public Complex[][] getMatrix() {
         return matrix;
     }
-    
+    boolean linv = false;
     /** {@inheritDoc} */
     @Override 
     public void setInverse(boolean inv) {
+        linv = inv;
         if (inv) {
             Complex[][] m = getMatrix();
             this.matrix = Complex.conjugateTranspose(m);
@@ -138,7 +140,7 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
 
     /** {@inheritDoc} */
     @Override public String getCaption() {
-        return "Cr" + ((pow> -1)? Integer.toString(pow): "th");
+        return "Cr" + ((pow> -1)? Integer.toString(pow): "th")+ (linv? "INV" : ".");
     }
     
     @Override
@@ -148,7 +150,11 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
 
     @Override
     public Gate getRootGate() {
-        return new R(expv, 0);
+        System.err.println("CR, getrootgate, inv = "+linv);
+        Gate answer = new R(expv, 0);
+        if (linv) answer.setInverse(true);
+        return answer;
+//        return new R(expv, 0);
     }
 
     @Override

@@ -112,6 +112,8 @@ public class Fourier extends BlockGate {
     /** {@inheritDoc} */
     @Override
     public void setInverse(boolean v) {
+        System.err.println("FOUR, setinv called");
+        super.setInverse(v);
         if (v) {
             Complex[][] m = getMatrix();
             this.matrix = Complex.conjugateTranspose(m);
@@ -121,6 +123,8 @@ public class Fourier extends BlockGate {
     /** {@inheritDoc} */
     @Override
     public Fourier inverse() {
+        System.err.println("FOURIER,inverse called!");
+        super.inverse();
         Complex[][] m = getMatrix();
         this.matrix = Complex.conjugateTranspose(m);
         return this;
@@ -150,6 +154,7 @@ public class Fourier extends BlockGate {
         int length = (int) Math.ceil(Math.log(size) / Math.log(2));
         Block answer = new Block("Fourier", length);
         for (Step step : getSubSteps()) {
+            if (inverse) step.setInverse(inverse);
             answer.addStep(step);
         }
         return answer;

@@ -36,6 +36,7 @@ package org.redfx.strange.test;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.redfx.strange.Complex;
 import org.redfx.strange.Program;
 import org.redfx.strange.Qubit;
 import org.redfx.strange.Result;
@@ -74,6 +75,8 @@ public class ThreeQubitGateTests extends BaseGateTests {
         );
         Result res = runProgram(p);
         Qubit[] qubits = res.getQubits();
+        Complex[] probs = res.getProbability();
+        Complex.printArray(probs);
         assertEquals(3, qubits.length);
         assertEquals(0, qubits[0].measure());
         assertEquals(0, qubits[1].measure());
@@ -121,6 +124,21 @@ public class ThreeQubitGateTests extends BaseGateTests {
         assertEquals(3, qubits.length);
         assertEquals(1, qubits[0].measure());
         assertEquals(0, qubits[1].measure());
+        assertEquals(0, qubits[2].measure());
+    }
+
+    @Test
+    public void ToffoliGate5() {
+        // |010> -> |010>
+        Program p = new Program(3,
+            new Step(new X(1)),
+            new Step(new Toffoli(2,1,0))
+        );
+        Result res = runProgram(p);
+        Qubit[] qubits = res.getQubits();
+        assertEquals(3, qubits.length);
+        assertEquals(0, qubits[0].measure());
+        assertEquals(1, qubits[1].measure());
         assertEquals(0, qubits[2].measure());
     }
 

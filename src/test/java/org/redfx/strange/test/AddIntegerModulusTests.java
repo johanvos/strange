@@ -35,12 +35,14 @@ package org.redfx.strange.test;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.redfx.strange.Complex;
 import org.redfx.strange.Program;
 import org.redfx.strange.Qubit;
 import org.redfx.strange.Result;
 import org.redfx.strange.Step;
 import org.redfx.strange.gate.AddIntegerModulus;
 import org.redfx.strange.gate.X;
+import static org.redfx.strange.test.BaseGateTests.DELTA;
 
 
 /**
@@ -106,6 +108,8 @@ public class AddIntegerModulusTests extends BaseGateTests {
         AddIntegerModulus aim = new AddIntegerModulus(0,1,add,mod);
         p.addStep(new Step(aim));
         Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[0].abssqr(), DELTA);
         Qubit[] q = result.getQubits();
         assertEquals(4, q.length);
         assertEquals(0, q[0].measure());

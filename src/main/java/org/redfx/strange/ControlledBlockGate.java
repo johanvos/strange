@@ -74,6 +74,9 @@ public class ControlledBlockGate<T> extends BlockGate {
         this (bg.getBlock(), idx, control);
     }
     
+    public int getControlIndex() {
+        return this.control;
+    }
     /**
      * Create a block
      *
@@ -284,6 +287,11 @@ public class ControlledBlockGate<T> extends BlockGate {
         @Override
         public int getControllQubitIndex() {
             return ctrl;
+        }
+
+        @Override
+        public List<Integer> getControllIndexes() {
+            return List.of(ctrl);
         }
 
         @Override

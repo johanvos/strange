@@ -35,6 +35,8 @@ package org.redfx.strange.test;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.redfx.strange.Block;
+import org.redfx.strange.BlockGate;
 import org.redfx.strange.Complex;
 import org.redfx.strange.Program;
 import org.redfx.strange.Qubit;
@@ -44,6 +46,7 @@ import org.redfx.strange.gate.Cr;
 import org.redfx.strange.gate.Fourier;
 import org.redfx.strange.gate.Hadamard;
 import org.redfx.strange.gate.InvFourier;
+import org.redfx.strange.gate.R;
 import org.redfx.strange.gate.X;
 
 
@@ -148,21 +151,29 @@ public class FourierTest extends BaseGateTests {
         Complex[] probability = res.getProbability();
         assertEquals (4, probability.length);
         assertEquals(.25, probability[0].abssqr(),D);
-        assertEquals(.25, probability[1].abssqr(),D  );
+        assertEquals(.25, probability[1].abssqr(),D);
         assertEquals(.25, probability[2].abssqr(),D);
-        assertEquals(.25, probability[3].abssqr(),D  );
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(.5, probability[1].r,D);
+        assertEquals(.5, probability[2].r,D);
+        assertEquals(.5, probability[3].r,D);
     }
                      
     @Test
-    public void fourierProgram2X() {
+    public void fourierProgram2X0() {
         Program p = new Program(2, new Step(new X(0)), new Step(new Fourier(2, 0)));
         Result res = runProgram(p);
         Complex[] probability = res.getProbability();
         assertEquals (4, probability.length);
         assertEquals(.25, probability[0].abssqr(),D);
-        assertEquals(.25, probability[1].abssqr(),D  );
+        assertEquals(.25, probability[1].abssqr(),D);
         assertEquals(.25, probability[2].abssqr(),D);
-        assertEquals(.25, probability[3].abssqr(),D  );
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(.5, probability[1].i,D);
+        assertEquals(-.5, probability[2].r,D);
+        assertEquals(-.5, probability[3].i,D);
     }
                               
     @Test
@@ -172,11 +183,63 @@ public class FourierTest extends BaseGateTests {
         Complex[] probability = res.getProbability();
         assertEquals (4, probability.length);
         assertEquals(.25, probability[0].abssqr(),D);
-        assertEquals(.25, probability[1].abssqr(),D  );
+        assertEquals(.25, probability[1].abssqr(),D);
         assertEquals(.25, probability[2].abssqr(),D);
-        assertEquals(.25, probability[3].abssqr(),D  );
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(-.5, probability[1].r,D);
+        assertEquals(.5, probability[2].r,D);
+        assertEquals(-.5, probability[3].r,D);
     }
-                   
+                                    
+    @Test
+    public void fourierProgram2XX() {
+        Program p = new Program(2, new Step(new X(0), new X(1)), new Step(new Fourier(2, 0)));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (4, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[1].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(-.5, probability[1].i,D);
+        assertEquals(-.5, probability[2].r,D);
+        assertEquals(.5, probability[3].i,D);
+    }
+                  
+    @Test
+    public void fourierProgram2X0inv() {
+        Program p = new Program(2, new Step(new X(0)), new Step(new Fourier(2, 0).inverse()));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (4, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[1].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(-.5, probability[1].i,D);
+        assertEquals(-.5, probability[2].r,D);
+        assertEquals(.5, probability[3].i,D);
+    }
+                                         
+    @Test
+    public void fourierProgram2X1inv() {
+        Program p = new Program(2, new Step(new X(1)), new Step(new Fourier(2, 0).inverse()));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (4, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[1].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(-.5, probability[1].r,D);
+        assertEquals(.5, probability[2].r,D);
+        assertEquals(-.5, probability[3].r,D);
+    }
+        
     @Test
     public void fourierProgram2H0() {
         Program p = new Program(2, new Step(new Hadamard(0)), new Step(new Fourier(2, 0)));
@@ -200,7 +263,110 @@ public class FourierTest extends BaseGateTests {
         assertEquals(.5, probability[2].abssqr(),D);
         assertEquals(.0, probability[3].abssqr(),D  );
     }
-                         
+                           
+    @Test
+    public void fourierProgram2HS() {
+        Program p = new Program(2, new Step(new Hadamard(0)), new Step(new R(2,2,0)), new Step(new Fourier(2, 0)));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (4, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.0, probability[1].abssqr(),D  );
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.5, probability[3].abssqr(),D  );
+        assertEquals(.35, probability[0].r,.01);
+        assertEquals(.35, probability[0].i,.01);
+        assertEquals(.35, probability[2].r,.01);
+        assertEquals(-.35, probability[2].i,.01);
+        assertEquals(.70, probability[3].r,.01);
+    }
+                                       
+    @Test
+    public void fourierProgram2HSinv() {
+        Program p = new Program(2, new Step(new Hadamard(0)), new Step(new R(2,2,0)), new Step(new Fourier(2, 0).inverse()));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (4, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.5, probability[1].abssqr(),D  );
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.0, probability[3].abssqr(),D  );
+        assertEquals(.35, probability[0].r,.01);
+        assertEquals(.35, probability[0].i,.01);
+        assertEquals(.70, probability[1].r,.01);
+        assertEquals(.35, probability[2].r,.01);
+        assertEquals(-.35, probability[2].i,.01);
+    }
+                                   
+    @Test
+    public void fourierProgram3_2X1() {
+        Program p = new Program(3, new Step(new X(1)), new Step(new Fourier(2, 1)));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (8, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[4].abssqr(),D);
+        assertEquals(.25, probability[6].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(.5, probability[2].i,D);
+        assertEquals(-.5, probability[4].r,D);
+        assertEquals(-.5, probability[6].i,D);
+    }
+                                        
+    @Test
+    public void fourierProgramGate3_2X1() {
+        Block block = new Block("my fourier", 2);
+        block.addStep(new Step(new Fourier(2,0)));
+        BlockGate bg = new BlockGate(block, 1);
+        Program p = new Program(3, new Step(new X(1)), new Step(bg));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (8, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[4].abssqr(),D);
+        assertEquals(.25, probability[6].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(.5, probability[2].i,D);
+        assertEquals(-.5, probability[4].r,D);
+        assertEquals(-.5, probability[6].i,D);
+    }
+                                       
+    @Test
+    public void fourierProgram3_2X1_inv() {
+        Program p = new Program(3, new Step(new X(1)), new Step(new Fourier(2, 1).inverse()));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (8, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[4].abssqr(),D);
+        assertEquals(.25, probability[6].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(-.5, probability[2].i,D);
+        assertEquals(-.5, probability[4].r,D);
+        assertEquals(.5, probability[6].i,D);
+    }
+                                            
+    @Test
+    public void fourierProgramGate3_2X1_inv() {
+        Block block = new Block("my fourier", 2);
+        block.addStep(new Step(new Fourier(2,0).inverse()));
+        BlockGate bg = new BlockGate(block, 1);
+        Program p = new Program(3, new Step(new X(1)), new Step(bg));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals (8, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[4].abssqr(),D);
+        assertEquals(.25, probability[6].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(-.5, probability[2].i,D);
+        assertEquals(-.5, probability[4].r,D);
+        assertEquals(.5, probability[6].i,D);
+    }
     @Test
     public void fourierProgram3HX() {
         Program p = new Program(3, new Step(new Hadamard(1), new X(0)), new Step(new Fourier(3, 0)));
@@ -252,6 +418,42 @@ public class FourierTest extends BaseGateTests {
 
     @Test
     public void invFourierOnly() {
+        Program p = new Program(2,
+                new Step(new InvFourier(2,0)));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals(4, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[1].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(.5, probability[1].r,D);
+        assertEquals(.5, probability[2].r,D);
+        assertEquals(.5, probability[3].r,D);
+    }
+
+    @Test
+    public void invFourierOnlyX0() {
+        Step prep = new Step(new X(0));
+        Program p = new Program(2,
+                prep,
+                new Step(new InvFourier(2,0)));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals(4, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[1].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(-.5, probability[1].i,D);
+        assertEquals(-.5, probability[2].r,D);
+        assertEquals(.5, probability[3].i,D);
+    }
+
+    @Test
+    public void invFourierOnlyX1() {
         Step prep = new Step(new X(1));
         Program p = new Program(2,
                 prep,
@@ -260,9 +462,32 @@ public class FourierTest extends BaseGateTests {
         Complex[] probability = res.getProbability();
         assertEquals(4, probability.length);
         assertEquals(.25, probability[0].abssqr(),D);
-        assertEquals(.25, probability[1].abssqr(),D  );
+        assertEquals(.25, probability[1].abssqr(),D);
         assertEquals(.25, probability[2].abssqr(),D);
-        assertEquals(.25, probability[3].abssqr(),D  );
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(-.5, probability[1].r,D);
+        assertEquals(.5, probability[2].r,D);
+        assertEquals(-.5, probability[3].r,D);
+    }
+
+    @Test
+    public void invFourierOnlyXX() {
+        Step prep = new Step(new X(0), new X(1));
+        Program p = new Program(2,
+                prep,
+                new Step(new InvFourier(2,0)));
+        Result res = runProgram(p);
+        Complex[] probability = res.getProbability();
+        assertEquals(4, probability.length);
+        assertEquals(.25, probability[0].abssqr(),D);
+        assertEquals(.25, probability[1].abssqr(),D);
+        assertEquals(.25, probability[2].abssqr(),D);
+        assertEquals(.25, probability[3].abssqr(),D);
+        assertEquals(.5, probability[0].r,D);
+        assertEquals(.5, probability[1].i,D);
+        assertEquals(-.5, probability[2].r,D);
+        assertEquals(-.5, probability[3].i,D);
     }
 
     @Test

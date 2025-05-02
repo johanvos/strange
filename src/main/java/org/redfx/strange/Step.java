@@ -250,11 +250,14 @@ public class Step {
      * @param val a boolean
      */
     public void setInverse(boolean val) {
+        System.err.println("STEP, set inv for step "+this+" with gates "+gates);
         // TODO: https://github.com/redfx-quantum/strange/issues/93
         for (Gate g: gates) {
             if (g instanceof BlockGate) {
+                System.err.println("STEP has gate that is blockgate: "+g);
                 ((BlockGate)g).inverse();
             } else {
+                System.err.println("STEP has non-blockgate: "+g);
                 g.setInverse(val);
             }
         }

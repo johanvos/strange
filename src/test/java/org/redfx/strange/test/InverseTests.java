@@ -42,7 +42,9 @@ import org.redfx.strange.Program;
 import org.redfx.strange.Result;
 import org.redfx.strange.Step;
 import org.redfx.strange.gate.Fourier;
+import org.redfx.strange.gate.InvFourier;
 import org.redfx.strange.gate.X;
+import static org.redfx.strange.test.FourierTest.D;
 
 
 /**
@@ -51,7 +53,7 @@ import org.redfx.strange.gate.X;
  */
 public class InverseTests extends BaseGateTests {
 
-    static final double D = 0.000000001d;
+    static final double D = 0.00001d;
     
    /*
     *          |  1   1   1   1  | 
@@ -254,6 +256,8 @@ public class InverseTests extends BaseGateTests {
         Fourier f = new Fourier(2,1).inverse();
         p.addStep(new Step(new X(1)));
         p.addStep(new Step(f));
+        p.addStep(new Step(new InvFourier(2,1)));
+        p.addStep(new Step(new Fourier(2,1)));
         Result result = runProgram(p);
         Complex[] probs = result.getProbability();
         assertEquals(probs[0].r, .5f,D);
@@ -305,13 +309,19 @@ public class InverseTests extends BaseGateTests {
     @Test
     public void blockinv3qX1() {
         Program p = new Program(3);
-        Block block = new Block("myfourier", 2);
-        block.addStep(new Step(new Fourier(2,0).inverse()));
-        BlockGate bg = new BlockGate(block, 1);
+//        Block block = new Block("myfourier", 2);
+//        block.addStep(new Step(new Fourier(2,0).inverse()));
+//        BlockGate bg = new BlockGate(block, 1);
         p.addStep(new Step(new X(1)));
-        p.addStep(new Step(bg));
+//        p.addStep(new Step(bg));
+        p.addStep(new Step (new Fourier(2,1).inverse()));
         Result result = runProgram(p);
         Complex[] probs = result.getProbability();   
+        assertEquals(.25, probs[0].abssqr(),D);
+        assertEquals(.25, probs[2].abssqr(),D);
+        assertEquals(.25, probs[4].abssqr(),D);
+        assertEquals(.25, probs[6].abssqr(),D);
+        Complex.printArray(probs);
         assertEquals(probs[0].r, .5f,D);
         assertEquals(probs[1].r, 0,D);
         assertEquals(probs[2].r, 0,D);

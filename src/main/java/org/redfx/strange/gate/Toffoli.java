@@ -32,6 +32,7 @@
  */
 package org.redfx.strange.gate;
 
+import java.util.List;
 import org.redfx.strange.Complex;
 
 import static org.redfx.strange.Complex.ONE;
@@ -108,6 +109,11 @@ public class Toffoli extends ThreeQubitGate implements ControlledGate {
     @Override
     public int getControllQubitIndex() {
         return ctrl0;
+    }
+
+    @Override
+    public List<Integer> getControllIndexes() {
+        return List.of(ctrl0, ctrl1);
     }
 
     @Override

@@ -82,6 +82,8 @@ public class ControlledBlockTests extends BaseGateTests {
         p.addStep(prep);
         p.addStep(new Step(cbg));
         Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[3].abssqr(), DELTA);
         Qubit[] q = result.getQubits();
         assertEquals(2, q.length);
         assertEquals(1, q[0].measure());

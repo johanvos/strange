@@ -79,6 +79,8 @@ public class ExpMulTests extends BaseGateTests {
             p.addStep(new Step(cbg));
         }
         Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[195].abssqr(), DELTA);
         Qubit[] q = result.getQubits();
         assertEquals(9, q.length);
         assertEquals(1, q[0].measure());
@@ -110,6 +112,8 @@ public class ExpMulTests extends BaseGateTests {
         p.addStep(new Step(mul));
 
         Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[67].abssqr(), DELTA);
         Qubit[] q = result.getQubits();
         assertEquals(9, q.length);
         assertEquals(1, q[0].measure());
@@ -165,6 +169,8 @@ public class ExpMulTests extends BaseGateTests {
             p.addStep(new Step(cbg));
         }
         Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[68].abssqr(), DELTA);
         Qubit[] q = result.getQubits();
         assertEquals(9, q.length);
         assertEquals(0, q[0].measure());

@@ -174,6 +174,10 @@ public class BlockGate<T extends Gate> implements Gate {
     /** {@inheritDoc} */
     @Override
     public void setInverse(boolean inv) {
+        System.err.println("SET inv for Blockgate " + this+" to "+inv);
+//       if (this.block == null) {
+            this.block = createBlock(inv);
+//        }
         this.inverse = inv;
     }
     
@@ -183,10 +187,14 @@ public class BlockGate<T extends Gate> implements Gate {
      * @return a T object
      */
     public T inverse() {
+        System.err.println("BLOCKGATE, inverse called");
         setInverse(!this.inverse);
         return (T) this;
     }
-    
+
+    public boolean isInverse() {
+        return this.inverse;
+    }
     /** {@inheritDoc} */
     @Override
     public int getSize() {

@@ -36,6 +36,7 @@ import org.redfx.strange.*;
 import org.redfx.strange.gate.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -115,6 +116,7 @@ public class Computations {
         return a;
     }
 
+    
     /**
      * decompose a Step into steps that can be processed without permutations
      *
@@ -137,25 +139,41 @@ public class Computations {
             LOG.info("Gates for step "+s+" ARE "+gates);
             for (Gate gate : gates) {
                 if (gate instanceof BlockGate blockGate) {
-                    LOG.info("Yes, blockgate with index at "+blockGate.getMainQubitIndex());
-                    List<Step> subSteps = blockGate.getSubSteps();
-                    LOG.info("and substeps dir = "+subSteps);
+                    boolean ctrlGate = gate instanceof ControlledBlockGate;
+                    LOG.info("Yes, blockgate with index at "+blockGate.getMainQubitIndex()+" control? " + ctrlGate+" and inv? "+blockGate.isInverse());
+                    
                     Block block = blockGate.getBlock();
-                    subSteps = block.getSteps();
+                    List<Step> subSteps = block.getSteps();
+                    if (blockGate.isInverse()) {
+                        LOG.info("Substeps WAS " + subSteps);
+                        subSteps.forEach(step -> step.setInverse(true));
+                        Collections.reverse(subSteps);
+                    }
                     LOG.info("And block = "+block+" with steps = "+subSteps);
                     for (Step blockStep : subSteps) {
                         LOG.info("Now decompose this step "+blockStep);
                         List<Step> steps = decomposeStep(blockStep, nqubit, shift + blockGate.getMainQubitIndex());
                         LOG.info("Decomposed step "+blockStep+" in steps "+steps);
                         for (Step step : steps) {
-                            step.setComplexStep(stepCount++);
-                            answer.add(step);
+                            if (ctrlGate) {
+                                int  ctrlIdx = ((ControlledBlockGate)gate).getControlIndex();
+                                List<Gate> subgates = step.getGates();
+                                Step ctrlStep = new Step();
+                                for (Gate sg: subgates) {
+                                    ctrlStep.addGate(ControlledGate.createControlledGate(sg, ctrlIdx));
+                                }
+                                ctrlStep.setComplexStep(stepCount++);
+                                answer.add(ctrlStep);
+                            } else {
+                                step.setComplexStep(stepCount++);
+                                answer.add(step);
+                            }
                         }
                     }
                 } else {
                     Gate target = gate;
                     if (shift >0 ) {
-                        target = gate.copy();
+              //          target = gate.copy();
                         target.shift(shift);
 //                        gate.setMainQubitIndex(gate.getMainQubitIndex() + shift);
 //                        if (gate instanceof ControlledGate cg) {
@@ -506,6 +524,8 @@ public class Computations {
 
     public static Complex[] simpleNextProb(Gate targetGate, Complex[] v, int baseIndex) {
         LOG.info("Simple prob should work with base = "+baseIndex+" and before we apply "+targetGate+" we have ");
+        boolean isControlGate =  (targetGate instanceof ControlledGate controlledGate);
+        List<Integer> controlIndexes = isControlGate ?((ControlledGate)targetGate).getControllIndexes() : List.of();
   //      Complex.printArray(v);
         int size = v.length;
         Complex[] answer = new Complex[size];
@@ -526,6 +546,7 @@ public class Computations {
             LOG.info("CONTROLLEDGATE");
             ControlledGate cGate = (ControlledGate) targetGate;
             gate = cGate.getRootGate();
+            LOG.info("gate = "+gate);
             controlQubit = baseIndex + cGate.getControllQubitIndex();
             if (cGate.getSecondControlQubitIndex() > -1) {
                 controlQubit2 = baseIndex + cGate.getSecondControlQubitIndex();
@@ -541,19 +562,21 @@ public class Computations {
         int ngroups = 1 << (length-index -1);
         int qdelta = 1 << index;
         LOG.info("index = "+index+" and controlqbit = "+controlQubit + " and cq2 = " + controlQubit2+" and qd = "+qdelta );
-//        LOG.info("ngroups = "+ngroups+" and qd = "+qdelta+" and nqubits = "+nqubits+" and index = "+index);
+        LOG.info("ngroups = "+ngroups+" and qd = "+qdelta+" and nqubits = "+nqubits+" and index = "+index);
         for (int group = 0; group < ngroups; group++) {
 //            LOG.info("group = "+group);
             for (int j = 2 * group * qdelta; j < (2 * group + 1) * qdelta; j++) {
-//                LOG.info("j = "+j);
+                LOG.info("j = "+j);
                 Complex[] work = new Complex[2];
                 Complex[] tmp = new Complex[2];
                 tmp[0] = Complex.ZERO;
                 tmp[1] = Complex.ZERO;
                 work[0] = v[j];
                 work[1] = v[j + qdelta];
-                if ((hasZeroBit(j, controlQubit)) || ((controlQubit2 > -1) && (hasZeroBit(j, controlQubit2))) ) {
-                    LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
+                if (shouldSkip(j, controlIndexes)) {
+                    LOG.info("YES, skip");
+//                if ((hasZeroBit(j, controlQubit)) || ((controlQubit2 > -1) && (hasZeroBit(j, controlQubit2))) ) {
+                   // LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
                     tmp[0] = v[j];
                     tmp[1] = v[j + qdelta];
                 } else {
@@ -561,7 +584,7 @@ public class Computations {
                     LOG.info("Yes, gate "+gate+" has optimize");
                     tmp = gate.applyOptimize(work);
                 } else {
-                    LOG.info("Noopt for gate "+gate);
+          //          LOG.info("Noopt for gate "+gate);
                     Complex[][] matrix = gate.getMatrix();
              //       printMatrix(matrix);
                     s1 = System.currentTimeMillis();
@@ -577,8 +600,22 @@ public class Computations {
                 answer[j + qdelta] = tmp[1];
             }
         }
+//        LOG.info("After this gate, probs = ");
+//        Complex.printArray(answer);
 //LOG.info("ANSWER = " + List.of(answer));
         return answer;
+    }
+    
+    static boolean shouldSkip(int target, List<Integer> ctrlIdxs) {
+        int size = ctrlIdxs.size();
+        if (size == 0) return false;
+        int idx = 0;
+//        System.err.println("TARGET = "+target+" and indexes = "+ctrlIdxs);
+        while(idx < size) {
+            if (hasZeroBit(target, ctrlIdxs.get(idx))) return true;
+            idx++;
+        }
+        return false;
     }
 
     public static Complex[] getNextProbability(List<Gate> gates, Complex[] v) {
@@ -895,6 +932,7 @@ public class Computations {
      * @return 
      */
     public static boolean hasZeroBit(int a, int b) {
+//        LOG.info("zero for a = " + a + " and b = "+b+"?");
        if (b < 0) return false;
         int res = a & (1 << b);
         return (res == 0);

@@ -44,8 +44,8 @@ import org.redfx.strange.Gate;
  */
 public class Cz extends TwoQubitGate implements ControlledGate {
         
-    final int controlQubit;
-    final int rootGateIndex;
+    int controlQubit;
+    int rootGateIndex;
     
     Complex[][] matrix =  new Complex[][]{
         {Complex.ONE,Complex.ZERO,Complex.ZERO,Complex.ZERO},
@@ -98,4 +98,12 @@ public class Cz extends TwoQubitGate implements ControlledGate {
     public int getRootGateIndex() {
         return this.rootGateIndex;
     }
+
+    @Override
+    public void shift(int n) {
+        super.shift(n);
+        this.controlQubit = controlQubit +n;
+        this.rootGateIndex = rootGateIndex +n;
+    }
+
 }
