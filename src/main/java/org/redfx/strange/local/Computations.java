@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -160,7 +161,16 @@ public class Computations {
                                 List<Gate> subgates = step.getGates();
                                 Step ctrlStep = new Step();
                                 for (Gate sg: subgates) {
-                                    ctrlStep.addGate(ControlledGate.createControlledGate(sg, ctrlIdx));
+                                    if (sg instanceof ControlledGate scg) {
+                                        List<Integer> ci = new ArrayList<>();
+                                        ci.addAll(scg.getControllIndexes());
+                                        ci.add(ctrlIdx);
+                                        ControlledGate createControlledGate = ControlledGate.createControlledGate(((ControlledGate) sg).getRootGate(), ci);
+                                        createControlledGate.setRootGateIndex(((ControlledGate) sg).getRootGateIndex());
+                                        ctrlStep.addGate(createControlledGate);
+                                    } else {
+                                        ctrlStep.addGate(ControlledGate.createControlledGate(sg, ctrlIdx));
+                                    }
                                 }
                                 ctrlStep.setComplexStep(stepCount++);
                                 answer.add(ctrlStep);
@@ -173,6 +183,7 @@ public class Computations {
                 } else {
                     Gate target = gate;
                     if (shift >0 ) {
+                        System.err.println("SHIFT GATE "+target+" at "+Objects.hashCode(target)+" or "+Objects.hashCode(gate));
               //          target = gate.copy();
                         target.shift(shift);
 //                        gate.setMainQubitIndex(gate.getMainQubitIndex() + shift);
@@ -540,17 +551,34 @@ public class Computations {
             for (int i = 0 ; i < size; i++) {
                 answer[i] = v[swapBits(i, b0, b1)];
             }
+        LOG.info("After SWAP gate, probs = ");
+        Complex.printArray(answer);
             return answer;
         }
         if (targetGate instanceof ControlledGate) {
             LOG.info("CONTROLLEDGATE");
             ControlledGate cGate = (ControlledGate) targetGate;
             gate = cGate.getRootGate();
-            LOG.info("gate = "+gate);
+            LOG.info("gate = " + gate);
+            if (gate instanceof Swap swap) {
+                int b0 = swap.getMainQubitIndex();
+                int b1 = swap.getSecondQubitIndex();
+                for (int i = 0; i < size; i++) {
+                    if (shouldSkip(i, controlIndexes)) {
+                        answer[i] = v[i];
+                    } else {
+                        answer[i] = v[swapBits(i, b0, b1)];
+                    }
+                }
+                LOG.info("After controlled SWAP gate, probs = ");
+                Complex.printArray(answer);
+                return answer;
+            }
             controlQubit = baseIndex + cGate.getControllQubitIndex();
             if (cGate.getSecondControlQubitIndex() > -1) {
                 controlQubit2 = baseIndex + cGate.getSecondControlQubitIndex();
             }
+            LOG.info("baseindex = "+baseIndex+" and cgateri = "+cGate.getRootGateIndex());
             index = baseIndex + cGate.getRootGateIndex();
         }
         int nqubits = gate.getSize();
@@ -576,25 +604,25 @@ public class Computations {
                 if (shouldSkip(j, controlIndexes)) {
                     LOG.info("YES, skip");
 //                if ((hasZeroBit(j, controlQubit)) || ((controlQubit2 > -1) && (hasZeroBit(j, controlQubit2))) ) {
-                   // LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
+                    // LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
                     tmp[0] = v[j];
                     tmp[1] = v[j + qdelta];
                 } else {
-                if (gate.hasOptimization()) {
-                    LOG.info("Yes, gate "+gate+" has optimize");
-                    tmp = gate.applyOptimize(work);
-                } else {
-          //          LOG.info("Noopt for gate "+gate);
-                    Complex[][] matrix = gate.getMatrix();
-             //       printMatrix(matrix);
-                    s1 = System.currentTimeMillis();
-                    for (int i = 0; i < gatedim; i++) {
-                        for (int k = 0; k < gatedim; k++) {
-                            tmp[i] = tmp[i].add(matrix[i][k].mul(work[k]));
+                    if (gate.hasOptimization()) {
+                        LOG.info("Yes, gate " + gate + " has optimize");
+                        tmp = gate.applyOptimize(work);
+                    } else {
+                        LOG.info("Noopt for gate " + gate + " with dim = "+gatedim);
+                        Complex[][] matrix = gate.getMatrix();
+                        //       printMatrix(matrix);
+                        s1 = System.currentTimeMillis();
+                        for (int i = 0; i < gatedim; i++) {
+                            for (int k = 0; k < gatedim; k++) {
+                                tmp[i] = tmp[i].add(matrix[i][k].mul(work[k]));
 //                            LOG.info("i = " + i + ", k = " + k + ", newv[i] = " + tmp[i] + " and oldvk = " + work[k]);
+                            }
                         }
                     }
-                }
                 }
                 answer[j] = tmp[0];
                 answer[j + qdelta] = tmp[1];

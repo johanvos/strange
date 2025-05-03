@@ -65,8 +65,8 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
     /**
      * Control-R gate
      *
-     * @param a target qubit
-     * @param b control qubit
+     * @param a control qubit
+     * @param b target qubit
      * @param exp exp
      */
     public Cr (int a, int b, double exp) {
@@ -94,8 +94,8 @@ public class Cr extends TwoQubitGate implements ControlledGate  {
     /**
      * <p>Constructor for Cr.</p>
      *
-     * @param a a int
-     * @param b a int
+     * @param a control qubit
+     * @param b target qubit
      * @param base a int
      * @param pow a int
      */

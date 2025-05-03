@@ -110,7 +110,7 @@ public class InvFourier extends Fourier {
     }
     
     @Override
-    public Block createBlock(boolean inverse) {
+    public Block createBlock() {
         int length = (int) Math.ceil(Math.log(size) / Math.log(2));
         Block answer = new Block("InvFourier", length);
         for (Step step : getSubSteps()) {

@@ -89,7 +89,7 @@ public class BlockGate<T extends Gate> implements Gate {
     public final Block getBlock() {
         LOG.info("GetBlock asked for "+this+", and block = "+this.block);
         if (this.block == null) {
-            this.block = createBlock(this.inverse);
+            this.block = createBlock();
         }
         return this.block;
     }
@@ -131,7 +131,7 @@ public class BlockGate<T extends Gate> implements Gate {
     @Override
     public int getHighestAffectedQubitIndex() {
         if (this.block == null) {
-            this.block = createBlock(inverse);
+            this.block = createBlock();
         }
         int answer = block.getNQubits()+idx-1;
         return answer;
@@ -175,9 +175,9 @@ public class BlockGate<T extends Gate> implements Gate {
     @Override
     public void setInverse(boolean inv) {
         System.err.println("SET inv for Blockgate " + this+" to "+inv);
-//       if (this.block == null) {
-            this.block = createBlock(inv);
-//        }
+        if (this.block == null) {
+            this.block = createBlock();
+        }
         this.inverse = inv;
     }
     
@@ -211,7 +211,7 @@ public class BlockGate<T extends Gate> implements Gate {
         return List.of();
     }
 
-    public Block createBlock(boolean inverse) {
+    public Block createBlock() {
         throw new RuntimeException();
     }
     /** {@inheritDoc} */
@@ -219,7 +219,7 @@ public class BlockGate<T extends Gate> implements Gate {
     public Complex[] applyOptimize(Complex[] v) {
         LOG.info("apply optimize, block = "+this.block);
         if (block == null) {
-            this.block = createBlock(inverse);
+            this.block = createBlock();
         }
         List<Step> steps = block.getSteps();
 //        if (inverse) {

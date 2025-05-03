@@ -89,16 +89,17 @@ public class AddIntegerModulus extends BlockGate<AddIntegerModulus> {
         AddInteger addN = new AddInteger(x0,x1,N);
         ControlledBlockGate cbg = new ControlledBlockGate(addN, x0,dim);
         answer.addStep(new Step(cbg));
+        //answer.addStep(new Step(addN));
 //
-//        AddInteger add2 = new AddInteger(x0,x1,a).inverse();
-//        answer.addStep(new Step(add2));
-//        
-//        answer.addStep(new Step(new X(x1)));
-//        answer.addStep(new Step(new Cnot(x1,dim)));
-//        answer.addStep(new Step(new X(x1)));
-//
-//        AddInteger add3 = new AddInteger(x0,x1,a);
-//        answer.addStep (new Step(add3));
+        AddInteger add2 = new AddInteger(x0,x1,a).inverse();
+        answer.addStep(new Step(add2));
+        
+        answer.addStep(new Step(new X(x1)));
+        answer.addStep(new Step(new Cnot(x1,dim)));
+        answer.addStep(new Step(new X(x1)));
+
+        AddInteger add3 = new AddInteger(x0,x1,a);
+        answer.addStep (new Step(add3));
         return answer;
     }
 

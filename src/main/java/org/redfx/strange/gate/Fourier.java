@@ -149,12 +149,11 @@ public class Fourier extends BlockGate {
     }
 
     @Override
-    public Block createBlock(boolean inverse) {
+    public Block createBlock() {
         LOG.info("Create block, size = "+size);
         int length = (int) Math.ceil(Math.log(size) / Math.log(2));
         Block answer = new Block("Fourier", length);
         for (Step step : getSubSteps()) {
-            if (inverse) step.setInverse(inverse);
             answer.addStep(step);
         }
         return answer;

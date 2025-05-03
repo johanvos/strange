@@ -80,8 +80,8 @@ public class AddInteger extends BlockGate<AddInteger> {
        
     }
     
-    public Block createBlock(boolean inverse) {
-        return createBlock(x0, x1, num, inverse);
+    public Block createBlock() {
+        return createBlock(x0, x1, num);
     }
     /**
      * <p>createBlock.</p>
@@ -91,7 +91,7 @@ public class AddInteger extends BlockGate<AddInteger> {
      * @param num a int
      * @return a {@link org.redfx.strange.Block} object
      */
-    public Block createBlock(int x0, int x1, int num, boolean inverse) {
+    public Block createBlock(int x0, int x1, int num) {
         System.err.println("CREATE addint with num = "+num+" and inv = "+inverse);
         boolean old = true;
         int m = x1-x0+1;

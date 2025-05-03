@@ -42,6 +42,8 @@ import org.redfx.strange.Program;
 import org.redfx.strange.Qubit;
 import org.redfx.strange.Result;
 import org.redfx.strange.Step;
+import org.redfx.strange.gate.Cr;
+import org.redfx.strange.gate.Hadamard;
 import org.redfx.strange.gate.X;
 
 
@@ -242,5 +244,19 @@ public class ControlledBlockTests extends BaseGateTests {
         assertEquals(0, q[2].measure());
         assertEquals(1, q[3].measure());
     }
-    
+     
+    @Test
+    public void CCR2() { //101 -> 001
+        Program p = new Program(3);
+        Step prep = new Step(new Hadamard(0), new Hadamard(1), new Hadamard(2));
+        Block block = new Block(2);
+        block.addStep(new Step(new Cr(0,1,2,2)));
+        BlockGate gate = new BlockGate(block, 0);
+        ControlledBlockGate cbg = new ControlledBlockGate(gate, 0, 2);
+        p.addStep(prep);
+        p.addStep(new Step(cbg));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(0.3535, probs[7].i, 0.01);
+    }
 }

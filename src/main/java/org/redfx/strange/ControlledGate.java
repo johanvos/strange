@@ -20,20 +20,29 @@ public interface ControlledGate extends Gate {
     public Gate getRootGate();
     
     default public int getSecondControlQubitIndex() {return -1;};
+    
+    default void setRootGateIndex(int i) {}
 
     public static ControlledGate createControlledGate(Gate g, int idx) {
+        return createControlledGate(g, List.of(idx));
+    }
+
+    public static ControlledGate createControlledGate(Gate g, List<Integer> idx) {
         System.err.println("CREATE CONTROLLED GATE for "+g);
         return new ControlledGate() {
+            
             @Override
             public int getControllQubitIndex() {
-                return idx;
+                return idx.get(0);
             }
 
             @Override
             public List<Integer> getControllIndexes() {
-                return List.of(idx);
+                return idx;
             }
-
+            public void setRootGateIndex(int i) {
+                g.setMainQubitIndex(i);
+            }
             @Override
             public int getRootGateIndex() {
                 return g.getMainQubitIndex();
@@ -66,7 +75,7 @@ public interface ControlledGate extends Gate {
 
             @Override
             public int getHighestAffectedQubitIndex() {
-                return Integer.max(g.getHighestAffectedQubitIndex(), idx);
+                return Integer.max(g.getHighestAffectedQubitIndex(), idx.get(0));
             }
 
             @Override
