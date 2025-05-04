@@ -42,6 +42,7 @@ import org.redfx.strange.Program;
 import org.redfx.strange.Qubit;
 import org.redfx.strange.Result;
 import org.redfx.strange.Step;
+import org.redfx.strange.gate.AddInteger;
 import org.redfx.strange.gate.Cr;
 import org.redfx.strange.gate.Hadamard;
 import org.redfx.strange.gate.X;
@@ -258,5 +259,81 @@ public class ControlledBlockTests extends BaseGateTests {
         Result result = runProgram(p);
         Complex[] probs = result.getProbability();
         assertEquals(0.3535, probs[7].i, 0.01);
+    }
+      
+    @Test
+    public void ccx() {
+        Program p = new Program(3);
+        Step prep = new Step(new Hadamard(0), new X(1),new Hadamard(2));
+        Block block = new Block(1);
+        block.addStep(new Step(new X(0)));
+        
+        ControlledBlockGate cbg = new ControlledBlockGate(block, 0, 1);
+        ControlledBlockGate cbg2 = new ControlledBlockGate(cbg,1,0);
+        p.addStep(prep);
+        p.addStep(new Step(cbg2));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(.5, probs[2].r, 0.01);
+        assertEquals(.5, probs[3].r, 0.01);
+        assertEquals(.5, probs[5].r, 0.01);
+        assertEquals(.5, probs[6].r, 0.01);
+    }    
+    @Test
+    public void ai2_11() {
+        Program p = new Program(5);
+        Step prep = new Step(new X(0), new X(1), new X(4));
+        AddInteger ai = new AddInteger(0,1,1);
+        ControlledBlockGate cbg = new ControlledBlockGate(ai, 0, 3);
+        ControlledBlockGate cbg2 = new ControlledBlockGate(cbg,1,0);
+        p.addStep(prep);
+        p.addStep(new Step(cbg2));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[21].r, 0.01);
+    }   
+        
+    @Test
+    public void ai2_01() {
+        Program p = new Program(5);
+        Step prep = new Step(new X(1), new X(4));
+        AddInteger ai = new AddInteger(0,1,1);
+        ControlledBlockGate cbg = new ControlledBlockGate(ai, 0, 3);
+        ControlledBlockGate cbg2 = new ControlledBlockGate(cbg,1,0);
+        p.addStep(prep);
+        p.addStep(new Step(cbg2));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[18].r, 0.01);
+    }
+
+    @Test
+    public void ai2_10() {
+        Program p = new Program(5);
+        Step prep = new Step(new X(0), new X(1));
+        AddInteger ai = new AddInteger(0,1,1);
+        ControlledBlockGate cbg = new ControlledBlockGate(ai, 0, 3);
+        ControlledBlockGate cbg2 = new ControlledBlockGate(cbg,1,0);
+        p.addStep(prep);
+        p.addStep(new Step(cbg2));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[3].r, 0.01);
+    }
+    @Test
+    public void ai2() {
+        Program p = new Program(5);
+        Step prep = new Step(new Hadamard(0), new X(1), new Hadamard(4));
+        AddInteger ai = new AddInteger(0,1,1);
+        ControlledBlockGate cbg = new ControlledBlockGate(ai, 0, 3);
+        ControlledBlockGate cbg2 = new ControlledBlockGate(cbg,1,0);
+        p.addStep(prep);
+        p.addStep(new Step(cbg2));
+        Result result = runProgram(p);
+        Complex[] probs = result.getProbability();
+        assertEquals(0.5, probs[2].r, 0.01);
+        assertEquals(0.5, probs[3].r, 0.01);
+        assertEquals(0.5, probs[18].r, 0.01);
+        assertEquals(0.5, probs[21].r, 0.01);
     }
 }

@@ -87,25 +87,28 @@ public class MulModulus extends BlockGate<MulModulus> {
         int size =  x1-x0 +1;
         int n = size;
         Block answer = new Block("MulModulus", 2 * size+2);
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < 1; i++) {
             int m = ( mul * (1 << i)) % mod;
+            System.err.println("PREMMM = "+m);
             AddIntegerModulus add = new AddIntegerModulus(x0, x1+1, m, mod);
             ControlledBlockGate cbg = new ControlledBlockGate(add, n, i);
             answer.addStep(new Step(cbg));
         }
-
-        for (int i = x0; i < x1+1; i++) {
-            answer.addStep(new Step (new Swap(i, i + size)));
-        }
-
-        int invmul = Computations.getInverseModulus(mul,mod);
-        for (int i = 0; i < n; i++) {
-            int m = ( invmul * (1 << i)) % mod;
-            AddIntegerModulus add = new AddIntegerModulus(x0, x1+1, m, mod);
-            ControlledBlockGate cbg = new ControlledBlockGate(add, n, i);
-            cbg.setInverse(true);
-            answer.addStep(new Step(cbg));
-        }
+//
+//        for (int i = x0; i < x1+1; i++) {
+//            answer.addStep(new Step (new Swap(i, i + size)));
+//        }
+//
+//        int invmul = Computations.getInverseModulus(mul,mod);
+//        System.err.println("INVMOD for "+mul+" and " + mod+" = "+invmul);
+//        for (int i = 0; i < n; i++) {
+//            int m = ( invmul * (1 << i)) % mod;
+//            System.err.println("MMM = "+m);
+//            AddIntegerModulus add = new AddIntegerModulus(x0, x1+1, m, mod);
+//            ControlledBlockGate cbg = new ControlledBlockGate(add, n, i);
+//            cbg.setInverse(true);
+//            answer.addStep(new Step(cbg));
+//        }
         return answer;
     }
   

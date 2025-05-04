@@ -133,7 +133,7 @@ public class InvFourier extends Fourier {
             }
         }
         for (int i = 0; i < length/2;i++) {
-            Step step = new Step(new Swap(0,length-1-i));
+            Step step = new Step(new Swap(i,length-1-i));
             answer.add(step);
         }
         return answer;

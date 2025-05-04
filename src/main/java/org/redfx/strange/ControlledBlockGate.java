@@ -71,7 +71,17 @@ public class ControlledBlockGate<T> extends BlockGate {
      * @param control the index of the control qubit
      */
     public ControlledBlockGate(BlockGate bg, int idx, int control) {
-        this (bg.getBlock(), idx, control);
+        super();
+        if (bg instanceof ControlledBlockGate cbg) {
+            Step s = new Step(cbg);
+            Block b = new Block(bg.getSize());
+            b.addStep(new Step(cbg));
+            this.setBlock(b);
+        } else {
+            this.setBlock(bg.getBlock());
+        }
+        this.setMainQubitIndex(idx);
+        this.control = control;
     }
     
     public int getControlIndex() {
@@ -85,6 +95,12 @@ public class ControlledBlockGate<T> extends BlockGate {
      * @param control the control qubit
      */
     public ControlledBlockGate (Block block, int idx, int control) {
+//        List<Step> steps = block.getSteps();
+//        Block cBlock = new Block(block.getNQubits()+1);
+//        for (Step step : steps) {
+//            ControlledGate.
+//        }
+//        System.err.println("");
         super(block, idx);
         this.control = control;
         if (control > idx) {
@@ -316,7 +332,7 @@ public class ControlledBlockGate<T> extends BlockGate {
     
     /** {@inheritDoc} */
     @Override public String toString() {
-        return "ControlledGate for "+super.toString();
+        return "ControlledBlockGate with control at " + control+" for "+super.toString();
     }
     
 }

@@ -63,7 +63,7 @@ public class Result {
      */
     public Result(int nqubits, int steps) {
         assert(steps >= 0);
-        LOG.info("Create result for "+nsteps+" steps");
+        LOG.info("Create result for "+nsteps+" steps and "+ nqubits+" qubits");
         this.nqubits = nqubits;
         this.nsteps = steps;
         intermediateProps = new Complex[steps > 0 ? steps : 1][];
