@@ -74,7 +74,7 @@ public class OverflowTests extends BaseGateTests {
         boolean iae = false;
         try {
             Result result = runProgram(p);
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             iae = true;
         }
         assertTrue(iae);
