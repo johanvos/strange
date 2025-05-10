@@ -198,7 +198,7 @@ public class Computations {
                     answer.add(step);
                 };
             }
-            LOG.info("Decomposed steps = "+answer);
+            LOG.info("Step " + s+" can be decomposed into steps = "+answer);
             return answer;
 
         }
