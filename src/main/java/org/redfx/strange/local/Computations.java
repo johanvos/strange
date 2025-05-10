@@ -675,6 +675,19 @@ checkSum(answer);
         return getNextProbability(gates, v, 0);
     }
 
+    public static Complex[] processMatrixGate(Gate gate, Complex[] v) {
+        int size = v.length;
+         Complex[][] matrix = gate.getMatrix();
+                Complex[] answer = new Complex[size];
+                for (int i = 0; i < size; i++) {
+                    answer[i] = Complex.ZERO;
+                    for (int j = 0; j < size; j++) {
+                        answer[i] = answer[i].add(matrix[i][j].mul(v[j]));
+                    }
+                }
+                return answer;
+    
+    }
     public static Complex[] getNextProbability(List<Gate> gates, Complex[] v, int baseIndex) {
         LOG.info("GNP for "+gates+" and base = " + baseIndex+" and probs = ");
   //      Complex.printArray(v);
@@ -695,7 +708,10 @@ checkSum(answer);
                     } else if (gate instanceof BlockGate) {
                         LOG.info("BLOCKGATE: "+ gate);
                         answer = gate.applyOptimize(answer);
-                    } else {
+                    } else if (gate instanceof Oracle){
+                        answer = processMatrixGate(gate, answer);
+                    } 
+                    else {
                         answer = simpleNextProb(gate, answer, baseIndex);
                     }
                 }

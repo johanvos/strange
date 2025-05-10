@@ -122,11 +122,15 @@ public class BlockTests extends BaseGateTests {
 
     @Test
     public void createManyXBlockInProgramAddPos2() {
-        Block block = new Block(1);
-        block.addStep(new Step(Gate.x(0)));
-        BlockGate gate = new BlockGate(block, 1);
-        BlockGate gate2 = new BlockGate(block, 0);
-        BlockGate gate3 = new BlockGate(block, 1);
+        Block block1 = new Block(1);
+        block1.addStep(new Step(Gate.x(0)));
+        Block block2 = new Block(1);
+        block2.addStep(new Step(Gate.x(0)));
+        Block block3 = new Block(1);
+        block3.addStep(new Step(Gate.x(0)));
+        BlockGate gate = new BlockGate(block1, 1);
+        BlockGate gate2 = new BlockGate(block2, 0);
+        BlockGate gate3 = new BlockGate(block3, 1);
         Program p = new Program(2);
         p.addSteps(new Step(gate), new Step(gate2), new Step(gate3));
         Result result = runProgram(p);
