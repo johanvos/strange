@@ -115,7 +115,7 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         int cntr = 0;
         for (Step step : simpleSteps) {
             long s0 = System.currentTimeMillis();
-
+            step.setComplexStep(cntr);
             if (!step.getGates().isEmpty()) {
                 LOG.info("RUN STEP " + step + ", cnt = " + cnt+" and complex step = "+step.getComplexStep());
                 cnt++;
@@ -125,7 +125,7 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
                 LOG.info("after step " + cnt + ", probs = COMMENT" + probs);
               //      printProbs(probs);
                 int idx = step.getComplexStep();
-                // System.err.println("complex? "+idx);
+                System.err.println("complex? "+idx);
                 if (idx > -1) {
                     result.setIntermediateProbability(idx, probs);
                 }
@@ -137,6 +137,9 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         LOG.info("DONE RUN, probability vector = " + probs);
         printProbs(probs);
         double[] qp = calculateQubitStatesFromVector(probs);
+        for (double qq: qp) {
+            LOG.info("res = "+qq);
+        }
         for (int i = 0; i < nQubits; i++) {
             qubit[i].setProbability(qp[i]);
         }

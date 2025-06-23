@@ -117,7 +117,7 @@ public class Computations {
         return a;
     }
 
-    
+    static int stepCount = 0;
     /**
      * decompose a Step into steps that can be processed without permutations
      *
@@ -134,7 +134,7 @@ public class Computations {
 //            return answer;
 //        }
         if (1 < 2) {
-            int stepCount = 0;
+         //   int stepCount = 0;
             answer = new ArrayList<>();
             List<Gate> gates = s.getGates();
             LOG.info("Gates for step "+s+" ARE "+gates);
@@ -528,6 +528,7 @@ public class Computations {
         nested++;
         Complex[] answer = getNextProbability(getAllGates(gates, length), vector);
         nested--;
+        LOG.info("After step, skipCall = "+skipcall+" and skiptot = "+skiptot/1000000);
         return answer;
     }
     
@@ -535,11 +536,15 @@ public class Computations {
         return simpleNextProb(targetGate, v, 0);
     }
 
+    static long skipcall = 0;
+    static long skiptot = 0;
     public static Complex[] simpleNextProb(Gate targetGate, Complex[] v, int baseIndex) {
         LOG.info("Simple prob should work with base = "+baseIndex+" and before we apply "+targetGate+" we have ");
         boolean isControlGate =  (targetGate instanceof ControlledGate controlledGate);
-        List<Integer> controlIndexes = isControlGate ?((ControlledGate)targetGate).getControllIndexes() : List.of();
-  //      Complex.printArray(v);
+        final List<Integer> controlIndexesl = isControlGate ?((ControlledGate)targetGate).getControllIndexes() : List.of();
+        int[] controlIndexes = new int[controlIndexesl.size()];
+        for (int i = 0; i < controlIndexes.length; i++) controlIndexes[i] = controlIndexesl.get(i);
+//      Complex.printArray(v);
         int size = v.length;
         Complex[] answer = new Complex[size];
         Gate gate = targetGate;
@@ -567,7 +572,12 @@ checkSum(answer);
                 int b0 = swap.getMainQubitIndex();
                 int b1 = swap.getSecondQubitIndex();
                 for (int i = 0; i < size; i++) {
-                    if (shouldSkip(i, controlIndexes)) {
+                    long t0 = System.nanoTime();
+                    boolean skip = shouldSkip(i, controlIndexes);
+                    long t1 = System.nanoTime();
+                    skiptot = skiptot + (t1 - t0);
+                    skipcall++;
+                    if (skip) {
                         answer[i] = v[i];
                     } else {
                         answer[i] = v[swapBits(i, b0, b1)];
@@ -606,7 +616,12 @@ checkSum(answer);
                 tmp[1] = Complex.ZERO;
                 work[0] = v[j];
                 work[1] = v[j + qdelta];
-                if (shouldSkip(j, controlIndexes)) {
+                long t0 = System.nanoTime();
+                boolean skip = shouldSkip(j, controlIndexes);
+                                    long t1 = System.nanoTime();
+                    skiptot = skiptot + (t1 - t0);
+                    skipcall++;
+                if (skip) {
 //                    LOG.info("YES, skip");
 //                if ((hasZeroBit(j, controlQubit)) || ((controlQubit2 > -1) && (hasZeroBit(j, controlQubit2))) ) {
                     // LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
@@ -659,11 +674,20 @@ checkSum(answer);
         }
     }
 
+    static boolean shouldSkip(int target, int[] ctrlIdxs) {
+        int size = ctrlIdxs.length;
+        if (size == 0) return false;
+        int idx = 0;
+        while(idx < size) {
+            if (hasZeroBit(target, ctrlIdxs[idx])) return true;
+            idx++;
+        }
+        return false;
+    }
     static boolean shouldSkip(int target, List<Integer> ctrlIdxs) {
         int size = ctrlIdxs.size();
         if (size == 0) return false;
         int idx = 0;
-//        System.err.println("TARGET = "+target+" and indexes = "+ctrlIdxs);
         while(idx < size) {
             if (hasZeroBit(target, ctrlIdxs.get(idx))) return true;
             idx++;

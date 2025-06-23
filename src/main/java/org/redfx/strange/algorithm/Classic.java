@@ -218,6 +218,7 @@ public class Classic {
         int p = 0;
         while ((p == 0) && tries < maxtries) {
             p = measurePeriod(a, mod);
+            System.err.println("p = "+p);
             if (p ==0) {
                 System.err.println("We measured a periodicity of 0, and have to start over.");
             }
@@ -264,7 +265,8 @@ public class Classic {
     
     private static int measurePeriod(int a, int mod) {         
         int length = (int) Math.ceil(Math.log(mod) / Math.log(2));
-        int offset = length;
+        int offset = 2 * length;
+        System.err.println("create with #qubits = "+length+" or "+ (2*length +2+offset));
         Program p = new Program(2 * length + 2 + offset);
         Step prep = new Step();
         for (int i = 0; i < offset; i++) {
@@ -285,6 +287,8 @@ public class Classic {
         p.addStep(new Step(new InvFourier(offset, 0)));
         Result result = qee.runProgram(p);
         Qubit[] q = result.getQubits();
+        Complex[] probs = result.getProbability();
+        Complex.printArray(probs);
         int answer = 0;
         for (int i = 0; i < offset; i++) {
             answer = answer + q[i].measure()*(1<< i);

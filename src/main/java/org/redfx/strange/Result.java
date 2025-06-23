@@ -34,7 +34,11 @@ package org.redfx.strange;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 /**
  * <p>Result class.</p>
@@ -147,7 +151,7 @@ public class Result {
      */
     public void setIntermediateProbability(int step, Complex[] p) {
         this.intermediateProps[step] = p;
-        this.intermediateQubits.put(step, calculateQubitsFromVector(p));
+    //    this.intermediateQubits.put(step, calculateQubitsFromVector(p));
     //    if ((step == nsteps -1) || (nsteps == 0)) { // in case we have no steps, this is the final result
             this.probability = p;
      //   }
@@ -164,24 +168,35 @@ public class Result {
         while ((ret > 0) && (intermediateProps[ret] == null)) ret--;
         return intermediateProps[ret];
     }
+static ForkJoinPool customPool = new ForkJoinPool(8);
 
     public static double[] calculateQubitStatesFromVector(Complex[] vectorresult) {
-        int nq = (int) Math.round(Math.log(vectorresult.length) / Math.log(2));
-        double[] answer = new double[nq];
-        int ressize = 1 << nq;
-        for (int i = 0; i < nq; i++) {
-            int pw = i;//nq - i - 1;
-            int div = 1 << pw;
-            for (int j = 0; j < ressize; j++) {
-                int p1 = j / div;
-                if (p1 % 2 == 1) {
-                    answer[i] = answer[i] + vectorresult[j].abssqr();
-                }
+        try {
+            int nq = (int) Math.round(Math.log(vectorresult.length) / Math.log(2));
+            double[] answer = new double[nq];
+            double[] pabs = new double[vectorresult.length];
+            for (int i = 0; i < pabs.length; i++) {
+                pabs[i] = vectorresult[i].abssqr();
             }
+            customPool.submit(() ->
+                    IntStream.range(0, nq).parallel().forEach(i -> {
+                        for (int j = 0; j < 1 << nq; j++) {
+                            if (!hasZeroBit(j, i)) {
+                                answer[i] = answer[i] + pabs[j];
+                            }
+                        }
+                    })).get();
+            return answer;
+        } catch (InterruptedException | ExecutionException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
-        return answer;
     }
-
+    public static boolean hasZeroBit(int a, int b) {
+        if (b < 0) return false;
+        int res = a & (1 << b);
+        return (res == 0);
+    }
     /**
      * Based on the probabilities of the system, this method will measure all qubits.
      * When this method is called, the <code>measuredValue</code> value of every qubit
