@@ -34,7 +34,6 @@ package org.redfx.strange.gate;
 
 import org.redfx.strange.Block;
 import org.redfx.strange.BlockGate;
-import org.redfx.strange.Complex;
 import org.redfx.strange.Step;
 
 import java.util.HashMap;
@@ -43,10 +42,11 @@ import org.redfx.strange.Gate;
 /**
  * <p>AddInteger class.</p>
  *
+ * Adds an integer, but without a QFT before and after the Draper algorithm.
  * @author johan
  * @version $Id: $Id
  */
-public class AddInteger extends BlockGate<AddInteger> {
+public class AddIntegerCore extends BlockGate<AddIntegerCore> {
 
     final int x0;
     final int x1;
@@ -63,7 +63,7 @@ public class AddInteger extends BlockGate<AddInteger> {
      * x_0 ----- y_0 + x_0
      * x_1 ----- y+1 + x_1
      */
-    public AddInteger(int x0, int x1, int num) {
+    public AddIntegerCore(int x0, int x1, int num) {
         super();
         setIndex(x0);
         this.x0 = x0;
@@ -83,31 +83,22 @@ public class AddInteger extends BlockGate<AddInteger> {
      * @return a {@link org.redfx.strange.Block} object
      */
     public Block createBlock(int x0, int x1, int num) {
-        System.err.println("CREATE addint with num = "+num+" and inv = "+inverse);
+        System.err.println("CREATE addintcore with num = "+num+" and inv = "+inverse);
         boolean old = true;
         int m = x1-x0+1;
-        Block answer = new Block("AddInteger ", m);
-        answer.addStep(new Step(new Fourier(m, 0)));
+        Block answer = new Block("AddIntegerCore ", m);
         Step pstep = new Step();
         for (int i = 0; i < m; i++) {
-//            Complex[][] mat = Complex.identityMatrix(2);
             for (int j = 0; j < m-i ; j++) {
                 int cr0 = m-j-i-1;
-//                if (inverse) {
-//                    System.err.println("ADDINT inv");
-//                    cr0 = -1*cr0;
-//                }
                 if ((num >> cr0 & 1) == 1) {
-//                    mat = Complex.mmul(mat, new R(2, 1 + j, i).getMatrix());
                     if (old) {
                        int pow =  1 + j;
                        double exp = Math.PI*2/Math.pow(2, pow);
                        if (inverse) exp = -1 * exp;
                        Gate g = new R(exp, i);
                        System.err.println("CREATED addint subgate (pow = "+pow+", exp = " + exp+",): "+g);
-//                       if (inverse) {
-//                           g.setInverse(true);
-//                       }
+
                         Step s = new Step(g);
                         answer.addStep(s);
                     }
@@ -120,7 +111,6 @@ public class AddInteger extends BlockGate<AddInteger> {
         if (!old) {
             answer.addStep(pstep);
         }
-        answer.addStep(new Step(new InvFourier(m, 0)));
         System.err.println("CREATED addint with num = "+num+" and inv = "+inverse);
 
         return answer;

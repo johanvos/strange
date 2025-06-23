@@ -81,24 +81,32 @@ public class AddIntegerModulus extends BlockGate<AddIntegerModulus> {
         Block answer = new Block("AddIntegerModulus", x1-x0+2);
         int nn = x1-x0;
         int dim = nn+1+x0;
-        AddInteger add = new AddInteger(x0, x1, a);
+        answer.addStep (new Step(new Fourier(x1-x0+1,x0)));
+        AddIntegerCore add = new AddIntegerCore(x0, x1, a);
         answer.addStep(new Step(add));
-        AddInteger min = new AddInteger(x0,x1,N).inverse();
+        AddIntegerCore min = new AddIntegerCore(x0,x1,N).inverse();
         answer.addStep(new Step(min));
+        
+        answer.addStep (new Step(new InvFourier(x1-x0+1,x0)));
         answer.addStep(new Step(new Cnot(x1,dim)));
-        AddInteger addN = new AddInteger(x0,x1,N);
+        answer.addStep (new Step(new Fourier(x1-x0+1,x0)));
+
+        AddIntegerCore addN = new AddIntegerCore(x0,x1,N);
         ControlledBlockGate cbg = new ControlledBlockGate(addN, x0,dim);
         answer.addStep(new Step(cbg));
 
-        AddInteger add2 = new AddInteger(x0,x1,a).inverse();
+        AddIntegerCore add2 = new AddIntegerCore(x0,x1,a).inverse();
         answer.addStep(new Step(add2));
         
+        answer.addStep (new Step(new InvFourier(x1-x0+1,x0)));
         answer.addStep(new Step(new X(dim -1)));
         answer.addStep(new Step(new Cnot(x1,dim)));
         answer.addStep(new Step(new X(dim -1)));
+        answer.addStep (new Step(new Fourier(x1-x0+1,x0)));
 
-        AddInteger add3 = new AddInteger(x0,x1,a);
+        AddIntegerCore add3 = new AddIntegerCore(x0,x1,a);
         answer.addStep (new Step(add3));
+        answer.addStep (new Step(new InvFourier(x1-x0+1,x0)));
         return answer;
     }
 
