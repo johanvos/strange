@@ -547,6 +547,7 @@ public class Computations {
 //      Complex.printArray(v);
         int size = v.length;
         Complex[] answer = new Complex[size];
+        System.arraycopy(v, 0, answer, 0, size);
         Gate gate = targetGate;
         int controlQubit = -1;
         int controlQubit2 = -1;
@@ -558,9 +559,7 @@ public class Computations {
             for (int i = 0 ; i < size; i++) {
                 answer[i] = v[swapBits(i, b0, b1)];
             }
-//        LOG.info("After SWAP gate, probs = ");
-//        Complex.printArray(answer);
-checkSum(answer);
+            checkSum(answer);
             return answer;
         }
         if (targetGate instanceof ControlledGate) {
@@ -583,10 +582,7 @@ checkSum(answer);
                         answer[i] = v[swapBits(i, b0, b1)];
                     }
                 }
-//                LOG.info("After controlled SWAP gate, probs = ");
-//                Complex.printArray(answer);
-checkSum(answer);
-
+                checkSum(answer);
                 return answer;
             }
             controlQubit = baseIndex + cGate.getControllQubitIndex();
@@ -606,10 +602,11 @@ checkSum(answer);
         int qdelta = 1 << index;
         LOG.info("index = "+index+" and controlqbit = "+controlQubit + " and cq2 = " + controlQubit2+" and qd = "+qdelta );
         LOG.info("ngroups = "+ngroups+" and qd = "+qdelta+" and nqubits = "+nqubits+" and index = "+index);
+        
         for (int group = 0; group < ngroups; group++) {
-//            LOG.info("group = "+group);
             for (int j = 2 * group * qdelta; j < (2 * group + 1) * qdelta; j++) {
-//                LOG.info("j = "+j);
+                boolean skip = shouldSkip(j, controlIndexes);
+                if (!skip) {
                 Complex[] work = new Complex[2];
                 Complex[] tmp = new Complex[2];
                 tmp[0] = Complex.ZERO;
@@ -617,37 +614,26 @@ checkSum(answer);
                 work[0] = v[j];
                 work[1] = v[j + qdelta];
                 long t0 = System.nanoTime();
-                boolean skip = shouldSkip(j, controlIndexes);
-                                    long t1 = System.nanoTime();
-                    skiptot = skiptot + (t1 - t0);
-                    skipcall++;
-                if (skip) {
-//                    LOG.info("YES, skip");
-//                if ((hasZeroBit(j, controlQubit)) || ((controlQubit2 > -1) && (hasZeroBit(j, controlQubit2))) ) {
-                    // LOG.info("YES, CONTROLBIT ZERO for "+j+" and v[j] = "+v[j]+" and dist = "+v[j+qdelta]);
-                    tmp[0] = v[j];
-                    tmp[1] = v[j + qdelta];
-                } else {
+                long t1 = System.nanoTime();
+                skiptot = skiptot + (t1 - t0);
+                skipcall++;
                     if (gate.hasOptimization()) {
-                        LOG.info("Yes, gate " + gate + " has optimize");
                         tmp = gate.applyOptimize(work);
                     } else {
-//                        LOG.info("Noopt for gate " + gate + " with dim = "+gatedim);
                         Complex[][] matrix = gate.getMatrix();
-                        //       printMatrix(matrix);
                         s1 = System.currentTimeMillis();
                         for (int i = 0; i < gatedim; i++) {
                             for (int k = 0; k < gatedim; k++) {
                                 tmp[i] = tmp[i].add(matrix[i][k].mul(work[k]));
-//                            LOG.info("i = " + i + ", k = " + k + ", newv[i] = " + tmp[i] + " and oldvk = " + work[k]);
                             }
                         }
                     }
+                    answer[j] = tmp[0];
+                    answer[j + qdelta] = tmp[1];
                 }
-                answer[j] = tmp[0];
-                answer[j + qdelta] = tmp[1];
             }
         }
+        
 //        LOG.info("After this gate, probs = ");
 //        Complex.printArray(answer);
         checkSum(answer);
