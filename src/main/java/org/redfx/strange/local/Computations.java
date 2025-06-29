@@ -939,7 +939,7 @@ public class Computations {
      * <p>calculateQubitStatesFromVector.</p>
      *
      * @param vectorresult an array of {@link org.redfx.strange.Complex} objects
-     * @return an array of {@link double} objects
+     * @return an array of doubles
      */
     public static double[] calculateQubitStatesFromVector(Complex[] vectorresult) {
         int nq = (int) Math.round(Math.log(vectorresult.length) / Math.log(2));

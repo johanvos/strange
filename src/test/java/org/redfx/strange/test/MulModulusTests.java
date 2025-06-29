@@ -32,16 +32,16 @@
  */
 package org.redfx.strange.test;
 
-
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import org.redfx.strange.Complex;
 import org.redfx.strange.Program;
 import org.redfx.strange.Qubit;
 import org.redfx.strange.Result;
 import org.redfx.strange.Step;
 import org.redfx.strange.gate.MulModulus;
 import org.redfx.strange.gate.X;
-
 
 /**
  *
@@ -58,7 +58,7 @@ public class MulModulusTests extends BaseGateTests {
         int N = 3;
         Step prep = new Step();
         prep.addGates(new X(1)); // 2
-        Step s = new Step(new MulModulus(0,1,mul, N));
+        Step s = new Step(new MulModulus(0, 1, mul, N));
         p.addStep(prep);
         p.addStep(s);
         Result result = runProgram(p);
@@ -66,14 +66,14 @@ public class MulModulusTests extends BaseGateTests {
 
         assertEquals(6, q.length);
         assertEquals(1, q[0].measure()); // 1
-        assertEquals(0, q[1].measure());  
+        assertEquals(0, q[1].measure());
         assertEquals(0, q[2].measure()); // clean from here on
         assertEquals(0, q[3].measure());
         assertEquals(0, q[4].measure());
         assertEquals(0, q[5].measure());
 
     }
-    
+
     @Test
     public void mul3x5mod6() { // 3 x 5 mod 6 = 3
         Program p = new Program(8);
@@ -81,7 +81,7 @@ public class MulModulusTests extends BaseGateTests {
         int N = 6;
         Step prep = new Step();
         prep.addGates(new X(0), new X(1)); // 3 in high register
-        Step s = new Step(new MulModulus(0,2,mul, N));
+        Step s = new Step(new MulModulus(0, 2, mul, N));
         p.addStep(prep);
         p.addStep(s);
         Result result = runProgram(p);
@@ -89,13 +89,49 @@ public class MulModulusTests extends BaseGateTests {
 
         assertEquals(8, q.length);
         assertEquals(1, q[0].measure()); // q2,q1,q0,q3 should be clean
-        assertEquals(1, q[1].measure());  
+        assertEquals(1, q[1].measure());
         assertEquals(0, q[2].measure());
         assertEquals(0, q[3].measure());
         assertEquals(0, q[4].measure()); // result in q4,q5,q6,q7
         assertEquals(0, q[5].measure());
-        assertEquals(0, q[6].measure());  
-        assertEquals(0, q[7].measure());  
+        assertEquals(0, q[6].measure());
+        assertEquals(0, q[7].measure());
+    }
+
+    @Tag("performance")
+    @Test
+    public void mul3x11mod31() { // 3 x 11 mod 31 = 2
+        Program p = new Program(12);
+        int mul = 11;
+        int N = 31;
+        Step prep = new Step();
+        prep.addGates(new X(0), new X(1)); // 3 in high register
+        Step s = new Step(new MulModulus(0, 4, mul, N));
+        p.addStep(prep);
+        p.addStep(s);
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[2].abssqr(), 0.0001);
+        assertEquals(12, q.length);
+    }
+
+    @Tag("performance")
+    @Test
+    public void mul11x13mod97() { // 11 x 13 mod 97 = 46
+        Program p = new Program(16);
+        int mul = 13;
+        int N = 97;
+        Step prep = new Step();
+        prep.addGates(new X(0), new X(1), new X(3)); // 11 in high register
+        Step s = new Step(new MulModulus(0, 6, mul, N));
+        p.addStep(prep);
+        p.addStep(s);
+        Result result = runProgram(p);
+        Qubit[] q = result.getQubits();
+        Complex[] probs = result.getProbability();
+        assertEquals(1, probs[46].abssqr(), 0.0001);
+        assertEquals(16, q.length);
     }
 
 }
