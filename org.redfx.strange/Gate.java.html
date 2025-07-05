@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Gate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange</a> &gt; <span class="el_source">Gate.java</span></div><h1>Gate.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange;
+
+import org.redfx.strange.gate.*;
+
+import java.util.List;
+
+/**
+ *
+ * A Gate describes an operation on one or more qubits. Gates are combined in
+ * {@link Step}s, and {@link Step}s are added to a quantum {@link Program}
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+public interface Gate {
+
+    /**
+     * &lt;p&gt;cnot.&lt;/p&gt;
+     *
+     * @param a a int
+     * @param b a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L56">    static Gate cnot(int a, int b) { return new Cnot(a, b); }</span>
+    /**
+     * &lt;p&gt;cz.&lt;/p&gt;
+     *
+     * @param a a int
+     * @param b a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L64">    static Gate cz(int a, int b)   { return new Cz(a, b); }</span>
+    /**
+     * &lt;p&gt;hadamard.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L71">    static Gate hadamard(int idx)  { return new Hadamard(idx); }</span>
+    /**
+     * &lt;p&gt;identity.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="fc" id="L78">    static Gate identity(int idx) { return new Identity(idx); }</span>
+    /**
+     * &lt;p&gt;measurement.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L85">    static Gate measurement(int idx) { return new Measurement(idx); }</span>
+    /**
+     * &lt;p&gt;oracle.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L92">    static Gate oracle(int idx) { return new Oracle(idx); }</span>
+    /**
+     * &lt;p&gt;oracle.&lt;/p&gt;
+     *
+     * @param matrix an array of {@link org.redfx.strange.Complex} objects
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L99">    static Gate oracle(Complex[][] matrix) { return new Oracle(matrix); }</span>
+    /**
+     * &lt;p&gt;permutation.&lt;/p&gt;
+     *
+     * @param a a int
+     * @param b a int
+     * @param n a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L108">    static Gate permutation(int a, int b, int n) { return new PermutationGate(a, b, n); }</span>
+    /**
+     * &lt;p&gt;probability.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L115">    static Gate probability(int idx) { return new ProbabilitiesGate(idx); }</span>
+    /**
+     * &lt;p&gt;swap.&lt;/p&gt;
+     *
+     * @param a a int
+     * @param b a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L123">    static Gate swap(int a, int b) { return new Swap(a, b); }</span>
+    /**
+     * &lt;p&gt;toffoli.&lt;/p&gt;
+     *
+     * @param a a int
+     * @param b a int
+     * @param c a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L132">    static Gate toffoli(int a, int b, int c) { return new Toffoli(a, b, c); }</span>
+    /**
+     * &lt;p&gt;x.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="fc" id="L139">    static Gate x(int idx)  { return new X(idx); }</span>
+    /**
+     * &lt;p&gt;y.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L146">    static Gate y(int idx)  { return new Y(idx); }</span>
+    /**
+     * &lt;p&gt;z.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L153">    static Gate z(int idx)  { return new Z(idx); }</span>
+    /**
+     * &lt;p&gt;rotation.&lt;/p&gt;
+     *
+     * @param theta a double
+     * @param axis a {@link org.redfx.strange.gate.Rotation.Axes} object
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L162">    static Gate rotation(double theta, Rotation.Axes axis, int idx) {return new Rotation(theta, axis, idx);}</span>
+    /**
+     * &lt;p&gt;rotationX.&lt;/p&gt;
+     *
+     * @param theta a double
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L170">    static Gate rotationX(double theta, int idx) {return new RotationX(theta, idx);}</span>
+    /**
+     * &lt;p&gt;rotationY.&lt;/p&gt;
+     *
+     * @param theta a double
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L178">    static Gate rotationY(double theta, int idx) {return new RotationY(theta, idx);}</span>
+    /**
+     * &lt;p&gt;rotationZ.&lt;/p&gt;
+     *
+     * @param theta a double
+     * @param idx a int
+     * @return a {@link org.redfx.strange.Gate} object
+     */
+<span class="nc" id="L186">    static Gate rotationZ(double theta, int idx) {return new RotationZ(theta, idx);}</span>
+
+    /**
+     * Set the main qubit where this gate operates on.
+     *
+     * @param idx the index of the main qubit
+     */
+    public void setMainQubitIndex(int idx);
+    
+    /**
+     * Return the index of the main qubit this gate acts upon
+     *
+     * @return the index of the main qubit
+     */
+    public int getMainQubitIndex();
+    
+    /**
+     * &lt;p&gt;setAdditionalQubit.&lt;/p&gt;
+     *
+     * @param idx a int
+     * @param cnt a int
+     */
+    public void setAdditionalQubit(int idx, int cnt);
+    
+    /**
+     * &lt;p&gt;getAffectedQubitIndexes.&lt;/p&gt;
+     *
+     * @return a {@link java.util.List} object
+     */
+    public List&lt;Integer&gt; getAffectedQubitIndexes();
+
+    /**
+     * Get the highest index of the qubit that is affected by this gate
+     *
+     * @return the index of the highest affected qubit
+     */
+    public int getHighestAffectedQubitIndex();
+
+    /**
+     * &lt;p&gt;getCaption.&lt;/p&gt;
+     *
+     * @return a {@link java.lang.String} object
+     */
+    public String getCaption();
+    
+    /**
+     * &lt;p&gt;getName.&lt;/p&gt;
+     *
+     * @return a {@link java.lang.String} object
+     */
+    public String getName();
+    
+    /**
+     * &lt;p&gt;getGroup.&lt;/p&gt;
+     *
+     * @return a {@link java.lang.String} object
+     */
+    public String getGroup();
+    
+    /**
+     * &lt;p&gt;getMatrix.&lt;/p&gt;
+     *
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    public Complex[][] getMatrix();
+    
+    /**
+     * Return the number of qubits that are affected by this gate
+     *
+     * @return the number of qubits that are affected by this gate
+     */
+    public int getSize();
+    
+    /**
+     * &lt;p&gt;getMatrix.&lt;/p&gt;
+     *
+     * @param qee a {@link org.redfx.strange.QuantumExecutionEnvironment} object
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    default public Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
+<span class="nc" id="L266">        return getMatrix();</span>
+    }
+    
+    /**
+     * &lt;p&gt;hasOptimization.&lt;/p&gt;
+     *
+     * @return a boolean
+     */
+    default public boolean hasOptimization() {
+<span class="fc" id="L275">        return false;</span>
+    }
+    
+    /**
+     * &lt;p&gt;applyOptimize.&lt;/p&gt;
+     *
+     * @param v an array of {@link org.redfx.strange.Complex} objects
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    default public Complex[] applyOptimize(Complex[] v) {
+<span class="nc" id="L285">        return null;</span>
+    }
+    
+    /**
+     * Defines whether or not this gate should be inversed
+     *
+     * @param inv the boolean to check if this gate should be inversed or not
+     */
+    void setInverse(boolean inv);
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BlockGate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange</a> &gt; <span class="el_source">BlockGate.java</span></div><h1>BlockGate.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+/**
+ *
+ * A Gate describes an operation on one or more qubits.
+ *
+ * @author johan
+ * @param &lt;T&gt; Type of the Gate
+ * @version $Id: $Id
+ */
+public class BlockGate&lt;T extends Gate&gt; implements Gate {
+
+    protected Block block;
+    protected int idx;
+<span class="fc" id="L51">    protected boolean inverse = false;</span>
+    
+    /**
+     * &lt;p&gt;Constructor for BlockGate.&lt;/p&gt;
+     */
+<span class="fc" id="L56">    protected BlockGate() {</span>
+<span class="fc" id="L57">    }</span>
+    
+    /**
+     * Create a block
+     *
+     * @param block a {@link org.redfx.strange.Block} object
+     * @param idx a int
+     */
+<span class="fc" id="L65">    public BlockGate (Block block, int idx) {</span>
+<span class="fc" id="L66">        this.block = block;</span>
+<span class="fc" id="L67">        this.idx = idx;</span>
+<span class="fc" id="L68">    }</span>
+    
+    /**
+     * &lt;p&gt;Setter for the field &lt;code&gt;block&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @param b a {@link org.redfx.strange.Block} object
+     */
+    protected final void setBlock(Block b) {
+<span class="fc" id="L76">        this.block = b;</span>
+<span class="fc" id="L77">    }</span>
+    
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;block&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return a {@link org.redfx.strange.Block} object
+     */
+    public final Block getBlock() {
+<span class="fc" id="L85">        return this.block;</span>
+    }
+    
+    /**
+     * &lt;p&gt;setIndex.&lt;/p&gt;
+     *
+     * @param idx a int
+     */
+    protected final void setIndex(int idx) {
+<span class="fc" id="L94">        this.idx = idx;</span>
+<span class="fc" id="L95">    }</span>
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setMainQubitIndex(int idx) {
+<span class="nc" id="L100">        throw new UnsupportedOperationException(&quot;Not supported yet.&quot;); //To change body of generated methods, choose Tools | Templates.</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getMainQubitIndex() {
+<span class="fc" id="L106">        return idx;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setAdditionalQubit(int idx, int cnt) {
+<span class="nc" id="L112">        throw new UnsupportedOperationException(&quot;Not supported yet.&quot;); //To change body of generated methods, choose Tools | Templates.</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List&lt;Integer&gt; getAffectedQubitIndexes() {
+<span class="nc" id="L118">        return IntStream.range(idx, idx+block.getNQubits()).boxed().collect(Collectors.toList());</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getHighestAffectedQubitIndex() {
+<span class="fc" id="L124">        int answer = block.getNQubits()+idx-1;</span>
+<span class="fc" id="L125">        return answer;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getCaption() {
+<span class="nc" id="L131">        return &quot;B&quot;;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+<span class="nc" id="L137">        return &quot;BlockGate&quot;;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getGroup() {
+<span class="nc" id="L143">        return &quot;BlockGroup&quot;;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Complex[][] getMatrix() {
+<span class="nc" id="L149">        return getMatrix(null);</span>
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
+<span class="nc" id="L155">        Complex[][] answer = block.getMatrix(qee);</span>
+<span class="nc bnc" id="L156" title="All 2 branches missed.">        if (inverse) {</span>
+<span class="nc" id="L157">            answer = Complex.conjugateTranspose(answer);</span>
+        }
+<span class="nc" id="L159">        return answer;</span>
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setInverse(boolean inv) {
+<span class="fc" id="L165">        this.inverse = inv;</span>
+<span class="fc" id="L166">    }</span>
+    
+    /**
+     * &lt;p&gt;inverse.&lt;/p&gt;
+     *
+     * @return a T object
+     */
+    public T inverse() {
+<span class="fc bfc" id="L174" title="All 2 branches covered.">        setInverse(!this.inverse);</span>
+<span class="fc" id="L175">        return (T) this;</span>
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public int getSize() {
+<span class="fc" id="L181">        return block.getNQubits();</span>
+    }
+        
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasOptimization() {
+<span class="fc" id="L187">        return true;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Complex[] applyOptimize(Complex[] v) {
+<span class="fc" id="L193">        return block.applyOptimize(v, inverse);</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override public String toString() {
+<span class="fc" id="L198">        return &quot;Gate for block &quot;+block+&quot;, size = &quot;+getSize()+&quot;, inv = &quot;+inverse;</span>
+    }
+
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

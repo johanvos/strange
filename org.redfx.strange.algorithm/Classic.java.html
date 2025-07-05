@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Classic.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange.algorithm</a> &gt; <span class="el_source">Classic.java</span></div><h1>Classic.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange.algorithm;
+
+import org.redfx.strange.*;
+import org.redfx.strange.gate.*;
+import org.redfx.strange.local.Computations;
+import org.redfx.strange.local.SimpleQuantumExecutionEnvironment;
+
+import java.util.List;
+import java.util.function.Function;
+
+/**
+ * &lt;p&gt;Classic class.&lt;/p&gt;
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+<span class="nc" id="L49">public class Classic {</span>
+    
+<span class="fc" id="L51">    private static QuantumExecutionEnvironment qee = new SimpleQuantumExecutionEnvironment();</span>
+            
+    /**
+     * &lt;p&gt;setQuantumExecutionEnvironment.&lt;/p&gt;
+     *
+     * @param val a {@link org.redfx.strange.QuantumExecutionEnvironment} object
+     */
+    public static void setQuantumExecutionEnvironment(QuantumExecutionEnvironment val) {
+<span class="nc" id="L59">        qee = val;</span>
+<span class="nc" id="L60">    }</span>
+    
+    /**
+     * &lt;p&gt;randomBit.&lt;/p&gt;
+     *
+     * @return a int
+     */
+    public static int randomBit() {
+<span class="fc" id="L68">        Program program = new Program(1, new Step(new Hadamard(0)));</span>
+<span class="fc" id="L69">        Result result = qee.runProgram(program);</span>
+<span class="fc" id="L70">        Qubit[] qubits = result.getQubits();</span>
+<span class="fc" id="L71">        int answer = qubits[0].measure();</span>
+<span class="fc" id="L72">        return answer;</span>
+    }
+    
+    /**
+     * Use a quantum addition algorithm to compute the sum of a and b
+     *
+     * @param a first term
+     * @param b second term
+     * @return the sum of a and b
+     */
+    public static int qsum(int a, int b) {
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        int y = a &gt; b ? a : b;</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        int x = a &gt; b ? b : a;</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        int m = y &lt; 2? 1 : 1 + (int) Math.ceil(Math.log(y)/Math.log(2));</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        int n = x &lt; 2? 1 : 1 + (int) Math.ceil(Math.log(x)/Math.log(2));</span>
+<span class="fc" id="L87">        Program program = new Program(m + n);</span>
+<span class="fc" id="L88">        Step prep = new Step();</span>
+<span class="fc" id="L89">        int y0 = y;</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        for (int i = 0; i &lt; m; i++) {</span>
+<span class="fc" id="L91">            int p = 1 &lt;&lt; (m-i-1);</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            if (y0 &gt;= p) {</span>
+<span class="fc" id="L93">                prep.addGate(new X(m-i-1));</span>
+<span class="fc" id="L94">                y0 = y0-p;</span>
+            }
+        }
+<span class="fc" id="L97">        int x0 = x;</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">        for (int i = 0; i &lt; n; i++) {</span>
+<span class="fc" id="L99">            int p = 1 &lt;&lt; (n-i-1);</span>
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            if (x0 &gt;= p) {</span>
+<span class="fc" id="L101">                prep.addGate(new X(m+n-i-1));</span>
+<span class="fc" id="L102">                x0 = x0-p;</span>
+            }   
+        }
+<span class="fc" id="L105">        program.addStep(prep);</span>
+<span class="fc" id="L106">        program.addStep(new Step(new Fourier(m, 0)));</span>
+<span class="fc bfc" id="L107" title="All 2 branches covered.">        for (int i = 0; i &lt; m; i++) {</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">           for (int j = 0; j &lt; m-i ; j++) {</span>
+<span class="fc" id="L109">                int cr0 = 2 *m-j-i-1;</span>
+<span class="fc bfc" id="L110" title="All 2 branches covered.">                if (cr0 &lt; m + n) {</span>
+<span class="fc" id="L111">                    Step s = new Step(new Cr(i, cr0,2,1+j));</span>
+<span class="fc" id="L112">                    program.addStep(s);</span>
+                }
+            }
+        }
+<span class="fc" id="L116">        program.addStep(new Step(new InvFourier(m, 0)));</span>
+<span class="fc" id="L117">        Result res = qee.runProgram(program);</span>
+<span class="fc" id="L118">        Qubit[] qubits = res.getQubits();</span>
+<span class="fc" id="L119">        int answer = 0;</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        for (int i = 0; i &lt; m; i++) {</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">            if (qubits[i].measure() == 1) {</span>
+<span class="fc" id="L122">                answer = answer + (1&lt;&lt;i);</span>
+            }
+        }
+<span class="fc" id="L125">        return answer;</span>
+    }
+    
+    /**
+     * Apply Grover's search algorithm to find the element from the supplied
+     * list that would evaluate the provided function to 1
+     *
+     * @param &lt;T&gt; the type of the element
+     * @param list the list of all elements that need to be searched into
+     * @param function the function that, when evaluated, returns 0 for all
+     * elements except for the element that this method returns, which evaluation
+     * leads to 1.
+     * @return the single element from the provided list that, when evaluated
+     * by the function, returns 1.
+     */
+    public static&lt;T&gt; T search(List&lt;T&gt; list, Function&lt;T, Integer&gt; function) {
+<span class="fc" id="L141">        double[] probability = searchProbabilities(list, function);</span>
+<span class="fc" id="L142">        int winner = 0;</span>
+<span class="fc" id="L143">        double wv = 0;</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        for (int i = 0 ; i &lt; probability.length; i++) {</span>
+<span class="fc" id="L145">            double a = probability[i];</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">            if (a &gt; wv) {</span>
+<span class="fc" id="L147">                wv = a;</span>
+<span class="fc" id="L148">                winner = i;</span>
+            }
+        }
+<span class="fc" id="L151">        System.err.println(&quot;winner = &quot;+winner+&quot; with prob &quot;+wv);</span>
+<span class="fc" id="L152">        return list.get(winner);</span>
+    }
+    
+      
+    /**
+     * Apply Grover's search algorithm to find the element from the supplied
+     * list that would evaluate the provided function to 1
+     *
+     * @param &lt;T&gt; the type of the element
+     * @param list the list of all elements that need to be searched into
+     * @param function the function that, when evaluated, returns 0 for all
+     * elements except for the element that this method returns, which evaluation
+     * leads to 1.
+     * @return the single element from the provided list that, when evaluated
+     * by the function, returns 1.
+     */
+    public static&lt;T&gt; double[] searchProbabilities(List&lt;T&gt; list, Function&lt;T, Integer&gt; function) {
+<span class="fc" id="L169">        int size = list.size();</span>
+<span class="fc" id="L170">        int n = (int) Math.ceil((Math.log(size)/Math.log(2)));</span>
+<span class="fc" id="L171">        int N = 1 &lt;&lt; n;</span>
+<span class="fc" id="L172">        double cnt = Math.PI*Math.sqrt(N)/4;</span>
+
+<span class="fc" id="L174">        Oracle oracle = createGroverOracle(n, list, function);</span>
+<span class="fc" id="L175">        Program p = new Program(n);</span>
+<span class="fc" id="L176">        Step s0 = new Step();</span>
+<span class="fc bfc" id="L177" title="All 2 branches covered.">        for (int i = 0; i &lt; n; i++) {</span>
+<span class="fc" id="L178">            s0.addGate(new Hadamard(i));</span>
+        }
+<span class="fc" id="L180">        p.addStep(s0);</span>
+<span class="fc" id="L181">        oracle.setCaption(&quot;O&quot;);</span>
+<span class="fc" id="L182">        Complex[][] dif = createDiffMatrix(n);</span>
+<span class="fc" id="L183">        Oracle difOracle = new Oracle(dif);</span>
+<span class="fc" id="L184">        difOracle.setCaption(&quot;D&quot;);</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">        for (int i = 1; i &lt; cnt; i++) {</span>
+<span class="fc" id="L186">            Step s1 = new Step(&quot;Oracle &quot;+i);</span>
+<span class="fc" id="L187">            s1.addGate(oracle);</span>
+<span class="fc" id="L188">            Step s2 = new Step(&quot;Diffusion &quot;+i);</span>
+<span class="fc" id="L189">            s2.addGate(difOracle);</span>
+<span class="fc" id="L190">            Step s3 = new Step(&quot;Prob &quot;+i);</span>
+<span class="fc" id="L191">            s3.addGate(new ProbabilitiesGate(0));</span>
+<span class="fc" id="L192">            p.addStep(s1);</span>
+<span class="fc" id="L193">            p.addStep(s2);</span>
+<span class="fc" id="L194">            p.addStep(s3);</span>
+        }
+<span class="fc" id="L196">        System.out.println(&quot; n = &quot;+n+&quot;, steps = &quot;+cnt);</span>
+
+<span class="fc" id="L198">        Result res = qee.runProgram(p);</span>
+<span class="fc" id="L199">        Complex[] probability = res.getProbability();</span>
+<span class="fc" id="L200">        double[] answer = new double[probability.length];</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">        for (int i = 0; i &lt; probability.length; i++) {</span>
+<span class="fc" id="L202">            answer[i] = probability[i].abssqr();</span>
+        }
+<span class="fc" id="L204">        return answer;</span>
+      
+    }
+
+    /**
+     * Find the periodicity of a^x mod N
+     *
+     * @param a a int
+     * @param mod N
+     * @return period r or -1 if no period is found
+     */
+    public static int findPeriod(int a, int mod) {
+<span class="nc" id="L216">        int maxtries = 2;</span>
+<span class="nc" id="L217">        int tries = 0;</span>
+<span class="nc" id="L218">        int p = 0;</span>
+<span class="nc bnc" id="L219" title="All 4 branches missed.">        while ((p == 0) &amp;&amp; tries &lt; maxtries) {</span>
+<span class="nc" id="L220">            p = measurePeriod(a, mod);</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">            if (p ==0) {</span>
+<span class="nc" id="L222">                System.err.println(&quot;We measured a periodicity of 0, and have to start over.&quot;);</span>
+            }
+        }
+<span class="nc bnc" id="L225" title="All 2 branches missed.">        if (p ==0) return -1;</span>
+<span class="nc" id="L226">        int period = Computations.fraction(p, mod);</span>
+<span class="nc" id="L227">        return period;</span>
+    }
+    
+    /**
+     * &lt;p&gt;qfactor.&lt;/p&gt;
+     *
+     * @param N a int
+     * @return a int
+     */
+    public static int qfactor (int N) {
+<span class="nc" id="L237">        System.out.println(&quot;We need to factor &quot;+N);</span>
+<span class="nc" id="L238">        int a = 1+ (int)((N-1) * Math.random());</span>
+<span class="nc" id="L239">        System.out.println(&quot;Pick a random number a, a &lt; N: &quot;+a);</span>
+<span class="nc" id="L240">        int gcdan = Computations.gcd(N,a);</span>
+<span class="nc" id="L241">        System.out.println(&quot;calculate gcd(a, N):&quot;+ gcdan); </span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        if (gcdan != 1) return gcdan;</span>
+<span class="nc" id="L243">        int p = findPeriod (a, N); </span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">        if (p == -1) {</span>
+<span class="nc" id="L245">            System.err.println(&quot;After too many tries with &quot; + a+&quot;, we need to pick a new random number.&quot;);</span>
+<span class="nc" id="L246">            return qfactor(N);</span>
+
+        }
+<span class="nc" id="L249">        System.out.println(&quot;period of f = &quot;+p);</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        if (p%2 == 1) { </span>
+<span class="nc" id="L251">            System.out.println(&quot;bummer, odd period, restart.&quot;);</span>
+<span class="nc" id="L252">            return qfactor(N);</span>
+        }
+<span class="nc" id="L254">        int md = (int)(Math.pow(a, p/2) +1);</span>
+<span class="nc" id="L255">        int m2 = md%N; </span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        if (m2 == 0) { </span>
+<span class="nc" id="L257">            System.out.println(&quot;bummer, m^p/2 + 1 = 0 mod N, restart&quot;);</span>
+<span class="nc" id="L258">            return qfactor(N);</span>
+        }
+<span class="nc" id="L260">        int f2 = (int)Math.pow(a, p/2) -1;</span>
+<span class="nc" id="L261">        int factor = Computations.gcd(N, f2);</span>
+<span class="nc" id="L262">        return factor;</span>
+    }
+    
+    private static int measurePeriod(int a, int mod) {         
+<span class="nc" id="L266">        int length = (int) Math.ceil(Math.log(mod) / Math.log(2));</span>
+<span class="nc" id="L267">        int offset = length;</span>
+<span class="nc" id="L268">        Program p = new Program(2 * length + 2 + offset);</span>
+<span class="nc" id="L269">        Step prep = new Step();</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">        for (int i = 0; i &lt; offset; i++) {</span>
+<span class="nc" id="L271">            prep.addGate(new Hadamard(i));</span>
+        }
+<span class="nc" id="L273">        Step prepAnc = new Step(new X(offset));</span>
+<span class="nc" id="L274">        p.addStep(prep);</span>
+<span class="nc" id="L275">        p.addStep(prepAnc);</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">        for (int i = length - 1; i &gt; length - 1 - offset; i--) {</span>
+<span class="nc" id="L277">            int m = 1;</span>
+<span class="nc bnc" id="L278" title="All 2 branches missed.">            for (int j = 0; j &lt; 1 &lt;&lt; i; j++) {</span>
+<span class="nc" id="L279">                m = m * a % mod;</span>
+            }
+<span class="nc" id="L281">            MulModulus mul = new MulModulus(length, 2 * length-1, m, mod);</span>
+<span class="nc" id="L282">            ControlledBlockGate cbg = new ControlledBlockGate(mul, offset, i);</span>
+<span class="nc" id="L283">            p.addStep(new Step(cbg));</span>
+        }
+<span class="nc" id="L285">        p.addStep(new Step(new InvFourier(offset, 0)));</span>
+<span class="nc" id="L286">        Result result = qee.runProgram(p);</span>
+<span class="nc" id="L287">        Qubit[] q = result.getQubits();</span>
+<span class="nc" id="L288">        int answer = 0;</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">        for (int i = 0; i &lt; offset; i++) {</span>
+<span class="nc" id="L290">            answer = answer + q[i].measure()*(1&lt;&lt; i);</span>
+        }
+<span class="nc" id="L292">        return answer;</span>
+    }
+          
+    private static&lt;T&gt; Oracle createGroverOracle(int n, List&lt;T&gt; list, Function&lt;T, Integer&gt; function) {
+<span class="fc" id="L296">        int N = 1 &lt;&lt; n;</span>
+<span class="fc" id="L297">        int listSize = list.size();</span>
+<span class="fc" id="L298">        Complex[][] matrix = new Complex[N][N];</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">        for (int i = 0; i &lt; N; i++) {</span>
+<span class="fc bfc" id="L300" title="All 2 branches covered.">            for (int j = 0; j &lt; N; j++) {</span>
+<span class="fc bfc" id="L301" title="All 2 branches covered.">                matrix[i][j] = (i!=j) ? Complex.ZERO : </span>
+<span class="pc bpc" id="L302" title="1 of 4 branches missed.">                        ((i &gt;= listSize) || function.apply(list.get(i)) == 0 )? </span>
+<span class="fc" id="L303">                        Complex.ONE : Complex.ONE.mul(-1);</span>
+            }
+        }
+<span class="fc" id="L306">        return new Oracle(matrix);</span>
+    }
+
+    private static Complex[][] createDiffMatrix(int n) {
+<span class="fc" id="L310">        int N = 1&lt;&lt;n;</span>
+<span class="fc" id="L311">        Gate g = new Hadamard(0);</span>
+<span class="fc" id="L312">        Complex[][] matrix = g.getMatrix();</span>
+<span class="fc" id="L313">        Complex[][] h2 = matrix;</span>
+<span class="fc bfc" id="L314" title="All 2 branches covered.">        for (int i = 1; i &lt; n; i++) {</span>
+<span class="fc" id="L315">            h2 = Complex.tensor(h2, matrix);</span>
+        }
+<span class="fc" id="L317">        Complex[][] I2 = new Complex[N][N];</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">        for (int i = 0; i &lt; N; i++) {</span>
+<span class="fc bfc" id="L319" title="All 2 branches covered.">            for (int j = 0; j &lt;N;j++) {</span>
+<span class="fc bfc" id="L320" title="All 2 branches covered.">                if (i!=j) {</span>
+<span class="fc" id="L321">                    I2[i][j] = Complex.ZERO;</span>
+                } else {
+<span class="fc" id="L323">                    I2[i][j] = Complex.ONE;</span>
+                }
+            }
+        }
+<span class="fc" id="L327">        I2[0][0] = Complex.ONE.mul(-1);</span>
+<span class="fc" id="L328">        int nd = n&lt;&lt;1;</span>
+
+<span class="fc" id="L330">        Complex[][] inter1 = Complex.mmul(h2,I2);</span>
+<span class="fc" id="L331">        Complex[][] dif = Complex.mmul(inter1, h2);</span>
+<span class="fc" id="L332">        return dif;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

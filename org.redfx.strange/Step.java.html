@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Step.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange</a> &gt; <span class="el_source">Step.java</span></div><h1>Step.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ *
+ * A single Step in a quantum {@link Program}. In a step, a number
+ * of {@link Gate}s can be added, involving a number of {@link Qubit}s. However, in a single
+ * step a qubit can be involved in at most one Gate. It is illegal
+ * to declare 2 gates in a single step that operate on the same qubit.
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+public class Step {
+    
+    /**
+     * The type of the step. Typically, a step contains instructions that alter 
+     * the quantum circuit. Those are steps with type &lt;code&gt;NORMAL&lt;/code&gt;.
+     * &lt;br&gt;
+     * Some steps do not alter the quantum circuit at all and can be ignored in
+     * computations. Those are steps with type &lt;code&gt;PSEUDO&lt;/code&gt; and they 
+     * are typically used for visualization.
+     */
+<span class="fc" id="L60">    public enum Type {</span>
+<span class="fc" id="L61">        NORMAL,</span>
+<span class="fc" id="L62">        PSEUDO,</span>
+<span class="fc" id="L63">        PROBABILITY</span>
+    }
+    
+    private final Type type;
+<span class="pc" id="L67">    private final ArrayList&lt;Gate&gt; gates = new ArrayList&lt;&gt;();</span>
+    private int index;
+    private final String name;
+
+    private Program program;
+    
+<span class="pc" id="L73">    private int complexStep = -1; // if a complex step needs to broken into</span>
+    // simple steps, only one simple step can have this value to be the index of the complex step
+
+<span class="pc" id="L76">    private boolean informal = false;</span>
+
+    /**
+     * Create a Step instance and populate it with zero or more {@link Gate}s. 
+     * Note that it is possible to add gates later by invoking the
+     * {@link addGate} or {@link addGates} method.
+     *
+     * @param moreGates zero or more {@link org.redfx.strange.Gate} objects
+     */
+    public Step(Gate... moreGates ) {
+<span class="fc" id="L86">        this(&quot;unknown&quot;, moreGates);</span>
+<span class="fc" id="L87">    }</span>
+
+    /**
+     * Create a Step with a specific name.
+     *
+     * @param name the name of this step
+     * @param moreGates zero or more {@link org.redfx.strange.Gate} objects
+     */
+<span class="fc" id="L95">    public Step(String name, Gate... moreGates ) {</span>
+<span class="fc" id="L96">        this.name = name;</span>
+<span class="fc" id="L97">        addGates(moreGates);</span>
+<span class="fc" id="L98">        this.type = Type.NORMAL;</span>
+<span class="fc" id="L99">    }</span>
+    
+    /**
+     * Create a step with a specific (pseudo) type
+     *
+     * @param type a {@link org.redfx.strange.Step.Type} object
+     */
+<span class="nc" id="L106">    public Step(Type type) {</span>
+<span class="nc" id="L107">        this.type = type;</span>
+<span class="nc" id="L108">        this.name = &quot;pseudo&quot;;</span>
+<span class="nc" id="L109">    }</span>
+
+    /**
+     * return the type of this step.
+     *
+     * @return a {@link org.redfx.strange.Step.Type} object
+     */
+    public Type getType() {
+<span class="fc" id="L117">        return this.type;</span>
+    }
+    /**
+     * Return the name of this step. This is for descriptive information only, it has no impact on the
+     * computations
+     *
+     * @return the name of the step, if supplied by the user.
+     */
+    public String getName() {
+<span class="nc" id="L126">        return this.name;</span>
+    }
+
+    /**
+     * Add gate to the list of gates for this step
+     *
+     * @param gate gate to add
+     * @throws java.lang.IllegalArgumentException in case the supplied Gate operates on a qubit that is already
+     * been operated on in this step
+     */
+    public void addGate(Gate gate) throws IllegalArgumentException {
+<span class="fc" id="L137">        verifyUnique(Objects.requireNonNull(gate));</span>
+<span class="fc" id="L138">        gates.add(gate);</span>
+<span class="fc" id="L139">    }</span>
+
+    /**
+     * Adds the multiple Gates to the list of gates for this step
+     *
+     * @param moreGates more gates
+     * @throws java.lang.IllegalArgumentException in case the supplied Gate operates on a qubit that is already
+     * been operated on in this step
+     */
+    public void addGates(Gate... moreGates) throws IllegalArgumentException {
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        for( Gate g: moreGates ){</span>
+<span class="fc" id="L150">            addGate(g);</span>
+        }
+<span class="fc" id="L152">    }</span>
+
+    /**
+     * Return all gates for this step in an unmodifiable collection
+     *
+     * @return a List with {@link Gate}s that are added to this step, either
+     * via the constructor or the {@link addGate} or {@link addGates} methods.
+     */
+    public List&lt;Gate&gt; getGates() {
+<span class="fc" id="L161">        return Collections.unmodifiableList(gates);</span>
+    }
+    
+    /**
+     * Remove a Gate from this step
+     *
+     * @param g the Gate that should be removed
+     */
+    public void removeGate(Gate g) {
+<span class="nc" id="L170">        gates.remove(g);</span>
+<span class="nc" id="L171">    }</span>
+    
+    /**
+     * Indicate that this step is part of a complex step. 
+     *
+     * @param idx the index of the complex step that this step is part of in
+     * the original Program
+     */
+    public void setComplexStep(int idx) {
+<span class="fc" id="L180">        this.complexStep = idx;</span>
+<span class="fc" id="L181">    }</span>
+    
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;complexStep&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return a int
+     */
+    public int getComplexStep() {
+<span class="fc" id="L189">        return this.complexStep;</span>
+    }
+
+    /**
+     * &lt;p&gt;setInformalStep.&lt;/p&gt;
+     *
+     * @param b a boolean
+     */
+    public void setInformalStep(boolean b) {
+<span class="fc" id="L198">        this.informal = b;</span>
+<span class="fc" id="L199">    }</span>
+
+    /**
+     * &lt;p&gt;isInformal.&lt;/p&gt;
+     *
+     * @return a boolean
+     */
+    public boolean isInformal() {
+<span class="nc" id="L207">        return informal;</span>
+    }
+
+    /**
+     * &lt;p&gt;Setter for the field &lt;code&gt;index&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @param s a int
+     */
+    public void setIndex(int s) {
+<span class="fc" id="L216">        this.index = s;</span>
+<span class="fc" id="L217">        this.complexStep = s;</span>
+<span class="fc" id="L218">    }</span>
+    
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;index&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return a int
+     */
+    public int getIndex() {
+<span class="fc" id="L226">        return this.index;</span>
+    }
+
+    /**
+     * &lt;p&gt;Setter for the field &lt;code&gt;program&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @param p a {@link org.redfx.strange.Program} object
+     */
+    public void setProgram(Program p) {
+<span class="fc" id="L235">        this.program = p;</span>
+<span class="fc" id="L236">    }</span>
+
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;program&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return a {@link org.redfx.strange.Program} object
+     */
+    public Program getProgram() {
+<span class="nc" id="L244">        return this.program;</span>
+    }
+
+    /**
+     * &lt;p&gt;setInverse.&lt;/p&gt;
+     *
+     * @param val a boolean
+     */
+    public void setInverse(boolean val) {
+        // TODO: https://github.com/redfx-quantum/strange/issues/93
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        for (Gate g: gates) {</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">            if (g instanceof BlockGate) {</span>
+<span class="fc" id="L256">                ((BlockGate)g).inverse();</span>
+            } else {
+<span class="fc" id="L258">                g.setInverse(val);</span>
+            }
+<span class="fc" id="L260">        }</span>
+<span class="fc" id="L261">    }</span>
+    
+    private void verifyUnique (Gate gate) {
+<span class="fc bfc" id="L264" title="All 2 branches covered.">        for (Gate g: gates) {</span>
+<span class="fc" id="L265">            long overlap = g.getAffectedQubitIndexes().stream().filter(gate.getAffectedQubitIndexes()::contains).count();</span>
+<span class="fc bfc" id="L266" title="All 2 branches covered.">            if (overlap &gt; 0) throw new IllegalArgumentException(&quot;Adding gate that affects a qubit already involved in this step&quot;);</span>
+<span class="fc" id="L267">        }</span>
+<span class="fc" id="L268">    }</span>
+
+    /** {@inheritDoc} */
+    @Override public String toString() {
+<span class="pc bpc" id="L272" title="1 of 2 branches missed.">        if (this.getType() == Step.Type.PSEUDO) {</span>
+<span class="nc" id="L273">            return &quot;Pseudo-step&quot;;</span>
+        } else {
+<span class="fc" id="L275">            return &quot;Step with gates &quot;+this.gates;</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

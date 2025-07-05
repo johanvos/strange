@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Block.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange</a> &gt; <span class="el_source">Block.java</span></div><h1>Block.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange;
+
+import org.redfx.strange.gate.PermutationGate;
+import org.redfx.strange.gate.ProbabilitiesGate;
+import org.redfx.strange.local.Computations;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ * &lt;p&gt;Block class.&lt;/p&gt;
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+public class Block {
+
+<span class="fc" id="L51">    List&lt;Step&gt; steps = new ArrayList&lt;&gt;();</span>
+    private final int nqubits;
+<span class="fc" id="L53">    private Complex[][] matrix = null;</span>
+    private final String name;
+
+    /**
+     * Create a block spanning size qubits
+     *
+     * @param size the number of (adjacent) qubits in this block
+     */
+    public Block(int size) {
+<span class="fc" id="L62">        this(&quot;anonymous&quot;, size);</span>
+<span class="fc" id="L63">    }</span>
+    
+    /**
+     * Create a named block spanning size qubits
+     *
+     * @param name the name of the block
+     * @param size the number of (adjacent) qubits in this block
+     */
+<span class="fc" id="L71">    public Block(String name, int size) {</span>
+<span class="fc" id="L72">        this.nqubits = size;</span>
+<span class="fc" id="L73">        this.name = name;</span>
+<span class="fc" id="L74">    }</span>
+
+    /**
+     * &lt;p&gt;addStep.&lt;/p&gt;
+     *
+     * @param step a {@link org.redfx.strange.Step} object
+     */
+    public void addStep(Step step) {
+<span class="fc" id="L82">        this.steps.add(step);</span>
+<span class="fc" id="L83">        matrix = null;</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;steps&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return a {@link java.util.List} object
+     */
+    public List&lt;Step&gt; getSteps() {
+<span class="fc" id="L92">        return this.steps;</span>
+    }
+
+    /**
+     * &lt;p&gt;getNQubits.&lt;/p&gt;
+     *
+     * @return a int
+     */
+    public int getNQubits() {
+<span class="fc" id="L101">        return this.nqubits;</span>
+    }
+
+    private void validateGate(Gate gate) {
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        gate.getAffectedQubitIndexes().stream().filter((idx) -&gt; (idx &gt; nqubits - 1)).</span>
+<span class="nc" id="L106">                forEachOrdered(item -&gt; {</span>
+<span class="nc" id="L107">                    throw new IllegalArgumentException(&quot;Can't add a gate with qubit index larger than block size&quot;);</span>
+                });
+<span class="nc" id="L109">    }</span>
+
+    Complex[][] getMatrix() {
+<span class="nc" id="L112">        return getMatrix(null);</span>
+    }
+
+    Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">        if (matrix == null) {</span>
+<span class="fc" id="L117">            matrix = Complex.identityMatrix(1 &lt;&lt; nqubits);</span>
+<span class="fc" id="L118">            List&lt;Step&gt; simpleSteps = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">            for (Step step : steps) {</span>
+<span class="fc" id="L120">                simpleSteps.addAll(Computations.decomposeStep(step, nqubits));</span>
+<span class="fc" id="L121">            }</span>
+<span class="fc" id="L122">            Collections.reverse(simpleSteps);</span>
+
+<span class="fc bfc" id="L124" title="All 2 branches covered.">            for (Step step : simpleSteps) {</span>
+<span class="fc" id="L125">                List&lt;Gate&gt; gates = step.getGates();</span>
+<span class="pc bpc" id="L126" title="1 of 6 branches missed.">                if ((matrix != null) &amp;&amp; (gates.size() == 1) &amp;&amp; (gates.get(0) instanceof PermutationGate)) {</span>
+<span class="fc" id="L127">                    matrix = Complex.permutate((PermutationGate) gates.get(0), matrix);</span>
+                } else {
+<span class="fc" id="L129">                    Complex[][] m = Computations.calculateStepMatrix(step.getGates(), nqubits, qee);</span>
+<span class="pc bpc" id="L130" title="1 of 2 branches missed.">                    if (matrix == null) {</span>
+<span class="nc" id="L131">                        matrix = m;</span>
+                    } else {
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">                        if (qee != null) {</span>
+<span class="nc" id="L134">                            matrix = qee.mmul(matrix, m);</span>
+                        } else {
+<span class="fc" id="L136">                            matrix = Complex.mmul(matrix, m);</span>
+                        }
+                    }
+                }
+<span class="fc" id="L140">            }</span>
+        }
+<span class="fc" id="L142">        return matrix;</span>
+    }
+
+    /**
+     * &lt;p&gt;applyOptimize.&lt;/p&gt;
+     *
+     * @param probs an array of {@link org.redfx.strange.Complex} objects
+     * @param inverse a boolean
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    public Complex[] applyOptimize(Complex[] probs, boolean inverse) {
+<span class="fc" id="L153">        List&lt;Step&gt; simpleSteps = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        for (Step step : steps) {</span>
+<span class="fc" id="L155">            simpleSteps.addAll(Computations.decomposeStep(step, nqubits));</span>
+<span class="fc" id="L156">        }</span>
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        if (inverse) {</span>
+<span class="fc" id="L158">            Collections.reverse(simpleSteps);</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">            for (Step step : simpleSteps) {</span>
+<span class="fc" id="L160">                step.setInverse(true);</span>
+<span class="fc" id="L161">            }</span>
+        }
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        for (Step step : simpleSteps) {</span>
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">            if (!step.getGates().isEmpty()) {</span>
+<span class="fc" id="L165">                probs = applyStep(step, probs);</span>
+            }
+<span class="fc" id="L167">        }</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        if (inverse) {</span>
+<span class="fc bfc" id="L169" title="All 2 branches covered.">            for (Step step : simpleSteps) {</span>
+<span class="fc" id="L170">                step.setInverse(true);</span>
+<span class="fc" id="L171">            }</span>
+        }
+<span class="fc" id="L173">        return probs;</span>
+    }
+
+    private Complex[] applyStep(Step step, Complex[] vector) {
+<span class="fc" id="L177">        long s0 = System.currentTimeMillis();</span>
+<span class="fc" id="L178">        List&lt;Gate&gt; gates = step.getGates();</span>
+<span class="pc bpc" id="L179" title="2 of 4 branches missed.">        if (!gates.isEmpty() &amp;&amp; gates.get(0) instanceof ProbabilitiesGate) {</span>
+<span class="nc" id="L180">            return vector;</span>
+        }
+<span class="fc bfc" id="L182" title="All 4 branches covered.">        if (gates.size() == 1 &amp;&amp; gates.get(0) instanceof PermutationGate) {</span>
+<span class="fc" id="L183">            PermutationGate pg = (PermutationGate) gates.get(0);</span>
+<span class="fc" id="L184">            return Computations.permutateVector(vector, pg.getIndex1(), pg.getIndex2());</span>
+        }
+
+<span class="fc" id="L187">        Complex[] result = new Complex[vector.length];</span>
+<span class="fc" id="L188">        result = Computations.calculateNewState(gates, vector, nqubits);</span>
+<span class="fc" id="L189">        long s1 = System.currentTimeMillis();</span>
+<span class="fc" id="L190">        return result;</span>
+
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+<span class="fc" id="L197">        return &quot;Block named &quot; + name + &quot; at &quot; + super.toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

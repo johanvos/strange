@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Mul.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange.gate</a> &gt; <span class="el_source">Mul.java</span></div><h1>Mul.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange.gate;
+
+import org.redfx.strange.Block;
+import org.redfx.strange.BlockGate;
+import org.redfx.strange.Step;
+import org.redfx.strange.local.Computations;
+
+/**
+ * &lt;p&gt;Mul class.&lt;/p&gt;
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+public class Mul extends BlockGate&lt;Mul&gt; {
+
+    final Block block;
+    
+    /**
+     * Multiply the qubit in the x register with an integer mul
+     *
+     * @param x0 start idx x register
+     * @param x1 end idx x register
+     * @param mul
+     * x_0 ----- y_0 + x_0
+     * x_1 ----- y+1 + x_1
+     * y_0 ----- 0
+     * y_1 ----- 0
+     */
+    public Mul(int x0, int x1, int mul) {
+<span class="fc" id="L62">        super();</span>
+<span class="fc" id="L63">        setIndex(x0);</span>
+<span class="fc" id="L64">        this.idx = x0;</span>
+<span class="fc" id="L65">        this.block = createBlock(x0, x1,mul);</span>
+<span class="fc" id="L66">        setBlock(block);</span>
+       
+<span class="fc" id="L68">    }</span>
+    
+    /**
+     * &lt;p&gt;createBlock.&lt;/p&gt;
+     *
+     * @param y0 a int
+     * @param y1 a int
+     * @param mul a int
+     * @return a {@link org.redfx.strange.Block} object
+     */
+    public Block createBlock(int y0, int y1, int mul) {
+<span class="fc" id="L79">        int x0 = 0;</span>
+<span class="fc" id="L80">        int x1 = y1-y0;</span>
+<span class="fc" id="L81">        int size = 1 + x1-x0;</span>
+<span class="fc" id="L82">        int dim = 1 &lt;&lt; size;</span>
+<span class="fc" id="L83">        Block answer = new Block(&quot;Mul&quot;, 2 * size);</span>
+
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        for (int i = 0; i &lt; mul; i++) {</span>
+<span class="fc" id="L86">            Add add = new Add(x0, x1, x1+1, x1 + size);</span>
+<span class="fc" id="L87">            answer.addStep(new Step(add));</span>
+        }
+
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        for (int i = x0; i &lt; x1+1; i++) {</span>
+<span class="fc" id="L91">            answer.addStep(new Step (new Swap(i, i + size)));</span>
+        }
+
+<span class="fc" id="L94">        int invsteps = Computations.getInverseModulus(mul,dim);</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        for (int i = 0; i &lt; invsteps; i++) {</span>
+<span class="fc" id="L96">            Add add = new Add(x0, x1, x1+1, x1 + size).inverse();</span>
+<span class="fc" id="L97">            answer.addStep(new Step(add));</span>
+        }
+<span class="fc" id="L99">        return answer;</span>
+    }
+  
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

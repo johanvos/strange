@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Program.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange</a> &gt; <span class="el_source">Program.java</span></div><h1>Program.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange;
+
+import org.redfx.strange.gate.Cnot;
+import org.redfx.strange.gate.Hadamard;
+import org.redfx.strange.gate.Measurement;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ *
+ * A Quantum Program.
+ * A Program contains a list of &lt;code&gt;Step&lt;/code&gt;s that are executed sequentially
+ * by a QuantumExecutionEnvironment.
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+public class Program {
+ 
+    private final int numberQubits;
+    private Result result;
+    private double[] initAlpha;
+
+<span class="fc" id="L59">    private final ArrayList&lt;Step&gt; steps = new ArrayList&lt;&gt;();</span>
+
+    // cache decomposedSteps
+<span class="fc" id="L62">    private List&lt;Step&gt; decomposedSteps = null;</span>
+
+    /**
+     * Create a Quantum Program and indicate how many qubits will be involved.
+     * By default, all qubits are initialized to the |0 &amp;gt; state. Steps can
+     * be added via this constructor, but they can also be added later by calling
+     * the {@link addStep} or {@link addSteps} methods.
+     *
+     * @param nQubits the amount of qubits that will be used in this program
+     * @param moreSteps steps to add to the program
+     */
+<span class="fc" id="L73">    public Program(int nQubits, Step... moreSteps) {</span>
+<span class="fc" id="L74">        this.numberQubits = nQubits;</span>
+<span class="fc" id="L75">        this.initAlpha = new double[numberQubits];</span>
+<span class="fc" id="L76">        Arrays.fill(initAlpha, 1d);</span>
+<span class="fc" id="L77">        addSteps(moreSteps);</span>
+<span class="fc" id="L78">    }</span>
+
+    /**
+     * Initialize this qubit. The qubit will be in a state
+     * \psi = \alpha |0 &amp;gt; + \beta |1 &amp;gt; .
+     * Since \alpha^2 + \beta^2 should equals 1, only
+     * \alpha is required.
+     *
+     * @param idx the index of the qubit to be initialized
+     * @param alpha the alpha value of the qubit state.
+     * @throws java.lang.IllegalArgumentException in case the index of the qubit is higher than the amount of qubits -1 .
+     */
+    public void initializeQubit(int idx, double alpha) {
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (idx &gt;= numberQubits) {</span>
+<span class="nc" id="L92">            throw new IllegalArgumentException(&quot;Can not initialize qubit &quot;+</span>
+                    idx+&quot; since we have only &quot;+numberQubits+&quot; qubits.&quot;);
+        }
+<span class="fc" id="L95">        this.initAlpha[idx] = alpha;</span>
+<span class="fc" id="L96">    }</span>
+
+    /**
+     * This method allows to set the initial values of the probabilities of the qubits in this
+     * program. By default, all qubits are in the |0 &amp;gt; state when a Program is created.
+     * However, for testing or demoes, it sometimes makes sense to show the behavior of an
+     * application that starts with non-zero qubits.
+     * 
+     * @return an array of the initial probabilities that the qubits in this program are supposed to have.
+     */
+    public double[] getInitialAlphas() {
+<span class="fc" id="L107">        return this.initAlpha;</span>
+    }
+
+    /**
+     * Adds a {@link Step} containing zero or more gates to the current program.
+     * In case the {@link Step} contains an operation that would put a measured qubit into a potential superposition
+     * again, an IllegalArgumentException is thrown.
+     *
+     * @param step the {@link Step} to be added to the program
+     */
+    public void addStep(Step step) {
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (!ensureMeasuresafe( Objects.requireNonNull(step)) ) {</span>
+<span class="fc" id="L119">            throw new IllegalArgumentException (&quot;Adding a superposition step to a measured qubit&quot;);</span>
+        }
+<span class="fc" id="L121">        step.setIndex(steps.size());</span>
+<span class="fc" id="L122">        step.setProgram(this);</span>
+<span class="fc" id="L123">        steps.add(step);</span>
+<span class="fc" id="L124">        this.decomposedSteps = null;</span>
+<span class="fc" id="L125">    }</span>
+
+    /**
+     * Adds multiple steps with one or more gates to the existing program.
+     * In case the Step contains an operation that would put a measured qubit into a potential superposition
+     * again, an IllegalArgumentException is thrown.
+     *
+     * @param moreSteps steps to be added to the program
+     */
+    public void addSteps(Step... moreSteps) {
+<span class="fc bfc" id="L135" title="All 2 branches covered.">       for ( Step step: moreSteps) {</span>
+<span class="fc" id="L136">           addStep(step);</span>
+       }
+<span class="fc" id="L138">    }</span>
+
+    private boolean ensureMeasuresafe(Step newStep) {
+
+        // determine which qubits might get superpositioned
+<span class="fc" id="L143">        List&lt;Integer&gt; mainQubits = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        for (Gate g : newStep.getGates()) {</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">            if (g instanceof Hadamard) {</span>
+<span class="fc" id="L146">                mainQubits.add(g.getMainQubitIndex());</span>
+<span class="fc bfc" id="L147" title="All 2 branches covered.">            } else if (g instanceof Cnot) {</span>
+<span class="fc" id="L148">                mainQubits.add(((Cnot) g).getSecondQubitIndex());</span>
+            }
+<span class="fc" id="L150">        }</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        for (Step step : this.getSteps()) {</span>
+<span class="fc" id="L152">            boolean match = step.getGates().stream().filter(g -&gt; g instanceof Measurement)</span>
+<span class="fc" id="L153">                    .map(Gate::getMainQubitIndex).anyMatch(mainQubits::contains);</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">            if (match) return false;</span>
+<span class="fc" id="L155">        }</span>
+        ;
+<span class="fc" id="L157">        return true;</span>
+    }
+    
+    /**
+     * Return the list of {@link Step}s in this program. Steps are added either via the
+     * constructor or via the {@link addStep} or {@link addSteps} methods.
+     *
+     * @return a list of {@link Step}s.
+     */
+    public List&lt;Step&gt; getSteps() {
+<span class="fc" id="L167">        return this.steps;</span>
+    }
+
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;decomposedSteps&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return a {@link java.util.List} object
+     */
+    @Deprecated
+    public List&lt;Step&gt; getDecomposedSteps () {
+<span class="fc" id="L177">        return this.decomposedSteps;</span>
+    }
+
+    /**
+     * &lt;p&gt;Setter for the field &lt;code&gt;decomposedSteps&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @param ds a {@link java.util.List} object
+     */
+    @Deprecated
+    public void setDecomposedSteps(List&lt;Step&gt; ds) {
+<span class="fc" id="L187">        this.decomposedSteps = ds;</span>
+<span class="fc" id="L188">    }</span>
+    
+    /**
+     * Return the number of @{link Qubit}s in this program.
+     *
+     * @return an int containing the number of qubits in this program.
+     */
+    public int getNumberQubits() {
+<span class="fc" id="L196">        return this.numberQubits;</span>
+    }
+
+    /**
+     * Sets the {@link Result} of the execution of the program. This method is
+     * invoked by the {@link QuantumExecutionEnvironment} when it has executed
+     * this program. It should not be called by the developer.
+     *
+     * @param r a {@link org.redfx.strange.Result} object
+     */
+    public void setResult(Result r) {
+<span class="fc" id="L207">        this.result = r;</span>
+<span class="fc" id="L208">    }</span>
+
+    /**
+     * Returns the {@link Result} object of a program, after it has been
+     * executed by a {@link QuantumExecutionEnvironment}.
+     *
+     * @return a {@link org.redfx.strange.Result} object
+     */
+    public Result getResult() {
+<span class="nc" id="L217">        return this.result;</span>
+    }
+
+    /**
+     * Print info about this program to stdout
+     */
+    public void printInfo() {
+<span class="nc" id="L224">        System.out.println(&quot;Info about Quantum Program&quot;);</span>
+<span class="nc" id="L225">        System.out.println(&quot;==========================&quot;);</span>
+<span class="nc" id="L226">        System.out.println(&quot;Number of qubits = &quot;+numberQubits+&quot;, number of steps = &quot;+steps.size());</span>
+<span class="nc" id="L227">        steps.forEach(step -&gt; {</span>
+<span class="nc" id="L228">            System.out.println(&quot;Step: &quot;+step.getGates());</span>
+<span class="nc" id="L229">        });</span>
+<span class="nc" id="L230">        System.out.println(&quot;==========================&quot;);</span>
+<span class="nc" id="L231">    }</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

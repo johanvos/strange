@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Result.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange</a> &gt; <span class="el_source">Result.java</span></div><h1>Result.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020, 2021 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * &lt;p&gt;Result class.&lt;/p&gt;
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+<span class="fc" id="L44">public class Result {</span>
+
+    private int nqubits;
+    private int nsteps;
+    
+    private Qubit[] qubits;
+    private Complex[] probability;
+    private Complex[][] intermediateProps;
+    private Map&lt;Integer, Qubit[]&gt; intermediateQubits;
+<span class="pc" id="L53">    private int measuredProbability = -1;</span>
+ 
+    /**
+     * &lt;p&gt;Constructor for Result.&lt;/p&gt;
+     *
+     * @param nqubits a int
+     * @param steps a int
+     */
+<span class="fc" id="L61">    public Result(int nqubits, int steps) {</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        assert(steps &gt;= 0);</span>
+<span class="fc" id="L63">        this.nqubits = nqubits;</span>
+<span class="fc" id="L64">        this.nsteps = steps;</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        intermediateProps = new Complex[steps &gt; 0 ? steps : 1][];</span>
+<span class="fc" id="L66">        intermediateQubits = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * &lt;p&gt;Constructor for Result.&lt;/p&gt;
+     *
+     * @param q an array of {@link org.redfx.strange.Qubit} objects
+     * @param p an array of {@link org.redfx.strange.Complex} objects
+     */
+<span class="nc" id="L75">    public Result(Qubit[] q, Complex[] p) {</span>
+<span class="nc" id="L76">        this.qubits = q;</span>
+<span class="nc" id="L77">        this.probability = p;</span>
+<span class="nc" id="L78">    }</span>
+    
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;qubits&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return an array of {@link org.redfx.strange.Qubit} objects
+     */
+    public Qubit[] getQubits() {
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (this.qubits == null) {</span>
+<span class="fc" id="L87">            this.qubits = calculateQubits();</span>
+        }
+<span class="fc" id="L89">        return this.qubits;</span>
+    }
+
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;intermediateQubits&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return a {@link java.util.Map} object
+     */
+    public Map&lt;Integer, Qubit[]&gt; getIntermediateQubits() {
+<span class="nc" id="L98">        return this.intermediateQubits;</span>
+    }
+    
+    private Qubit[] calculateQubits() {
+<span class="fc" id="L102">        Qubit[] answer = new Qubit[nqubits];</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">        if (nqubits == 0) {</span>
+<span class="fc" id="L104">            return answer;</span>
+        }
+<span class="fc" id="L106">        int lastidx = nsteps-1;</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        while (intermediateProps[lastidx] == null) lastidx--;</span>
+<span class="fc" id="L108">        double[] d = calculateQubitStatesFromVector(intermediateProps[lastidx]);</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        for (int i = 0; i &lt; answer.length; i++) {</span>
+<span class="fc" id="L110">            answer[i] = new Qubit();</span>
+<span class="fc" id="L111">            answer[i].setProbability(d[i]);</span>
+        }
+<span class="fc" id="L113">        return answer;</span>
+    }
+    
+    private Qubit[] calculateQubitsFromVector(Complex[] probs) {
+<span class="fc" id="L117">        Qubit[] answer = new Qubit[nqubits];</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">        if (nqubits == 0) {</span>
+<span class="fc" id="L119">            return answer;</span>
+        }
+<span class="fc" id="L121">        double[] d = calculateQubitStatesFromVector(probs);</span>
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        for (int i = 0; i &lt; answer.length; i++) {</span>
+<span class="fc" id="L123">            answer[i] = new Qubit();</span>
+<span class="fc" id="L124">            answer[i].setProbability(d[i]);</span>
+        }
+<span class="fc" id="L126">        return answer;</span>
+    }
+    
+    /**
+     * &lt;p&gt;Getter for the field &lt;code&gt;probability&lt;/code&gt;.&lt;/p&gt;
+     *
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    public Complex[] getProbability() {
+<span class="fc" id="L135">        return this.probability;</span>
+    }
+    
+    /**
+     * &lt;p&gt;setIntermediateProbability.&lt;/p&gt;
+     *
+     * @param step a int
+     * @param p an array of {@link org.redfx.strange.Complex} objects
+     */
+    public void setIntermediateProbability(int step, Complex[] p) {
+<span class="fc" id="L145">        this.intermediateProps[step] = p;</span>
+<span class="fc" id="L146">        this.intermediateQubits.put(step, calculateQubitsFromVector(p));</span>
+    //    if ((step == nsteps -1) || (nsteps == 0)) { // in case we have no steps, this is the final result
+<span class="fc" id="L148">            this.probability = p;</span>
+     //   }
+<span class="fc" id="L150">    }</span>
+
+    /**
+     * &lt;p&gt;getIntermediateProbability.&lt;/p&gt;
+     *
+     * @param step a int
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    public Complex[] getIntermediateProbability(int step) {
+<span class="nc" id="L159">        int ret = step;</span>
+<span class="nc bnc" id="L160" title="All 4 branches missed.">        while ((ret &gt; 0) &amp;&amp; (intermediateProps[ret] == null)) ret--;</span>
+<span class="nc" id="L161">        return intermediateProps[ret];</span>
+    }
+
+    static double[] calculateQubitStatesFromVector(Complex[] vectorresult) {
+<span class="fc" id="L165">        int nq = (int) Math.round(Math.log(vectorresult.length) / Math.log(2));</span>
+<span class="fc" id="L166">        double[] answer = new double[nq];</span>
+<span class="fc" id="L167">        int ressize = 1 &lt;&lt; nq;</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">        for (int i = 0; i &lt; nq; i++) {</span>
+<span class="fc" id="L169">            int pw = i;//nq - i - 1;</span>
+<span class="fc" id="L170">            int div = 1 &lt;&lt; pw;</span>
+<span class="fc bfc" id="L171" title="All 2 branches covered.">            for (int j = 0; j &lt; ressize; j++) {</span>
+<span class="fc" id="L172">                int p1 = j / div;</span>
+<span class="fc bfc" id="L173" title="All 2 branches covered.">                if (p1 % 2 == 1) {</span>
+<span class="fc" id="L174">                    answer[i] = answer[i] + vectorresult[j].abssqr();</span>
+                }
+            }
+        }
+<span class="fc" id="L178">        return answer;</span>
+    }
+
+    /**
+     * Based on the probabilities of the system, this method will measure all qubits.
+     * When this method is called, the &lt;code&gt;measuredValue&lt;/code&gt; value of every qubit
+     * contains a possible measurement value. The values are consistent for the entire system.
+     * (e.g. when an entangled pair is measured, its values are equal)
+     * However, different invocations of this method may result in different values.
+     */
+    public void measureSystem() {
+<span class="fc bfc" id="L189" title="All 2 branches covered.">        if (this.qubits == null) {</span>
+<span class="fc" id="L190">            this.qubits = getQubits();</span>
+        }
+<span class="fc" id="L192">        double random = Math.random();</span>
+<span class="fc" id="L193">        int ressize = 1 &lt;&lt; nqubits;</span>
+<span class="fc" id="L194">        double[] probamp = new double[ressize];</span>
+<span class="fc" id="L195">        double probtot = 0;</span>
+        // we don't need all probabilities, but we might use this later
+<span class="fc bfc" id="L197" title="All 2 branches covered.">        for (int i = 0; i &lt; ressize; i++) {</span>
+<span class="fc" id="L198">            probamp[i] = this.probability[i].abssqr();</span>
+        }
+<span class="fc" id="L200">        int sel = 0;</span>
+<span class="fc" id="L201">        probtot = probamp[0];</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        while (probtot &lt; random) {</span>
+<span class="fc" id="L203">            sel++;</span>
+<span class="fc" id="L204">            probtot = probtot + probamp[sel];</span>
+        }
+<span class="fc" id="L206">        this.measuredProbability = sel;</span>
+<span class="fc" id="L207">        double outcome = probamp[sel];</span>
+<span class="fc bfc" id="L208" title="All 2 branches covered.">        for (int i = 0; i &lt; nqubits; i++) {</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">            qubits[i].setMeasuredValue(sel %2 == 1);</span>
+<span class="fc" id="L210">            sel = sel/2;</span>
+        }
+<span class="fc" id="L212">    }</span>
+
+    /**
+     * Returns a measurement based on the probability vector
+     *
+     * @return an integer representation of the measurement
+     */
+    public int getMeasuredProbability() {
+<span class="nc" id="L220">        return measuredProbability;</span>
+    }
+
+    /**
+     * Print info about this result to stdout
+     */
+    public void printInfo() {
+<span class="nc" id="L227">        System.out.println(&quot;Info about Quantum Result&quot;);</span>
+<span class="nc" id="L228">        System.out.println(&quot;==========================&quot;);</span>
+<span class="nc" id="L229">        System.out.println(&quot;Number of qubits = &quot;+nqubits+&quot;, number of steps = &quot;+nsteps);</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        for (int i = 0; i &lt; probability.length;i++) {</span>
+<span class="nc" id="L231">            System.out.println(&quot;Probability on &quot;+i+&quot;:&quot;+ probability[i].abssqr());</span>
+        }
+<span class="nc" id="L233">        System.out.println(&quot;==========================&quot;);</span>
+<span class="nc" id="L234">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

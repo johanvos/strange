@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PermutationGate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange.gate</a> &gt; <span class="el_source">PermutationGate.java</span></div><h1>PermutationGate.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange.gate;
+
+import org.redfx.strange.Complex;
+import org.redfx.strange.Gate;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * &lt;p&gt;PermutationGate class.&lt;/p&gt;
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+<span class="fc" id="L48">public class PermutationGate implements Gate {</span>
+
+    private int a;
+    private int b;
+    private int n;
+    
+    private Complex[][] m;
+<span class="fc" id="L55">    private List&lt;Integer&gt; affected = new LinkedList&lt;&gt;();</span>
+    
+    /** {@inheritDoc} */
+    @Override
+    public int getMainQubitIndex() {
+<span class="nc" id="L60">        return this.a;</span>
+    }
+    
+    /**
+     * &lt;p&gt;Constructor for PermutationGate.&lt;/p&gt;
+     *
+     * @param a a int
+     * @param b a int
+     * @param n a int
+     */
+<span class="fc" id="L70">    public PermutationGate(int a, int b, int n) {</span>
+<span class="pc bpc" id="L71" title="1 of 2 branches missed.">        assert(a &lt; n);</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">        assert(b &lt; n);</span>
+<span class="fc" id="L73">        this.a = a;</span>
+<span class="fc" id="L74">        this.b = b;</span>
+<span class="fc" id="L75">        this.n = n;</span>
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        for (int i =0 ; i &lt; n; i++) {</span>
+<span class="fc" id="L77">            affected.add(i);</span>
+        }
+<span class="fc" id="L79">    }</span>
+    
+    /**
+     * &lt;p&gt;getIndex1.&lt;/p&gt;
+     *
+     * @return a int
+     */
+    public int getIndex1() {
+<span class="fc" id="L87">        return a;</span>
+    }
+    
+    /**
+     * &lt;p&gt;getIndex2.&lt;/p&gt;
+     *
+     * @return a int
+     */
+    public int getIndex2() {
+<span class="fc" id="L96">        return b;</span>
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public void setMainQubitIndex(int idx) {
+<span class="nc" id="L102">        throw new UnsupportedOperationException(&quot;Not supported yet.&quot;); //To change body of generated methods, choose Tools | Templates.</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setAdditionalQubit(int idx, int cnt) {
+<span class="nc" id="L108">        throw new UnsupportedOperationException(&quot;Not supported yet.&quot;); //To change body of generated methods, choose Tools | Templates.</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List&lt;Integer&gt; getAffectedQubitIndexes() {
+<span class="nc" id="L114">        return affected;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int getHighestAffectedQubitIndex() {
+<span class="nc" id="L120">        return Collections.max(affected);</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getCaption() {
+<span class="nc" id="L126">        return &quot;P&quot;;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getName() {
+<span class="nc" id="L132">        return &quot;permutation gate&quot;;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getGroup() {
+<span class="nc" id="L138">        return &quot;permutation&quot;;</span>
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Complex[][] getMatrix() {
+<span class="nc" id="L144">        throw new RuntimeException (&quot;No matrix required for Permutation&quot;);</span>
+//        return m;
+    }
+    
+    /** {@inheritDoc} */
+    @Override
+    public int getSize() {
+<span class="nc" id="L151">        return 2;</span>
+    }
+    
+    /** {@inheritDoc} */
+    @Override public void setInverse(boolean v) {
+        // NOP
+<span class="fc" id="L157">    }</span>
+    
+    /** {@inheritDoc} */
+    @Override
+    public String toString() {
+<span class="fc" id="L162">        return &quot;Perm &quot;+a+&quot;, &quot;+b;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -1,0 +1,722 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Computations.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange.local</a> &gt; <span class="el_source">Computations.java</span></div><h1>Computations.java</h1><pre class="source lang-java linenums">/*-
+ * #%L
+ * Strange
+ * %%
+ * Copyright (C) 2020 Johan Vos
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Johan Vos nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+package org.redfx.strange.local;
+
+import org.redfx.strange.*;
+import org.redfx.strange.gate.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+
+import static org.redfx.strange.Complex.tensor;
+
+/**
+ * &lt;p&gt;Computations class.&lt;/p&gt;
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
+<span class="nc" id="L51">public class Computations {</span>
+
+    private static final boolean debug = false;
+
+    static void dbg(String s) {
+<span class="fc" id="L56">        SimpleQuantumExecutionEnvironment.LOG.finer(s);</span>
+<span class="fc" id="L57">    }</span>
+
+    /**
+     * &lt;p&gt;calculateStepMatrix.&lt;/p&gt;
+     *
+     * @param gates a {@link java.util.List} object
+     * @param nQubits a int
+     * @param qee a {@link org.redfx.strange.QuantumExecutionEnvironment} object
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    public static Complex[][] calculateStepMatrix(List&lt;Gate&gt; gates, int nQubits, QuantumExecutionEnvironment qee) {
+<span class="fc" id="L68">        long l0 = System.currentTimeMillis();</span>
+<span class="fc" id="L69">        Complex[][] a = new Complex[1][1];</span>
+<span class="fc" id="L70">        a[0][0] = Complex.ONE;</span>
+<span class="fc" id="L71">        int idx = nQubits - 1;</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        while (idx &gt;= 0) {</span>
+<span class="fc" id="L73">            final int cnt = idx;</span>
+<span class="fc" id="L74">            Gate myGate = gates.stream()</span>
+<span class="fc" id="L75">                    .filter(</span>
+                            // gate -&gt; gate.getAffectedQubitIndex().contains(cnt)
+<span class="fc bfc" id="L77" title="All 2 branches covered.">                            gate -&gt; gate.getHighestAffectedQubitIndex() == cnt)</span>
+<span class="fc" id="L78">                    .findFirst()</span>
+<span class="fc" id="L79">                    .orElse(new Identity(idx));</span>
+<span class="fc" id="L80">            dbg(&quot;stepmatrix, cnt = &quot; + cnt + &quot;, idx = &quot; + idx + &quot;, myGate = &quot; + myGate);</span>
+<span class="fc bfc" id="L81" title="All 2 branches covered.">            if (myGate instanceof BlockGate) {</span>
+<span class="fc" id="L82">                dbg(&quot;calculateStepMatrix for blockgate &quot; + myGate + &quot; of class &quot; + myGate.getClass());</span>
+<span class="fc" id="L83">                BlockGate sqg = (BlockGate) myGate;</span>
+<span class="fc" id="L84">                a = tensor(a, sqg.getMatrix(qee));</span>
+<span class="fc" id="L85">                dbg(&quot;calculateStepMatrix for blockgate calculated &quot; + myGate);</span>
+
+<span class="fc" id="L87">                idx = idx - sqg.getSize() + 1;</span>
+            }
+<span class="fc bfc" id="L89" title="All 2 branches covered.">            if (myGate instanceof SingleQubitGate) {</span>
+<span class="fc" id="L90">                SingleQubitGate sqg = (SingleQubitGate) myGate;</span>
+<span class="fc" id="L91">                a = tensor(a, sqg.getMatrix());</span>
+            }
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            if (myGate instanceof TwoQubitGate) {</span>
+<span class="fc" id="L94">                TwoQubitGate tqg = (TwoQubitGate) myGate;</span>
+<span class="fc" id="L95">                a = tensor(a, tqg.getMatrix());</span>
+<span class="fc" id="L96">                idx--;</span>
+            }
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">            if (myGate instanceof ThreeQubitGate) {</span>
+<span class="nc" id="L99">                ThreeQubitGate tqg = (ThreeQubitGate) myGate;</span>
+<span class="nc" id="L100">                a = tensor(a, tqg.getMatrix());</span>
+<span class="nc" id="L101">                idx = idx - 2;</span>
+            }
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">            if (myGate instanceof PermutationGate) {</span>
+<span class="nc" id="L104">                throw new RuntimeException(&quot;No perm allowed &quot;);</span>
+            }
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">            if (myGate instanceof Oracle) {</span>
+<span class="nc" id="L107">                a = myGate.getMatrix();</span>
+<span class="nc" id="L108">                idx = 0;</span>
+            }
+<span class="fc" id="L110">            idx--;</span>
+<span class="fc" id="L111">        }</span>
+<span class="fc" id="L112">        long l1 = System.currentTimeMillis();</span>
+<span class="fc" id="L113">        return a;</span>
+    }
+
+    /**
+     * decompose a Step into steps that can be processed without permutations
+     *
+     * @param s a {@link org.redfx.strange.Step} object
+     * @param nqubit a int
+     * @return a {@link java.util.List} object
+     */
+    public static List&lt;Step&gt; decomposeStep(Step s, int nqubit) {
+<span class="fc" id="L124">        ArrayList&lt;Step&gt; answer = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L125">        answer.add(s);</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">        if (s.getType() == Step.Type.PSEUDO) {</span>
+<span class="nc" id="L127">            s.setComplexStep(s.getIndex());</span>
+<span class="nc" id="L128">            return answer;</span>
+        }
+
+<span class="fc" id="L131">        List&lt;Gate&gt; gates = s.getGates();</span>
+
+<span class="fc bfc" id="L133" title="All 2 branches covered.">        if (gates.isEmpty()) {</span>
+<span class="fc" id="L134">            return answer;</span>
+        }
+<span class="fc" id="L136">        boolean simple = gates.stream().allMatch(g -&gt; g instanceof SingleQubitGate);</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        if (simple) {</span>
+<span class="fc" id="L138">            return answer;</span>
+        }
+        // if only 1 gate, which is an oracle, return as well
+<span class="fc bfc" id="L141" title="All 4 branches covered.">        if ((gates.size() == 1) &amp;&amp; (gates.get(0) instanceof Oracle)) {</span>
+<span class="fc" id="L142">            return answer;</span>
+        }
+        // at least one non-singlequbitgate
+<span class="fc" id="L145">        List&lt;Gate&gt; firstGates = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        for (Gate gate : gates) {</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">            if (gate.getHighestAffectedQubitIndex() &gt; nqubit) {</span>
+<span class="nc" id="L148">                throw new IllegalArgumentException(&quot;Only &quot;+nqubit+&quot; qubits available while Gate &quot;+gate+&quot; requires qubit &quot;+gate.getHighestAffectedQubitIndex());</span>
+            }
+<span class="fc bfc" id="L150" title="All 2 branches covered.">            if (gate instanceof ProbabilitiesGate) {</span>
+<span class="fc" id="L151">                s.setInformalStep(true);</span>
+<span class="fc" id="L152">                return answer;</span>
+            }
+<span class="fc bfc" id="L154" title="All 2 branches covered.">            if (gate instanceof BlockGate) {</span>
+<span class="fc bfc" id="L155" title="All 2 branches covered.">                if (gate instanceof ControlledBlockGate) {</span>
+<span class="fc" id="L156">                    processBlockGate((ControlledBlockGate) gate, answer);</span>
+                }
+<span class="fc" id="L158">                firstGates.add(gate);</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">            } else if (gate instanceof SingleQubitGate) {</span>
+<span class="fc" id="L160">                firstGates.add(gate);</span>
+<span class="fc bfc" id="L161" title="All 2 branches covered.">            } else if (gate instanceof TwoQubitGate) {</span>
+<span class="fc" id="L162">                TwoQubitGate tqg = (TwoQubitGate) gate;</span>
+<span class="fc" id="L163">                int first = tqg.getMainQubitIndex();</span>
+<span class="fc" id="L164">                int second = tqg.getSecondQubitIndex();</span>
+<span class="pc bpc" id="L165" title="2 of 4 branches missed.">                if ((first &gt;= nqubit) || (second &gt;= nqubit)) {</span>
+<span class="nc" id="L166">                    throw new IllegalArgumentException(&quot;Step &quot; + s + &quot; uses a gate with invalid index &quot; + first + &quot; or &quot; + second);</span>
+                }
+<span class="fc bfc" id="L168" title="All 2 branches covered.">                if (first == second + 1) {</span>
+<span class="fc" id="L169">                    firstGates.add(gate);</span>
+                } else {
+<span class="pc bpc" id="L171" title="1 of 2 branches missed.">                    if (first == second) {</span>
+<span class="nc" id="L172">                        throw new RuntimeException(&quot;Wrong gate, first == second for &quot; + gate);</span>
+                    }
+<span class="fc bfc" id="L174" title="All 2 branches covered.">                    if (first &gt; second) {</span>
+<span class="fc" id="L175">                        PermutationGate pg = new PermutationGate(first - 1, second, nqubit);</span>
+<span class="fc" id="L176">                        Step prePermutation = new Step(pg);</span>
+<span class="fc" id="L177">                        Step postPermutation = new Step(pg);</span>
+<span class="fc" id="L178">                        answer.add(0, prePermutation);</span>
+<span class="fc" id="L179">                        answer.add(postPermutation);</span>
+<span class="fc" id="L180">                        postPermutation.setComplexStep(s.getIndex());</span>
+<span class="fc" id="L181">                        s.setComplexStep(-1);</span>
+<span class="fc" id="L182">                    } else {</span>
+<span class="fc" id="L183">                        PermutationGate pg = new PermutationGate(first, second, nqubit);</span>
+<span class="fc" id="L184">                        Step prePermutation = new Step(pg);</span>
+<span class="fc" id="L185">                        Step prePermutationInv = new Step(pg);</span>
+<span class="fc" id="L186">                        int realStep = s.getIndex();</span>
+<span class="fc" id="L187">                        s.setComplexStep(-1);</span>
+<span class="fc" id="L188">                        answer.add(0, prePermutation);</span>
+<span class="fc" id="L189">                        answer.add(prePermutationInv);</span>
+<span class="fc" id="L190">                        Step postPermutation = new Step();</span>
+<span class="fc" id="L191">                        Step postPermutationInv = new Step();</span>
+<span class="fc bfc" id="L192" title="All 2 branches covered.">                        if (first != second - 1) {</span>
+<span class="fc" id="L193">                            PermutationGate pg2 = new PermutationGate(second - 1, first, nqubit);</span>
+<span class="fc" id="L194">                            postPermutation.addGate(pg2);</span>
+<span class="fc" id="L195">                            postPermutationInv.addGate(pg2);</span>
+<span class="fc" id="L196">                            answer.add(1, postPermutation);</span>
+<span class="fc" id="L197">                            answer.add(3, postPermutationInv);</span>
+                        }
+<span class="fc" id="L199">                        prePermutationInv.setComplexStep(realStep);</span>
+                    }
+                }
+<span class="pc bpc" id="L202" title="1 of 2 branches missed.">            } else if (gate instanceof ThreeQubitGate) {</span>
+<span class="fc" id="L203">                ThreeQubitGate tqg = (ThreeQubitGate) gate;</span>
+<span class="fc" id="L204">                int first = tqg.getMainQubit();</span>
+<span class="fc" id="L205">                int second = tqg.getSecondQubit();</span>
+<span class="fc" id="L206">                int third = tqg.getThirdQubit();</span>
+<span class="fc" id="L207">                int sFirst = first;</span>
+<span class="fc" id="L208">                int sSecond = second;</span>
+<span class="fc" id="L209">                int sThird = third;</span>
+<span class="fc bfc" id="L210" title="All 4 branches covered.">                if ((first == second + 1) &amp;&amp; (second == third + 1)) {</span>
+<span class="fc" id="L211">                    firstGates.add(gate);</span>
+                } else {
+<span class="fc" id="L213">                    int p0idx = 0;</span>
+<span class="fc" id="L214">                    int maxs = Math.max(second, third);</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">                    if (first &lt; maxs) {</span>
+<span class="fc" id="L216">                        PermutationGate pg = new PermutationGate(first, maxs, nqubit);</span>
+<span class="fc" id="L217">                        Step prePermutation = new Step(pg);</span>
+<span class="fc" id="L218">                        Step postPermutation = new Step(pg);</span>
+<span class="fc" id="L219">                        answer.add(p0idx, prePermutation);</span>
+<span class="fc" id="L220">                        answer.add(answer.size() - p0idx, postPermutation);</span>
+<span class="fc" id="L221">                        p0idx++;</span>
+<span class="fc" id="L222">                        postPermutation.setComplexStep(s.getIndex());</span>
+<span class="fc" id="L223">                        s.setComplexStep(-1);</span>
+<span class="fc" id="L224">                        sFirst = maxs;</span>
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">                        if (second &gt; third) {</span>
+<span class="nc" id="L226">                            sSecond = first;</span>
+                        } else {
+<span class="fc" id="L228">                            sThird = first;</span>
+                        }
+                    }
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">                    if (sSecond != sFirst - 1) {</span>
+<span class="nc" id="L232">                        PermutationGate pg = new PermutationGate(sFirst - 1, sSecond, nqubit);</span>
+<span class="nc" id="L233">                        Step prePermutation = new Step(pg);</span>
+<span class="nc" id="L234">                        Step postPermutation = new Step(pg);</span>
+<span class="nc" id="L235">                        answer.add(p0idx, prePermutation);</span>
+<span class="nc" id="L236">                        answer.add(answer.size() - p0idx, postPermutation);</span>
+<span class="nc" id="L237">                        p0idx++;</span>
+<span class="nc" id="L238">                        postPermutation.setComplexStep(s.getIndex());</span>
+<span class="nc" id="L239">                        s.setComplexStep(-1);</span>
+<span class="nc" id="L240">                        sSecond = sFirst - 1;</span>
+                    }
+<span class="fc bfc" id="L242" title="All 2 branches covered.">                    if (sThird != sFirst - 2) {</span>
+<span class="fc" id="L243">                        PermutationGate pg = new PermutationGate(sFirst - 2, sThird, nqubit);</span>
+<span class="fc" id="L244">                        Step prePermutation = new Step(pg);</span>
+<span class="fc" id="L245">                        Step postPermutation = new Step(pg);</span>
+<span class="fc" id="L246">                        answer.add(p0idx, prePermutation);</span>
+<span class="fc" id="L247">                        answer.add(answer.size() - p0idx, postPermutation);</span>
+<span class="fc" id="L248">                        p0idx++;</span>
+<span class="fc" id="L249">                        postPermutation.setComplexStep(s.getIndex());</span>
+<span class="fc" id="L250">                        s.setComplexStep(-1);</span>
+<span class="fc" id="L251">                        sThird = sFirst - 2;</span>
+                    }
+                }
+<span class="fc" id="L254">            } else {</span>
+<span class="nc" id="L255">                throw new RuntimeException(&quot;Gate must be SingleQubit or TwoQubit&quot;);</span>
+            }
+<span class="fc" id="L257">        }</span>
+<span class="fc" id="L258">        return answer;</span>
+    }
+
+    /**
+     * &lt;p&gt;printMatrix.&lt;/p&gt;
+     *
+     * @param a an array of {@link org.redfx.strange.Complex} objects
+     */
+    public static void printMatrix(Complex[][] a) {
+<span class="nc bnc" id="L267" title="All 2 branches missed.">        for (int i = 0; i &lt; a.length; i++) {</span>
+<span class="nc" id="L268">            StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">            for (int j = 0; j &lt; a[i].length; j++) {</span>
+<span class="nc" id="L270">                sb.append(a[i][j]).append(&quot;    &quot;);</span>
+            }
+<span class="nc" id="L272">            System.out.println(&quot;m[&quot; + i + &quot;]: &quot; + sb);</span>
+        }
+<span class="nc" id="L274">    }</span>
+
+    /**
+     * &lt;p&gt;getInverseModulus.&lt;/p&gt;
+     *
+     * @param a a int
+     * @param b a int
+     * @return a int
+     */
+    public static int getInverseModulus(int a, int b) {
+<span class="fc" id="L284">        int r0 = a;</span>
+<span class="fc" id="L285">        int r1 = b;</span>
+<span class="fc" id="L286">        int r2 = 0;</span>
+<span class="fc" id="L287">        int s0 = 1;</span>
+<span class="fc" id="L288">        int s1 = 0;</span>
+<span class="fc" id="L289">        int s2 = 0;</span>
+<span class="fc bfc" id="L290" title="All 2 branches covered.">        while (r1 != 1) {</span>
+<span class="fc" id="L291">            int q = r0 / r1;</span>
+<span class="fc" id="L292">            r2 = r0 % r1;</span>
+<span class="fc" id="L293">            s2 = s0 - q * s1;</span>
+<span class="fc" id="L294">            r0 = r1;</span>
+<span class="fc" id="L295">            r1 = r2;</span>
+<span class="fc" id="L296">            s0 = s1;</span>
+<span class="fc" id="L297">            s1 = s2;</span>
+<span class="fc" id="L298">        }</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">        return s1 &gt; 0 ? s1 : s1 + b;</span>
+    }
+
+    /**
+     * &lt;p&gt;gcd.&lt;/p&gt;
+     *
+     * @param a a int
+     * @param b a int
+     * @return a int
+     */
+    public static int gcd(int a, int b) {
+<span class="fc bfc" id="L310" title="All 2 branches covered.">        int x = a &gt; b ? a : b;</span>
+<span class="fc bfc" id="L311" title="All 2 branches covered.">        int y = x == a ? b : a;</span>
+<span class="fc" id="L312">        int z = 0;</span>
+<span class="fc bfc" id="L313" title="All 2 branches covered.">        while (y != 0) {</span>
+<span class="fc" id="L314">            z = x % y;</span>
+<span class="fc" id="L315">            x = y;</span>
+<span class="fc" id="L316">            y = z;</span>
+        }
+<span class="fc" id="L318">        return x;</span>
+    }
+
+    /**
+     * &lt;p&gt;fraction.&lt;/p&gt;
+     *
+     * @param p a int
+     * @param max a int
+     * @return a int
+     */
+    public static int fraction(int p, int max) {
+<span class="nc" id="L329">        int length = (int) Math.ceil(Math.log(max) / Math.log(2));</span>
+<span class="nc" id="L330">        int offset = length;</span>
+<span class="nc" id="L331">        int dim = 1 &lt;&lt; offset;</span>
+<span class="nc" id="L332">        double r = (double) p / dim + .000001;</span>
+<span class="nc" id="L333">        int period = Computations.fraction(r, max);</span>
+<span class="nc" id="L334">        return period;</span>
+    }
+
+    /**
+     * &lt;p&gt;fraction.&lt;/p&gt;
+     *
+     * @param d a double
+     * @param max a int
+     * @return a int
+     */
+    public static int fraction(double d, int max) {
+<span class="nc" id="L345">        double EPS = 1e-15;</span>
+<span class="nc" id="L346">        int answer = -1;</span>
+<span class="nc" id="L347">        int h = 0;</span>
+<span class="nc" id="L348">        int k = -1;</span>
+<span class="nc" id="L349">        int a = (int) d;</span>
+<span class="nc" id="L350">        double r = d - a;</span>
+<span class="nc" id="L351">        int h_2 = 0;</span>
+<span class="nc" id="L352">        int h_1 = 1;</span>
+<span class="nc" id="L353">        int k_2 = 1;</span>
+<span class="nc" id="L354">        int k_1 = 0;</span>
+<span class="nc bnc" id="L355" title="All 4 branches missed.">        while ((k &lt; max) &amp;&amp; (r &gt; EPS)) {</span>
+<span class="nc" id="L356">            h = a * h_1 + h_2;</span>
+<span class="nc" id="L357">            k = a * k_1 + k_2;</span>
+<span class="nc" id="L358">            h_2 = h_1;</span>
+<span class="nc" id="L359">            h_1 = h;</span>
+<span class="nc" id="L360">            k_2 = k_1;</span>
+<span class="nc" id="L361">            k_1 = k;</span>
+<span class="nc" id="L362">            double rec = 1 / r;</span>
+<span class="nc" id="L363">            a = (int) rec;</span>
+<span class="nc" id="L364">            r = rec - a;</span>
+<span class="nc" id="L365">        }</span>
+<span class="nc" id="L366">        return k_2;</span>
+    }
+
+    /**
+     * &lt;p&gt;createIdentity.&lt;/p&gt;
+     *
+     * @param dim a int
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    public static Complex[][] createIdentity(int dim) {
+<span class="fc" id="L376">        Complex[][] matrix = new Complex[dim][dim];</span>
+<span class="fc bfc" id="L377" title="All 2 branches covered.">        for (int i = 0; i &lt; dim; i++) {</span>
+<span class="fc bfc" id="L378" title="All 2 branches covered.">            for (int j = 0; j &lt; dim; j++) {</span>
+<span class="fc bfc" id="L379" title="All 2 branches covered.">                matrix[i][j] = (i == j) ? Complex.ONE : Complex.ZERO;</span>
+            }
+        }
+<span class="fc" id="L382">        return matrix;</span>
+    }
+
+    /**
+     * &lt;p&gt;printMemory.&lt;/p&gt;
+     */
+    public static void printMemory() {
+        if (!debug) {
+<span class="nc" id="L390">            return;</span>
+        }
+        Runtime rt = Runtime.getRuntime();
+        long fm = rt.freeMemory() / 1024;
+        long mm = rt.maxMemory() / 1024;
+        long tm = rt.totalMemory() / 1024;
+        long um = tm - fm;
+        System.err.println(&quot;free = &quot; + fm + &quot;, mm = &quot; + mm + &quot;, tm = &quot; + tm + &quot;, used = &quot; + um);
+        /*
+        System.err.println(&quot;now gc...&quot;);
+        System.gc();
+        fm = rt.freeMemory()/1024;
+        mm = rt.maxMemory()/1024;
+        tm = rt.totalMemory()/1024;
+        um = tm - fm;
+        System.err.println(&quot;free = &quot;+fm+&quot;, mm = &quot;+mm+&quot;, tm = &quot;+tm+&quot;, used = &quot;+um);
+         */
+    }
+
+    /**
+     * &lt;p&gt;permutateVector.&lt;/p&gt;
+     *
+     * @param vector an array of {@link org.redfx.strange.Complex} objects
+     * @param a a int
+     * @param b a int
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    public static Complex[] permutateVector(Complex[] vector, int a, int b) {
+<span class="fc" id="L418">        int amask = 1 &lt;&lt; a;</span>
+<span class="fc" id="L419">        int bmask = 1 &lt;&lt; b;</span>
+<span class="pc bpc" id="L420" title="2 of 4 branches missed.">        if ((amask &gt;= vector.length) || (bmask &gt;= vector.length)) {</span>
+<span class="nc" id="L421">            throw new IllegalArgumentException(&quot;Can not permutate element &quot;+a+&quot; and &quot;+b+&quot; of vector sized &quot;+vector.length);</span>
+        }
+<span class="fc" id="L423">        int dim = vector.length;</span>
+<span class="fc" id="L424">        Complex[] answer = new Complex[dim];</span>
+<span class="fc bfc" id="L425" title="All 2 branches covered.">        for (int i = 0; i &lt; dim; i++) {</span>
+<span class="fc" id="L426">            int j = i;</span>
+<span class="fc" id="L427">            int x = (amask &amp; i) / amask;</span>
+<span class="fc" id="L428">            int y = (bmask &amp; i) / bmask;</span>
+<span class="fc bfc" id="L429" title="All 2 branches covered.">            if (x != y) {</span>
+<span class="fc" id="L430">                j ^= amask;</span>
+<span class="fc" id="L431">                j ^= bmask;</span>
+            }
+<span class="fc" id="L433">            answer[i] = vector[j];</span>
+        }
+<span class="fc" id="L435">        return answer;</span>
+    }
+
+<span class="fc" id="L438">    static int nested = 0; // allows us to e.g. show only 2 nested steps</span>
+
+    /**
+     * &lt;p&gt;calculateNewState.&lt;/p&gt;
+     *
+     * @param gates a {@link java.util.List} object
+     * @param vector an array of {@link org.redfx.strange.Complex} objects
+     * @param length a int
+     * @return an array of {@link org.redfx.strange.Complex} objects
+     */
+    public static Complex[] calculateNewState(List&lt;Gate&gt; gates, Complex[] vector, int length) {
+<span class="pc bpc" id="L449" title="1 of 2 branches missed.">        if (containsImmediateMeasurementOnly(gates)) {</span>
+<span class="nc" id="L450">            return doImmediateMeasurement(gates, vector, length);</span>
+        }
+<span class="fc" id="L452">        nested++;</span>
+<span class="fc" id="L453">        Complex[] answer = getNextProbability(getAllGates(gates, length), vector);</span>
+<span class="fc" id="L454">        nested--;</span>
+<span class="fc" id="L455">        return answer;</span>
+    }
+    
+    private static Complex[] getNextProbability(List&lt;Gate&gt; gates, Complex[] v) {
+<span class="fc" id="L459">        Gate gate = gates.get(0);</span>
+<span class="fc" id="L460">        int nqubits = gate.getSize();</span>
+<span class="fc" id="L461">        int gatedim = 1 &lt;&lt; nqubits;</span>
+<span class="fc" id="L462">        int size = v.length;</span>
+<span class="fc" id="L463">     dbg(&quot;GETNEXTPROBABILITY asked for size = &quot; + size + &quot; and gates = &quot; + gates+&quot;, gatedim = &quot;+gatedim);</span>
+<span class="fc bfc" id="L464" title="All 2 branches covered.">        if (gates.size() &gt; 1) {</span>
+
+<span class="fc" id="L466">            int partdim = size / gatedim;</span>
+<span class="fc" id="L467">            Complex[] answer = new Complex[size];</span>
+<span class="fc" id="L468">            List&lt;Gate&gt; nextGates = gates.subList(1, gates.size());</span>
+<span class="fc" id="L469">            boolean id = true;</span>
+<span class="fc bfc" id="L470" title="All 2 branches covered.">            for (Gate g : nextGates) {</span>
+<span class="fc bfc" id="L471" title="All 4 branches covered.">                id = id &amp;&amp; (g instanceof Identity);</span>
+<span class="fc" id="L472">            }</span>
+<span class="fc bfc" id="L473" title="All 2 branches covered.">            if (id) {</span>
+<span class="fc" id="L474">                dbg(&quot;ONLY IDENTITY!! partdim = &quot;+partdim);</span>
+<span class="fc" id="L475">                long s0 = System.currentTimeMillis();</span>
+<span class="fc" id="L476">                long s1 = s0;</span>
+<span class="fc bfc" id="L477" title="All 2 branches covered.">                for (int j = 0; j &lt; partdim; j++) {</span>
+<span class="fc" id="L478">                    dbg(&quot;do part &quot;+j+&quot; from &quot;+partdim);</span>
+<span class="fc" id="L479">                    Complex[] oldv = new Complex[gatedim];</span>
+<span class="fc" id="L480">                    Complex[] newv = new Complex[gatedim];</span>
+<span class="fc bfc" id="L481" title="All 2 branches covered.">                    for (int i = 0; i &lt; gatedim; i++) {</span>
+<span class="fc" id="L482">                        oldv[i] = v[i * partdim + j];</span>
+<span class="fc" id="L483">                        newv[i] = Complex.ZERO;</span>
+                    }
+
+<span class="fc bfc" id="L486" title="All 2 branches covered.">                    if (gate.hasOptimization()) {</span>
+<span class="fc" id="L487">                        dbg(&quot;OPTPART!&quot;);</span>
+<span class="fc" id="L488">                        newv = gate.applyOptimize(oldv);</span>
+                    } else {
+<span class="fc" id="L490">                        dbg(&quot;GET MATRIX for  &quot;+gate);</span>
+<span class="fc" id="L491">                        Complex[][] matrix = gate.getMatrix();</span>
+<span class="fc" id="L492">                        s1 = System.currentTimeMillis();</span>
+<span class="fc bfc" id="L493" title="All 2 branches covered.">                        for (int i = 0; i &lt; gatedim; i++) {</span>
+<span class="fc bfc" id="L494" title="All 2 branches covered.">                            for (int k = 0; k &lt; gatedim; k++) {</span>
+<span class="fc" id="L495">                                newv[i] = newv[i].add(matrix[i][k].mul(oldv[k]));</span>
+                            }
+                        }
+                    }
+<span class="fc bfc" id="L499" title="All 2 branches covered.">                    for (int i = 0; i &lt; gatedim; i++) {</span>
+<span class="fc" id="L500">                        answer[i * partdim + j] = newv[i];</span>
+                    }
+<span class="fc" id="L502">                    dbg(&quot;done part&quot;);</span>
+                }
+<span class="fc" id="L504">                long s2 = System.currentTimeMillis();</span>
+<span class="fc" id="L505">                return answer;</span>
+            }
+<span class="fc" id="L507">            long sm0 = System.currentTimeMillis();</span>
+<span class="fc" id="L508">            Complex[][] vsub = new Complex[gatedim][partdim];</span>
+<span class="fc bfc" id="L509" title="All 2 branches covered.">            for (int i = 0; i &lt; gatedim; i++) {</span>
+<span class="fc" id="L510">                Complex[] vorig = new Complex[partdim];</span>
+<span class="fc bfc" id="L511" title="All 2 branches covered.">                for (int j = 0; j &lt; partdim; j++) {</span>
+<span class="fc" id="L512">                    vorig[j] = v[j + i * partdim];</span>
+                }
+<span class="fc" id="L514">                vsub[i] = getNextProbability(nextGates, vorig);</span>
+            }
+<span class="fc" id="L516">            long s0 = System.currentTimeMillis();</span>
+<span class="fc" id="L517">            Complex[][] matrix = gate.getMatrix();</span>
+<span class="fc" id="L518">            long s1 = System.currentTimeMillis();</span>
+<span class="fc bfc" id="L519" title="All 2 branches covered.">            for (int i = 0; i &lt; gatedim; i++) {</span>
+<span class="fc bfc" id="L520" title="All 2 branches covered.">                for (int j = 0; j &lt; partdim; j++) {</span>
+<span class="fc" id="L521">                    answer[j + i * partdim] = Complex.ZERO;</span>
+<span class="fc bfc" id="L522" title="All 2 branches covered.">                    for (int k = 0; k &lt; gatedim; k++) {</span>
+<span class="fc" id="L523">                        answer[j + i * partdim] = answer[j + i * partdim].add(matrix[i][k].mul(vsub[k][j]));</span>
+                    }
+                }
+            }
+<span class="fc" id="L527">            long s2 = System.currentTimeMillis();</span>
+<span class="fc" id="L528">            return answer;</span>
+        } else {
+<span class="pc bpc" id="L530" title="1 of 2 branches missed.">            if (gatedim != size) {</span>
+<span class="nc" id="L531">                System.err.println(&quot;problem with matrix for gate &quot; + gate);</span>
+<span class="nc" id="L532">                throw new IllegalArgumentException(&quot;wrong matrix size &quot; + gatedim + &quot; vs vector size &quot; + v.length);</span>
+            }
+<span class="fc bfc" id="L534" title="All 2 branches covered.">            if (gate.hasOptimization()) {</span>
+<span class="fc" id="L535">                return gate.applyOptimize(v);</span>
+            } else {
+<span class="fc" id="L537">                Complex[][] matrix = gate.getMatrix();</span>
+<span class="fc" id="L538">                Complex[] answer = new Complex[size];</span>
+<span class="fc bfc" id="L539" title="All 2 branches covered.">                for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc" id="L540">                    answer[i] = Complex.ZERO;</span>
+<span class="fc bfc" id="L541" title="All 2 branches covered.">                    for (int j = 0; j &lt; size; j++) {</span>
+<span class="fc" id="L542">                        answer[i] = answer[i].add(matrix[i][j].mul(v[j]));</span>
+                    }
+                }
+<span class="fc" id="L545">                return answer;</span>
+            }
+        }
+    }
+    
+    /**
+     * Check if the gates operates on qubits that are part of this Program.
+     * e.g. if a 3-sized gate is applied to qubit 2 in a 3-qubit circuit, this
+     * will throw an IllegalArgumentException.
+     */
+    private static void validateGates(List&lt;Gate&gt; gates, int nQubits) {
+<span class="fc bfc" id="L556" title="All 2 branches covered.">        for (Gate gate : gates) {</span>
+<span class="fc bfc" id="L557" title="All 2 branches covered.">            if (gate.getHighestAffectedQubitIndex() &gt;= nQubits) {</span>
+<span class="fc" id="L558">                throw new IllegalArgumentException </span>
+<span class="fc" id="L559">        (&quot;Gate &quot;+gate+&quot; operates on qubit &quot;+ gate.getHighestAffectedQubitIndex()+&quot; but we have only &quot;+nQubits+&quot; qubits.&quot;);</span>
+            }
+<span class="fc" id="L561">        }</span>
+<span class="fc" id="L562">    }</span>
+
+    private static List&lt;Gate&gt; getAllGates(List&lt;Gate&gt; gates, int nQubits) {
+<span class="fc" id="L565">        validateGates(gates, nQubits);</span>
+<span class="fc" id="L566">        dbg(&quot;getAllGates, orig = &quot; + gates);</span>
+<span class="fc" id="L567">        List&lt;Gate&gt; answer = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L568">        int idx = nQubits - 1;</span>
+<span class="fc bfc" id="L569" title="All 2 branches covered.">        while (idx &gt;= 0) {</span>
+<span class="fc" id="L570">            final int cnt = idx;</span>
+<span class="fc" id="L571">            Gate myGate = gates.stream()</span>
+<span class="fc" id="L572">                    .filter(</span>
+<span class="fc bfc" id="L573" title="All 2 branches covered.">                            gate -&gt; gate.getHighestAffectedQubitIndex() == cnt)</span>
+<span class="fc" id="L574">                    .findFirst()</span>
+<span class="fc" id="L575">                    .orElse(new Identity(idx));</span>
+<span class="fc" id="L576">            dbg(&quot;stepmatrix, cnt = &quot; + cnt + &quot;, idx = &quot; + idx + &quot;, myGate = &quot; + myGate);</span>
+<span class="fc" id="L577">            answer.add(myGate);</span>
+<span class="fc bfc" id="L578" title="All 2 branches covered.">            if (myGate instanceof BlockGate) {</span>
+<span class="fc" id="L579">                BlockGate sqg = (BlockGate) myGate;</span>
+<span class="fc" id="L580">                idx = idx - sqg.getSize() + 1;</span>
+<span class="fc" id="L581">                dbg(&quot;processed blockgate, size = &quot; + sqg.getSize() + &quot;, idx = &quot; + idx);</span>
+            }
+<span class="fc bfc" id="L583" title="All 2 branches covered.">            if (myGate instanceof TwoQubitGate) {</span>
+<span class="fc" id="L584">                idx--;</span>
+            }
+<span class="fc bfc" id="L586" title="All 2 branches covered.">            if (myGate instanceof ThreeQubitGate) {</span>
+<span class="fc" id="L587">                idx = idx - 2;</span>
+            }
+<span class="pc bpc" id="L589" title="1 of 2 branches missed.">            if (myGate instanceof PermutationGate) {</span>
+<span class="nc" id="L590">                throw new RuntimeException(&quot;No perm allowed &quot;);</span>
+            }
+<span class="fc bfc" id="L592" title="All 2 branches covered.">            if (myGate instanceof Oracle) {</span>
+<span class="fc" id="L593">                idx = 0;</span>
+            }
+<span class="fc" id="L595">            idx--;</span>
+<span class="fc" id="L596">        }</span>
+<span class="fc" id="L597">        return answer;</span>
+    }
+
+    private static void processBlockGate(ControlledBlockGate gate, ArrayList&lt;Step&gt; answer) {
+<span class="fc" id="L601">        Step master = answer.get(answer.size() -1);</span>
+<span class="fc" id="L602">        gate.calculateHighLow();</span>
+<span class="fc" id="L603">        int low = gate.getLow();</span>
+<span class="fc" id="L604">        int control = gate.getControlQubit();</span>
+<span class="fc" id="L605">        int idx = gate.getMainQubitIndex();</span>
+<span class="fc" id="L606">        int high = control;</span>
+<span class="fc" id="L607">        int size = gate.getSize();</span>
+<span class="fc" id="L608">        int gap = control - idx;</span>
+<span class="fc" id="L609">        List&lt;PermutationGate&gt; perm = new LinkedList&lt;&gt;();</span>
+<span class="fc" id="L610">        Block block = gate.getBlock();</span>
+<span class="fc" id="L611">        int bs = block.getNQubits();</span>
+
+<span class="fc bfc" id="L613" title="All 2 branches covered.">        if (control &gt; idx) {</span>
+<span class="pc bpc" id="L614" title="1 of 2 branches missed.">            if (gap &lt; bs) {</span>
+<span class="nc" id="L615">                throw new IllegalArgumentException(&quot;Can't have control at &quot; + control + &quot; for gate with size &quot; + bs + &quot; starting at &quot; + idx);</span>
+            }
+<span class="fc" id="L617">            low = idx;</span>
+<span class="fc bfc" id="L618" title="All 2 branches covered.">            if (gap &gt; bs) {</span>
+<span class="fc" id="L619">                high = control;</span>
+<span class="fc" id="L620">                size = high - low + 1;</span>
+<span class="fc" id="L621">                PermutationGate pg = new PermutationGate(control, control - gap + bs, low + size);</span>
+
+<span class="fc" id="L623">                perm.add(pg);</span>
+<span class="fc" id="L624">            }</span>
+        } else {
+<span class="fc" id="L626">            low = control;</span>
+<span class="fc" id="L627">            high = idx + bs - 1;</span>
+<span class="fc" id="L628">            size = high - low + 1;</span>
+            //   gate.correctHigh(low+bs);
+<span class="fc bfc" id="L630" title="All 2 branches covered.">            for (int i = low; i &lt; low + size - 1; i++) {</span>
+<span class="fc" id="L631">                PermutationGate pg = new PermutationGate(i, i + 1, low + size);</span>
+<span class="fc" id="L632">                perm.add(0, pg);</span>
+            }
+        }
+
+<span class="fc bfc" id="L636" title="All 2 branches covered.">        for (int i = 0; i &lt; perm.size(); i++) {</span>
+<span class="fc" id="L637">            PermutationGate pg = perm.get(i);</span>
+<span class="fc" id="L638">            Step lpg = new Step(pg);</span>
+<span class="fc bfc" id="L639" title="All 2 branches covered.">            if (i &lt; perm.size()-1) {</span>
+<span class="fc" id="L640">                lpg.setComplexStep(-1);</span>
+            } else {
+                // the complex step should be the last part of the step
+<span class="fc" id="L643">                lpg.setComplexStep(master.getComplexStep());</span>
+<span class="fc" id="L644">                master.setComplexStep(-1);</span>
+            }
+<span class="fc" id="L646">            answer.add(lpg);</span>
+<span class="fc" id="L647">            answer.add(0, new Step(pg));</span>
+        }
+
+<span class="fc" id="L650">    }</span>
+    
+    // TODO: make this a utility method
+    /**
+     * &lt;p&gt;calculateQubitStatesFromVector.&lt;/p&gt;
+     *
+     * @param vectorresult an array of {@link org.redfx.strange.Complex} objects
+     * @return an array of doubles
+     */
+    public static double[] calculateQubitStatesFromVector(Complex[] vectorresult) {
+<span class="nc" id="L660">        int nq = (int) Math.round(Math.log(vectorresult.length) / Math.log(2));</span>
+<span class="nc" id="L661">        double[] answer = new double[nq];</span>
+<span class="nc" id="L662">        int ressize = 1 &lt;&lt; nq;</span>
+<span class="nc bnc" id="L663" title="All 2 branches missed.">        for (int i = 0; i &lt; nq; i++) {</span>
+<span class="nc" id="L664">            int pw = i;//nq - i - 1;</span>
+<span class="nc" id="L665">            int div = 1 &lt;&lt; pw;</span>
+<span class="nc bnc" id="L666" title="All 2 branches missed.">            for (int j = 0; j &lt; ressize; j++) {</span>
+<span class="nc" id="L667">                int p1 = j / div;</span>
+<span class="nc bnc" id="L668" title="All 2 branches missed.">                if (p1 % 2 == 1) {</span>
+<span class="nc" id="L669">                    answer[i] = answer[i] + vectorresult[j].abssqr();</span>
+                }
+            }
+        }
+<span class="nc" id="L673">        return answer;</span>
+    }
+
+    /**
+     * Evaluates the first ImmediateMeasurement gate in the supplied list.
+     * A measurement is done based on existing probabilities, and the resulting vector is
+     * post-conditioned for this value. In case a callback is provided when creating the
+     * ImmediateMeasurement gate, that will be called with the resulted measurement.
+     * @param gates
+     * @param vector
+     * @param length
+     * @return 
+     */
+    static Complex[] doImmediateMeasurement(List&lt;Gate&gt; gates, Complex[] vector, int length) {
+<span class="fc" id="L687">        int size = vector.length;</span>
+<span class="fc" id="L688">        Gate gate = gates.stream().filter(g -&gt; g instanceof ImmediateMeasurement).findFirst()</span>
+<span class="pc" id="L689">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Need an ImmediateMeasurement gate&quot;));</span>
+<span class="fc" id="L690">        ImmediateMeasurement mGate = (ImmediateMeasurement)gate;</span>
+<span class="fc" id="L691">        int idx = mGate.getMainQubitIndex();</span>
+<span class="fc" id="L692">        double[] p = new double[2];</span>
+<span class="fc bfc" id="L693" title="All 2 branches covered.">        for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc" id="L694">            p[(i/(1 &lt;&lt;idx))%2] += vector[i].abssqr();</span>
+        }
+<span class="fc" id="L696">        double rnd = Math.random();</span>
+<span class="fc bfc" id="L697" title="All 2 branches covered.">        int pick = rnd &gt; p[0] ? 1 : 0;</span>
+<span class="fc" id="L698">        Complex[] answer = new Complex[size];</span>
+<span class="fc bfc" id="L699" title="All 2 branches covered.">        for (int i = 0; i &lt; size; i++) {</span>
+<span class="fc bfc" id="L700" title="All 2 branches covered.">            if (pick == (i/(1 &lt;&lt;idx))%2) {</span>
+<span class="fc" id="L701">                answer[i] = vector[i].mul(1/Math.sqrt(p[pick]));</span>
+            } else {
+<span class="fc" id="L703">                answer[i] = Complex.ZERO;</span>
+            }
+        }
+<span class="fc" id="L706">        Consumer&lt;Boolean&gt; consumer = mGate.getConsumer();</span>
+<span class="fc bfc" id="L707" title="All 4 branches covered.">        if (consumer != null) consumer.accept(pick != 0);</span>
+<span class="fc" id="L708">        return answer;</span>
+    }
+
+    /**
+     * Checks if the list of gates contain one or more ImmediateMeasurement gates
+     * and no other gates apart from the Identity gate
+     * @param gates
+     * @return 
+     */
+    static boolean containsImmediateMeasurementOnly(List&lt;Gate&gt; gates) {
+<span class="fc bfc" id="L718" title="All 2 branches covered.">        return gates.stream().anyMatch(g -&gt; g instanceof ImmediateMeasurement) &amp;&amp;  </span>
+<span class="fc bfc" id="L719" title="All 6 branches covered.">               gates.stream().allMatch(g -&gt; g instanceof ImmediateMeasurement || g instanceof Identity);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
