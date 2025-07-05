@@ -97,7 +97,7 @@ public class BlockGate<T extends Gate> implements Gate {
     /** {@inheritDoc} */
     @Override
     public void setMainQubitIndex(int idx) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        this.idx = idx;
     }
 
     /** {@inheritDoc} */

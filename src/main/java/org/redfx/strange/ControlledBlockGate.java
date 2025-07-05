@@ -38,6 +38,7 @@ import org.redfx.strange.local.Computations;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import org.redfx.strange.gate.SingleQubitGate;
 
 /**
  *
@@ -70,9 +71,23 @@ public class ControlledBlockGate<T> extends BlockGate {
      * @param control the index of the control qubit
      */
     public ControlledBlockGate(BlockGate bg, int idx, int control) {
-        this (bg.getBlock(), idx, control);
+        super();
+        if (bg instanceof ControlledBlockGate cbg) {
+            Step s = new Step(cbg);
+            Block b = new Block(bg.getSize());
+            b.addStep(new Step(cbg));
+            this.setBlock(b);
+        } else {
+            this.setBlock(bg.getBlock());
+        }
+        this.setMainQubitIndex(idx);
+        this.control = control;
+        System.err.println("CREATED CBG");
     }
     
+    public int getControlIndex() {
+        return this.control;
+    }
     /**
      * Create a block
      *
@@ -81,6 +96,12 @@ public class ControlledBlockGate<T> extends BlockGate {
      * @param control the control qubit
      */
     public ControlledBlockGate (Block block, int idx, int control) {
+//        List<Step> steps = block.getSteps();
+//        Block cBlock = new Block(block.getNQubits()+1);
+//        for (Step step : steps) {
+//            ControlledGate.
+//        }
+//        System.err.println("");
         super(block, idx);
         this.control = control;
         if (control > idx) {
@@ -182,6 +203,7 @@ public class ControlledBlockGate<T> extends BlockGate {
     /** {@inheritDoc} */
     @Override
     public Complex[][] getMatrix(QuantumExecutionEnvironment qee) {
+        System.err.println("GETMATRIX");
         if (matrix == null) {
             int low = 0;
             this.high = control;
@@ -227,27 +249,71 @@ public class ControlledBlockGate<T> extends BlockGate {
     /** {@inheritDoc} */
     @Override
     public boolean hasOptimization() {
+        System.err.println("HASOPT");
         return true;
     }
 
     /** {@inheritDoc} */
     @Override
     public Complex[] applyOptimize(Complex[] v) {
-        int size = v.length;
-        Complex[] answer = new Complex[size];
-        int dim = size / 2;
-        Complex[] oldv = new Complex[dim];
-        for (int i = 0; i < dim; i++) {
-            oldv[i] = v[i + dim];
+        
+        System.err.println("[CBG] appopt for v = ");
+        Complex.printArray(v);
+        for (Step step : block.getSteps()) {
+            System.err.println("STEP "+step);
+
+            List<Gate> gates = step.getGates();
+                     v =     Computations.calculateNewState(gates, v, size);
+
+//            for (Gate gate: gates) {
+//                Gate singleGate = new SingleControlledGate(this.control, this.getMainQubitIndex()+ gate.getMainQubitIndex(), gate);
+//                v = Computations.simpleNextProb(singleGate, v);
+//                System.err.println("After this gate, probs = ");
+//                Complex.printArray(v);
+//            }
         }
-        Complex[] p2 = block.applyOptimize(oldv, inverse);
-        for (int i = 0; i < dim; i++) {
-            answer[i] = v[i];
-            answer[dim + i] = p2[i];
-        }
-        return answer;
+        System.err.println("[CBG] done");
+        return v;
     }
 
+    static class SingleControlledGate extends SingleQubitGate implements ControlledGate {
+
+        private final int ctrl;
+        private final int index;
+        private final Gate root;
+
+        SingleControlledGate(int ctrl, int index, Gate root) {
+            System.err.println("Created SCG with ctr at "+ctrl+" and index = "+ index);
+            this.ctrl = ctrl;
+            this.index = index;
+            this.root = root;
+        }
+        @Override
+        public Complex[][] getMatrix() {
+            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        }
+
+        @Override
+        public int getControllQubitIndex() {
+            return ctrl;
+        }
+
+        @Override
+        public List<Integer> getControllIndexes() {
+            return List.of(ctrl);
+        }
+
+        @Override
+        public int getRootGateIndex() {
+            return index;
+        }
+
+        @Override
+        public Gate getRootGate() {
+            return root;
+        }
+        
+    }
     /**
      * <p>Getter for the field <code>size</code>.</p>
      *
@@ -259,7 +325,7 @@ public class ControlledBlockGate<T> extends BlockGate {
     
     /** {@inheritDoc} */
     @Override public String toString() {
-        return "ControlledGate for "+super.toString();
+        return "ControlledBlockGate with control at " + control+" for "+super.toString();
     }
     
 }

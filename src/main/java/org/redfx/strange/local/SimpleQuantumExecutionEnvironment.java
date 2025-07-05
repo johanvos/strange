@@ -39,6 +39,7 @@ import org.redfx.strange.gate.ProbabilitiesGate;
 import org.redfx.strange.gate.Swap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -97,15 +98,15 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         Result result = new Result(nQubits, steps.size());
         int cnt = 0;
         result.setIntermediateProbability(0, probs);
-        LOG.fine("START RUN, number of steps = " + simpleSteps.size());
+        LOG.info("START RUN, number of steps = " + simpleSteps.size());
         for (Step step : simpleSteps) {
             if (!step.getGates().isEmpty()) {
-                LOG.finer("RUN STEP " + step + ", cnt = " + cnt);
+                LOG.info("RUN STEP " + step + ", cnt = " + cnt);
                 cnt++;
                 LOG.finest("before this step, probs = ");
           //      printProbs(probs);
                 probs = applyStep(step, probs, qubit);
-                LOG.finest("after this step, probs = "+probs);
+                LOG.info("after this step, probs = "+Arrays.toString(probs));
             //    printProbs(probs);
                 int idx = step.getComplexStep();
                 // System.err.println("complex? "+idx);
