@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Qubits.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange</a> &gt; <span class="el_source">Qubits.java</span></div><h1>Qubits.java</h1><pre class="source lang-java linenums">package org.redfx.strange;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * A class to manage names of qubits and the mapping to the qubit index.
+ */
+public class Qubits&lt;T&gt; {
+  
+<span class="fc" id="L12">  private Map&lt;T, Integer&gt; qubits = new HashMap&lt;&gt;();</span>
+
+  /**
+   * Initializes with the provided Qubit keys.
+   *
+   * @param keys the initial qubit keys
+   * @throws IllegalArgumentException if there are duplicate keys
+   */
+<span class="fc" id="L20">  public Qubits(T... keys) {</span>
+<span class="fc bfc" id="L21" title="All 2 branches covered.">    for (T key : keys) {</span>
+<span class="fc" id="L22">      newBit(key);</span>
+    }
+<span class="fc" id="L24">  }</span>
+
+  /**
+   * Gets the number of qubit keys.
+   *
+   * @return the number of qubits
+   */
+  public int numberOfQubits() {
+<span class="fc" id="L32">    return qubits.size();</span>
+  }
+
+  /**
+   * Returns a list of the qubit keys.
+   *
+   * @return the list of qubit keys
+   */
+  public List&lt;T&gt; qubitKeys() {
+<span class="nc" id="L41">    return List.copyOf(qubits.keySet());</span>
+  }
+
+  /**
+   * Registers a new qubit key and returns its index.
+   *
+   * @param key the key for the new qubit
+   * @return the index of the new qubit
+   * @throws IllegalArgumentException if the key already exists
+   */
+  public int newBit(T key) {
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">    if (qubits.containsKey(key)) {</span>
+<span class="nc" id="L53">      throw new IllegalArgumentException(&quot;Qubit &quot; + key + &quot; already exists, use bit(key) to retrieve it.&quot;);</span>
+    }
+<span class="fc" id="L55">    int index = qubits.size();</span>
+<span class="fc" id="L56">    qubits.put(key, index);</span>
+<span class="fc" id="L57">    return index;</span>
+  }
+
+  /**
+   * Returns the index of the qubit for the given key.
+   *
+   * @param key the key for the qubit
+   * @return the index of the qubit
+   * @throws IllegalArgumentException if the key does not exist
+   */
+  public int bit(T key) {
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">    if (! qubits.containsKey(key)) {</span>
+<span class="nc" id="L69">      throw new IllegalArgumentException(&quot;Qubit &quot; + key + &quot; isn't known, use newBit(key) to create it first.&quot;);</span>
+    }
+<span class="fc" id="L71">    return qubits.get(key);</span>
+  }
+
+  /**
+   * Creates a new Program with these qubits and the given steps.
+   *
+   * @param steps the steps to be included in the program
+   * @return a new Program instance containing the specified steps
+   */
+  public Program programOf(Step... steps) {
+<span class="fc" id="L81">    return new Program(this.numberOfQubits(), steps);</span>
+  }
+
+  /**
+   * &lt;p&gt;Getter for the field &lt;code&gt;qubits&lt;/code&gt;.&lt;/p&gt;
+   *
+   * @return an array of {@link org.redfx.strange.Qubit} objects
+   */
+  public Map&lt;T, Qubit&gt; getQubits(Result result) {
+<span class="nc" id="L90">    Qubit[] qubits = result.getQubits();</span>
+<span class="nc" id="L91">    Map&lt;T, Qubit&gt; qubitMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">    for (T key : qubitKeys()) {</span>
+<span class="nc" id="L93">        qubitMap.put(key, qubits[bit(key)]);</span>
+<span class="nc" id="L94">    }</span>
+<span class="nc" id="L95">    return qubitMap;</span>
+  }
+
+  // Factory methods for gates
+
+<span class="fc" id="L100">  public Gate cnot(T a, T b) { return Gate.cnot(bit(a), bit(b)); }</span>
+<span class="fc" id="L101">  public Step cnotStep(T a, T b) { return new Step(cnot(a, b)); }</span>
+
+<span class="nc" id="L103">  public Gate cz(T a, T b) { return Gate.cz(bit(a), bit(b)); }</span>
+<span class="nc" id="L104">  public Step czStep(T a, T b) { return new Step(cz(a, b)); }</span>
+
+<span class="fc" id="L106">  public Gate hadamard(T q) { return Gate.hadamard(bit(q)); }</span>
+<span class="fc" id="L107">  public Step hadamardStep(T q) { return new Step(hadamard(q)); }</span>
+
+  // ...
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -9,10 +9,11 @@ Strange,org.redfx.strange,ControlledBlockGate,62,360,3,25,13,74,9,23,6,12
 Strange,org.redfx.strange,Block,43,262,9,31,8,59,12,21,4,9
 Strange,org.redfx.strange,Complex,245,541,19,41,47,94,20,34,8,16
 Strange,org.redfx.strange,Qubit,60,33,0,2,8,12,4,5,4,4
+Strange,org.redfx.strange,Qubits,69,107,4,4,11,17,7,10,4,9
 Strange,org.redfx.strange,Step,37,158,1,11,10,42,6,20,5,15
 Strange,org.redfx.strange,QuantumExecutionEnvironment,4,0,0,0,1,0,1,0,1,0
 Strange,org.redfx.strange,Step.Type,0,21,0,0,0,4,0,1,0,1
-Strange,org.redfx.strange,Gate,97,12,0,0,18,3,18,3,18,3
+Strange,org.redfx.strange,Gate,86,23,0,0,16,5,16,5,16,5
 Strange,org.redfx.strange.gate,ImmediateMeasurement,41,45,0,0,5,6,3,3,3,3
 Strange,org.redfx.strange.gate,TwoQubitGate,43,40,0,0,11,13,8,7,8,7
 Strange,org.redfx.strange.gate,SingleQubitGate,18,32,0,0,6,11,5,8,5,8
@@ -30,7 +31,7 @@ Strange,org.redfx.strange.gate,X,0,39,0,0,0,5,0,3,0,3
 Strange,org.redfx.strange.gate,Y,0,41,0,0,0,5,0,3,0,3
 Strange,org.redfx.strange.gate,Mul,0,138,0,6,0,21,0,5,0,2
 Strange,org.redfx.strange.gate,Cz,93,100,0,0,2,6,1,3,1,3
-Strange,org.redfx.strange.gate,Toffoli,304,313,0,0,3,6,2,4,2,4
+Strange,org.redfx.strange.gate,Toffoli,0,314,0,0,0,7,0,5,0,5
 Strange,org.redfx.strange.gate,Rotation,16,190,1,3,4,13,3,4,2,2
 Strange,org.redfx.strange.gate,Cnot,91,98,0,0,2,5,1,3,1,3
 Strange,org.redfx.strange.gate,Z,0,41,0,0,0,5,0,3,0,3
