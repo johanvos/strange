@@ -39,6 +39,7 @@ import org.redfx.strange.gate.ProbabilitiesGate;
 import org.redfx.strange.gate.Swap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -51,140 +52,121 @@ import java.util.logging.Logger;
  */
 public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnvironment {
 
-<span class="fc" id="L54">    static Logger LOG = Logger.getLogger(SimpleQuantumExecutionEnvironment.class.getName());</span>
+<span class="fc" id="L55">    static Logger LOG = Logger.getLogger(SimpleQuantumExecutionEnvironment.class.getName());</span>
 
     /**
      * &lt;p&gt;Constructor for SimpleQuantumExecutionEnvironment.&lt;/p&gt;
      */
-<span class="fc" id="L59">    public SimpleQuantumExecutionEnvironment() {</span>
-<span class="fc" id="L60">    }</span>
+<span class="fc" id="L60">    public SimpleQuantumExecutionEnvironment() {</span>
+<span class="fc" id="L61">    }</span>
 
     /** {@inheritDoc} */
     @Override
     public Result runProgram(Program p) {
-<span class="fc" id="L65">        LOG.info(&quot;runProgram &quot;);</span>
-<span class="fc" id="L66">        int nQubits = p.getNumberQubits();</span>
-<span class="fc" id="L67">        Qubit[] qubit = new Qubit[nQubits];</span>
-<span class="fc bfc" id="L68" title="All 2 branches covered.">        for (int i = 0; i &lt; nQubits; i++) {</span>
-<span class="fc" id="L69">            qubit[i] = new Qubit();</span>
+<span class="fc" id="L66">        LOG.info(&quot;runProgram &quot;);</span>
+<span class="fc" id="L67">        int nQubits = p.getNumberQubits();</span>
+<span class="fc" id="L68">        Qubit[] qubit = new Qubit[nQubits];</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        for (int i = 0; i &lt; nQubits; i++) {</span>
+<span class="fc" id="L70">            qubit[i] = new Qubit();</span>
         }
-<span class="fc" id="L71">        int dim = 1 &lt;&lt; nQubits;</span>
-<span class="fc" id="L72">        double[] initalpha = p.getInitialAlphas();</span>
-<span class="fc" id="L73">        Complex[] probs = new Complex[dim];</span>
-<span class="fc bfc" id="L74" title="All 2 branches covered.">        for (int i = 0; i &lt; dim; i++) {</span>
-<span class="fc" id="L75">            probs[i] = Complex.ONE;</span>
-<span class="fc bfc" id="L76" title="All 2 branches covered.">            for (int j = 0; j &lt; nQubits; j++) {</span>
-<span class="fc" id="L77">                int pw = nQubits - j -1 ;</span>
-<span class="fc" id="L78">                int pt = 1 &lt;&lt; pw;</span>
-<span class="fc" id="L79">                int div = i/pt;</span>
-<span class="fc" id="L80">                int md = div % 2;</span>
-<span class="fc bfc" id="L81" title="All 2 branches covered.">                if (md == 0) {</span>
-<span class="fc" id="L82">                    probs[i] = probs[i].mul(initalpha[j]);</span>
+<span class="fc" id="L72">        int dim = 1 &lt;&lt; nQubits;</span>
+<span class="fc" id="L73">        double[] initalpha = p.getInitialAlphas();</span>
+<span class="fc" id="L74">        Complex[] probs = new Complex[dim];</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        for (int i = 0; i &lt; dim; i++) {</span>
+<span class="fc" id="L76">            probs[i] = Complex.ONE;</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">            for (int j = 0; j &lt; nQubits; j++) {</span>
+<span class="fc" id="L78">                int pw = nQubits - j -1 ;</span>
+<span class="fc" id="L79">                int pt = 1 &lt;&lt; pw;</span>
+<span class="fc" id="L80">                int div = i/pt;</span>
+<span class="fc" id="L81">                int md = div % 2;</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">                if (md == 0) {</span>
+<span class="fc" id="L83">                    probs[i] = probs[i].mul(initalpha[j]);</span>
                 } else {
-<span class="fc" id="L84">                    probs[i] = probs[i].mul(Math.sqrt(1-initalpha[j]*initalpha[j]));</span>
+<span class="fc" id="L85">                    probs[i] = probs[i].mul(Math.sqrt(1-initalpha[j]*initalpha[j]));</span>
                 }
             }
         }
-<span class="fc" id="L88">        List&lt;Step&gt; steps = p.getSteps();</span>
-<span class="fc" id="L89">        List&lt;Step&gt; simpleSteps = p.getDecomposedSteps();</span>
-<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (simpleSteps == null) {</span>
-<span class="fc" id="L91">            simpleSteps = new ArrayList&lt;&gt;();</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">            for (Step step : steps) {</span>
-<span class="fc" id="L93">                simpleSteps.addAll(Computations.decomposeStep(step, nQubits));</span>
-<span class="fc" id="L94">            }</span>
-<span class="fc" id="L95">            p.setDecomposedSteps(simpleSteps);</span>
+<span class="fc" id="L89">        List&lt;Step&gt; steps = p.getSteps();</span>
+<span class="fc" id="L90">        List&lt;Step&gt; simpleSteps = p.getDecomposedSteps();</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (simpleSteps == null) {</span>
+<span class="fc" id="L92">            simpleSteps = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            for (Step step : steps) {</span>
+<span class="fc" id="L94">                simpleSteps.addAll(Computations.decomposeStep(step, nQubits));</span>
+<span class="fc" id="L95">            }</span>
+<span class="fc" id="L96">            p.setDecomposedSteps(simpleSteps);</span>
         }
-<span class="fc" id="L97">        Result result = new Result(nQubits, steps.size());</span>
-<span class="fc" id="L98">        int cnt = 0;</span>
-<span class="fc" id="L99">        result.setIntermediateProbability(0, probs);</span>
-<span class="fc" id="L100">        LOG.fine(&quot;START RUN, number of steps = &quot; + simpleSteps.size());</span>
-<span class="fc bfc" id="L101" title="All 2 branches covered.">        for (Step step : simpleSteps) {</span>
-<span class="fc bfc" id="L102" title="All 2 branches covered.">            if (!step.getGates().isEmpty()) {</span>
-<span class="fc" id="L103">                LOG.finer(&quot;RUN STEP &quot; + step + &quot;, cnt = &quot; + cnt);</span>
-<span class="fc" id="L104">                cnt++;</span>
-<span class="fc" id="L105">                LOG.finest(&quot;before this step, probs = &quot;);</span>
+<span class="fc" id="L98">        Result result = new Result(nQubits, steps.size());</span>
+<span class="fc" id="L99">        int cnt = 0;</span>
+<span class="fc" id="L100">        result.setIntermediateProbability(0, probs);</span>
+<span class="fc" id="L101">        LOG.fine(&quot;START RUN, number of steps = &quot; + simpleSteps.size());</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        for (Step step : simpleSteps) {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            if (!step.getGates().isEmpty()) {</span>
+<span class="fc" id="L104">                LOG.finer(&quot;RUN STEP &quot; + step + &quot;, cnt = &quot; + cnt);</span>
+<span class="fc" id="L105">                cnt++;</span>
+<span class="fc" id="L106">                LOG.finest(&quot;before this step, probs = &quot;);</span>
           //      printProbs(probs);
-<span class="fc" id="L107">                probs = applyStep(step, probs, qubit);</span>
-<span class="fc" id="L108">                LOG.finest(&quot;after this step, probs = &quot;+probs);</span>
+<span class="fc" id="L108">                probs = applyStep(step, probs, qubit);</span>
+<span class="fc" id="L109">                LOG.info(&quot;after this step, probs = &quot;+probs);</span>
             //    printProbs(probs);
-<span class="fc" id="L110">                int idx = step.getComplexStep();</span>
+<span class="fc" id="L111">                int idx = step.getComplexStep();</span>
                 // System.err.println(&quot;complex? &quot;+idx);
-<span class="fc bfc" id="L112" title="All 2 branches covered.">                if (idx &gt; -1) {</span>
-<span class="fc" id="L113">                    result.setIntermediateProbability(idx, probs);</span>
+<span class="fc bfc" id="L113" title="All 2 branches covered.">                if (idx &gt; -1) {</span>
+<span class="fc" id="L114">                    result.setIntermediateProbability(idx, probs);</span>
                 }
             }
-<span class="fc" id="L116">        }</span>
-<span class="fc" id="L117">        LOG.info(&quot;DONE RUN, probability vector = &quot; + probs);</span>
-<span class="fc" id="L118">        printProbs(probs);</span>
-<span class="fc" id="L119">        double[] qp = calculateQubitStatesFromVector(probs);</span>
-<span class="fc bfc" id="L120" title="All 2 branches covered.">        for (int i = 0; i &lt; nQubits; i++) {</span>
-<span class="fc" id="L121">            qubit[i].setProbability(qp[i]);</span>
+<span class="fc" id="L117">        }</span>
+<span class="fc" id="L118">        LOG.info(&quot;DONE RUN, probability vector = &quot; + probs);</span>
+<span class="fc" id="L119">        printProbs(probs);</span>
+<span class="fc" id="L120">        double[] qp = calculateQubitStatesFromVector(probs);</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        for (int i = 0; i &lt; nQubits; i++) {</span>
+<span class="fc" id="L122">            qubit[i].setProbability(qp[i]);</span>
         }
-<span class="fc" id="L123">        result.measureSystem();</span>
-<span class="fc" id="L124">        p.setResult(result);</span>
-<span class="fc" id="L125">        return result;</span>
+<span class="fc" id="L124">        result.measureSystem();</span>
+<span class="fc" id="L125">        p.setResult(result);</span>
+<span class="fc" id="L126">        return result;</span>
     }
     
     /** {@inheritDoc} */
     @Override
     public void runProgram(Program p, Consumer&lt;Result&gt; result) {
-<span class="nc" id="L131">        Thread t = new Thread(() -&gt; result.accept(runProgram(p)));</span>
-<span class="nc" id="L132">        t.start();</span>
-<span class="nc" id="L133">    }</span>
+<span class="nc" id="L132">        Thread t = new Thread(() -&gt; result.accept(runProgram(p)));</span>
+<span class="nc" id="L133">        t.start();</span>
+<span class="nc" id="L134">    }</span>
 
     private void printProbs(Complex[] p) {
-<span class="fc" id="L136">        Complex.printArray(p);</span>
-<span class="fc" id="L137">    }</span>
+<span class="fc" id="L137">        Complex.printArray(p);</span>
+<span class="fc" id="L138">    }</span>
 
 
     private List&lt;Step&gt; decomposeSteps(List&lt;Step&gt; steps) {
-<span class="nc" id="L141">        return steps;</span>
+<span class="nc" id="L142">        return steps;</span>
     }
     
     private Complex[]  applyStep (Step step, Complex[] vector, Qubit[] qubits) {
-<span class="fc" id="L145">        LOG.finer(&quot;start applystep, vectorsize = &quot;+vector.length+&quot;, ql = &quot;+qubits.length);</span>
-<span class="fc" id="L146">        long s0 = System.currentTimeMillis();</span>
-<span class="fc" id="L147">        List&lt;Gate&gt; gates = step.getGates();</span>
-<span class="pc bpc" id="L148" title="1 of 4 branches missed.">        if (!gates.isEmpty() &amp;&amp; gates.get(0) instanceof ProbabilitiesGate ) {</span>
-<span class="fc" id="L149">            ProbabilitiesGate probGate = (ProbabilitiesGate)gates.get(0);</span>
-<span class="fc" id="L150">            probGate.setProbabilites(vector);</span>
-<span class="fc" id="L151">            return vector;</span>
+<span class="fc" id="L146">        LOG.finer(&quot;start applystep, vectorsize = &quot;+vector.length+&quot;, ql = &quot;+qubits.length);</span>
+<span class="fc" id="L147">        long s0 = System.currentTimeMillis();</span>
+<span class="fc" id="L148">        List&lt;Gate&gt; gates = step.getGates();</span>
+<span class="pc bpc" id="L149" title="1 of 4 branches missed.">        if (!gates.isEmpty() &amp;&amp; gates.get(0) instanceof ProbabilitiesGate ) {</span>
+<span class="fc" id="L150">            ProbabilitiesGate probGate = (ProbabilitiesGate)gates.get(0);</span>
+<span class="fc" id="L151">            probGate.setProbabilites(vector);</span>
+<span class="fc" id="L152">            return vector;</span>
         }
-<span class="fc bfc" id="L153" title="All 4 branches covered.">        if (gates.size() == 1 &amp;&amp; gates.get(0) instanceof PermutationGate) {</span>
-<span class="fc" id="L154">            PermutationGate pg = (PermutationGate)gates.get(0);</span>
-<span class="fc" id="L155">            return Computations.permutateVector (vector, pg.getIndex1(), pg.getIndex2());</span>
+<span class="fc bfc" id="L154" title="All 4 branches covered.">        if (gates.size() == 1 &amp;&amp; gates.get(0) instanceof PermutationGate) {</span>
+<span class="fc" id="L155">            PermutationGate pg = (PermutationGate)gates.get(0);</span>
+<span class="fc" id="L156">            return Computations.permutateVector (vector, pg.getIndex1(), pg.getIndex2());</span>
         }
       
-<span class="fc" id="L158">        Complex[] result = new Complex[vector.length];</span>
-<span class="fc" id="L159">        boolean vdd = true;</span>
-<span class="pc bpc" id="L160" title="1 of 2 branches missed.">        if (vdd) {</span>
-<span class="fc" id="L161">            result = Computations.calculateNewState(gates, vector, qubits.length);</span>
-        } else {
-<span class="nc" id="L163">            LOG.finest(&quot;start calcstepmatrix with gates &quot; + gates);</span>
-<span class="nc" id="L164">            Complex[][] a = calculateStepMatrix(gates, qubits.length);</span>
-<span class="nc" id="L165">            LOG.finest(&quot;done calcstepmatrix&quot;);</span>
-<span class="nc" id="L166">            LOG.finest(&quot;vector&quot;);</span>
-            // printProbs(vector);
-<span class="nc bnc" id="L168" title="All 2 branches missed.">            if (a.length != result.length) {</span>
-<span class="nc" id="L169">                System.err.println(&quot;fatal issue calculating step for gates &quot; + gates);</span>
-<span class="nc" id="L170">                throw new RuntimeException(&quot;Wrong length of matrix or probability vector: expected &quot; + result.length + &quot; but got &quot; + a.length);</span>
-            }
-<span class="nc" id="L172">            LOG.finest(&quot;start matrix-vector multiplication for vector size = &quot; + vector.length);</span>
-<span class="nc bnc" id="L173" title="All 2 branches missed.">            for (int i = 0; i &lt; vector.length; i++) {</span>
-<span class="nc" id="L174">                result[i] = Complex.ZERO;</span>
-<span class="nc bnc" id="L175" title="All 2 branches missed.">                for (int j = 0; j &lt; vector.length; j++) {</span>
-<span class="nc" id="L176">                    result[i] = result[i].add(a[i][j].mul(vector[j]));</span>
-                }
-            }
-        }
-<span class="fc" id="L180">        long s1 = System.currentTimeMillis();</span>
-<span class="fc" id="L181">        LOG.finer(&quot;done applystep took &quot;+ (s1-s0));</span>
+<span class="fc" id="L159">        Complex[] result = new Complex[vector.length];</span>
+<span class="fc" id="L160">        boolean vdd = true;</span>
+<span class="fc" id="L161">        result = Computations.calculateNewState(gates, vector, qubits.length);</span>
+<span class="fc" id="L162">        long s1 = System.currentTimeMillis();</span>
+<span class="fc" id="L163">        LOG.finer(&quot;done applystep took &quot;+ (s1-s0));</span>
 
-<span class="fc" id="L183">        return result;</span>
+<span class="fc" id="L165">        return result;</span>
     }
     
     private Complex[][] calculateStepMatrix(List&lt;Gate&gt; gates, int nQubits) {
-<span class="nc" id="L187">        return Computations.calculateStepMatrix(gates, nQubits, this);</span>
+<span class="nc" id="L169">        return Computations.calculateStepMatrix(gates, nQubits, this);</span>
 
     }
 
@@ -198,36 +180,36 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
      */
     @Deprecated
     public Complex[][] tensor(Complex[][] a, Complex[][] b) {
-<span class="nc" id="L201">        int d1 = a.length;</span>
-<span class="nc" id="L202">        int d2 = b.length;</span>
-<span class="nc" id="L203">        Complex[][] result = new Complex[d1 * d2][d1 * d2];</span>
-<span class="nc bnc" id="L204" title="All 2 branches missed.">        for (int rowa = 0; rowa &lt; d1; rowa++) {</span>
-<span class="nc bnc" id="L205" title="All 2 branches missed.">            for (int cola = 0; cola &lt; d1; cola++) {</span>
-<span class="nc bnc" id="L206" title="All 2 branches missed.">                for (int rowb = 0; rowb &lt; d2; rowb++) {</span>
-<span class="nc bnc" id="L207" title="All 2 branches missed.">                    for (int colb = 0; colb &lt; d2; colb++) {</span>
-<span class="nc" id="L208">                        result[d2 * rowa + rowb][d2 * cola + colb] = a[rowa][cola].mul( b[rowb][colb]);</span>
+<span class="nc" id="L183">        int d1 = a.length;</span>
+<span class="nc" id="L184">        int d2 = b.length;</span>
+<span class="nc" id="L185">        Complex[][] result = new Complex[d1 * d2][d1 * d2];</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">        for (int rowa = 0; rowa &lt; d1; rowa++) {</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">            for (int cola = 0; cola &lt; d1; cola++) {</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">                for (int rowb = 0; rowb &lt; d2; rowb++) {</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">                    for (int colb = 0; colb &lt; d2; colb++) {</span>
+<span class="nc" id="L190">                        result[d2 * rowa + rowb][d2 * cola + colb] = a[rowa][cola].mul( b[rowb][colb]);</span>
                     }
                 }
             }
         }
-<span class="nc" id="L213">        return result;</span>
+<span class="nc" id="L195">        return result;</span>
     }
 
     private double[] calculateQubitStatesFromVector(Complex[] vectorresult) {
-<span class="fc" id="L217">        int nq = (int) Math.round(Math.log(vectorresult.length) / Math.log(2));</span>
-<span class="fc" id="L218">        double[] answer = new double[nq];</span>
-<span class="fc" id="L219">        int ressize = 1 &lt;&lt; nq;</span>
-<span class="fc bfc" id="L220" title="All 2 branches covered.">        for (int i = 0; i &lt; nq; i++) {</span>
-<span class="fc" id="L221">            int pw = i;//nq - i - 1;</span>
-<span class="fc" id="L222">            int div = 1 &lt;&lt; pw;</span>
-<span class="fc bfc" id="L223" title="All 2 branches covered.">            for (int j = 0; j &lt; ressize; j++) {</span>
-<span class="fc" id="L224">                int p1 = j / div;</span>
-<span class="fc bfc" id="L225" title="All 2 branches covered.">                if (p1 % 2 == 1) {</span>
-<span class="fc" id="L226">                    answer[i] = answer[i] + vectorresult[j].abssqr();</span>
+<span class="fc" id="L199">        int nq = (int) Math.round(Math.log(vectorresult.length) / Math.log(2));</span>
+<span class="fc" id="L200">        double[] answer = new double[nq];</span>
+<span class="fc" id="L201">        int ressize = 1 &lt;&lt; nq;</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">        for (int i = 0; i &lt; nq; i++) {</span>
+<span class="fc" id="L203">            int pw = i;//nq - i - 1;</span>
+<span class="fc" id="L204">            int div = 1 &lt;&lt; pw;</span>
+<span class="fc bfc" id="L205" title="All 2 branches covered.">            for (int j = 0; j &lt; ressize; j++) {</span>
+<span class="fc" id="L206">                int p1 = j / div;</span>
+<span class="fc bfc" id="L207" title="All 2 branches covered.">                if (p1 % 2 == 1) {</span>
+<span class="fc" id="L208">                    answer[i] = answer[i] + vectorresult[j].abssqr();</span>
                 }
             }
         }
-<span class="fc" id="L230">        return answer;</span>
+<span class="fc" id="L212">        return answer;</span>
     }
     
     /**
@@ -239,24 +221,24 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public Complex[][] createPermutationMatrix(int first, int second, int n) {
-<span class="nc" id="L242">        Complex[][] swapMatrix = new Swap().getMatrix();</span>
-<span class="nc" id="L243">        Complex[][] iMatrix = new Identity().getMatrix();</span>
-<span class="nc" id="L244">        Complex[][] answer = iMatrix;</span>
-<span class="nc" id="L245">        int i = 1;</span>
-<span class="nc bnc" id="L246" title="All 2 branches missed.">        if (first == 0) {</span>
-<span class="nc" id="L247">            answer = swapMatrix;</span>
-<span class="nc" id="L248">            i++;</span>
+<span class="nc" id="L224">        Complex[][] swapMatrix = new Swap().getMatrix();</span>
+<span class="nc" id="L225">        Complex[][] iMatrix = new Identity().getMatrix();</span>
+<span class="nc" id="L226">        Complex[][] answer = iMatrix;</span>
+<span class="nc" id="L227">        int i = 1;</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">        if (first == 0) {</span>
+<span class="nc" id="L229">            answer = swapMatrix;</span>
+<span class="nc" id="L230">            i++;</span>
         }
-<span class="nc bnc" id="L250" title="All 2 branches missed.">        while (i &lt; n) {</span>
-<span class="nc bnc" id="L251" title="All 2 branches missed.">            if (i == first) {</span>
-<span class="nc" id="L252">                i++;</span>
-<span class="nc" id="L253">                answer = tensor(answer, swapMatrix);</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        while (i &lt; n) {</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">            if (i == first) {</span>
+<span class="nc" id="L234">                i++;</span>
+<span class="nc" id="L235">                answer = tensor(answer, swapMatrix);</span>
             } else {
-<span class="nc" id="L255">                answer = tensor(answer, iMatrix);</span>
+<span class="nc" id="L237">                answer = tensor(answer, iMatrix);</span>
             }
-<span class="nc" id="L257">            i++;</span>
+<span class="nc" id="L239">            i++;</span>
         }
-<span class="nc" id="L259">        return answer;</span>
+<span class="nc" id="L241">        return answer;</span>
     }
 
     
