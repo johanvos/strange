@@ -103,7 +103,7 @@ import java.util.Map;
 <span class="fc bfc" id="L103" title="All 2 branches covered.">        if (nqubits == 0) {</span>
 <span class="fc" id="L104">            return answer;</span>
         }
-<span class="fc" id="L106">        int lastidx = nsteps-1;</span>
+<span class="fc bfc" id="L106" title="All 2 branches covered.">        int lastidx = nsteps == 0 ? 0 : nsteps-1;</span>
 <span class="pc bpc" id="L107" title="1 of 2 branches missed.">        while (intermediateProps[lastidx] == null) lastidx--;</span>
 <span class="fc" id="L108">        double[] d = calculateQubitStatesFromVector(intermediateProps[lastidx]);</span>
 <span class="fc bfc" id="L109" title="All 2 branches covered.">        for (int i = 0; i &lt; answer.length; i++) {</span>
