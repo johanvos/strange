@@ -78,16 +78,20 @@ public final class Complex {
 <span class="fc" id="L78">        this(r, 0.d);</span>
 <span class="fc" id="L79">    }</span>
 
+    public Complex(Complex c) {
+<span class="fc" id="L82">        this(c.r, c.i);</span>
+<span class="fc" id="L83">    }</span>
+
     /**
      * Create a complex number with a real and imaginary component
      *
      * @param r the real component
      * @param i the imaginary component
      */
-<span class="fc" id="L87">    public Complex(double r, double i) {</span>
-<span class="fc" id="L88">        this.r = (float) r;</span>
-<span class="fc" id="L89">        this.i = (float) i;</span>
-<span class="fc" id="L90">    }</span>
+<span class="fc" id="L91">    public Complex(double r, double i) {</span>
+<span class="fc" id="L92">        this.r = (float) r;</span>
+<span class="fc" id="L93">        this.i = (float) i;</span>
+<span class="fc" id="L94">    }</span>
 
     /**
      * &lt;p&gt;add.&lt;/p&gt;
@@ -96,9 +100,9 @@ public final class Complex {
      * @return a {@link org.redfx.strange.Complex} object
      */
     public Complex add(Complex b) {
-<span class="fc" id="L99">        double nr = this.r + b.r;</span>
-<span class="fc" id="L100">        double ni = this.i + b.i;</span>
-<span class="fc" id="L101">        return new Complex(nr, ni);</span>
+<span class="fc" id="L103">        double nr = this.r + b.r;</span>
+<span class="fc" id="L104">        double ni = this.i + b.i;</span>
+<span class="fc" id="L105">        return new Complex(nr, ni);</span>
     }
 
     /**
@@ -108,9 +112,9 @@ public final class Complex {
      * @return the modified complex number
      */
     public Complex addr(Complex b) {
-<span class="fc" id="L111">        this.r = this.r + b.r;</span>
-<span class="fc" id="L112">        this.i = this.i + b.i;</span>
-<span class="fc" id="L113">        return this;</span>
+<span class="fc" id="L115">        this.r = this.r + b.r;</span>
+<span class="fc" id="L116">        this.i = this.i + b.i;</span>
+<span class="fc" id="L117">        return this;</span>
     }
 
     /**
@@ -121,11 +125,11 @@ public final class Complex {
      * @return a {@link org.redfx.strange.Complex} object
      */
     public Complex addmulr(Complex a, Complex b) {
-<span class="nc" id="L124">        double nr = (a.r * b.r) - (a.i * b.i);</span>
-<span class="nc" id="L125">        double ni = (a.r * b.i) + (a.i * b.r);</span>
-<span class="nc" id="L126">        this.r = (float) (this.r + nr);</span>
-<span class="nc" id="L127">        this.i = (float) (this.i + ni);</span>
-<span class="nc" id="L128">        return this;</span>
+<span class="nc" id="L128">        double nr = (a.r * b.r) - (a.i * b.i);</span>
+<span class="nc" id="L129">        double ni = (a.r * b.i) + (a.i * b.r);</span>
+<span class="nc" id="L130">        this.r = (float) (this.r + nr);</span>
+<span class="nc" id="L131">        this.i = (float) (this.i + ni);</span>
+<span class="nc" id="L132">        return this;</span>
     }
 
     /**
@@ -135,9 +139,9 @@ public final class Complex {
      * @return a {@link org.redfx.strange.Complex} object
      */
     public Complex min(Complex b) {
-<span class="nc" id="L138">        double nr = this.r - b.r;</span>
-<span class="nc" id="L139">        double ni = this.i - b.i;</span>
-<span class="nc" id="L140">        return new Complex(nr, ni);</span>
+<span class="nc" id="L142">        double nr = this.r - b.r;</span>
+<span class="nc" id="L143">        double ni = this.i - b.i;</span>
+<span class="nc" id="L144">        return new Complex(nr, ni);</span>
     }
 
     /**
@@ -147,9 +151,9 @@ public final class Complex {
      * @return a {@link org.redfx.strange.Complex} object
      */
     public Complex mul(Complex b) {
-<span class="fc" id="L150">        double nr = (this.r * b.r) - (this.i * b.i);</span>
-<span class="fc" id="L151">        double ni = (this.r * b.i) + (this.i * b.r);</span>
-<span class="fc" id="L152">        return new Complex(nr, ni);</span>
+<span class="fc" id="L154">        double nr = (this.r * b.r) - (this.i * b.i);</span>
+<span class="fc" id="L155">        double ni = (this.r * b.i) + (this.i * b.r);</span>
+<span class="fc" id="L156">        return new Complex(nr, ni);</span>
     }
 
     /**
@@ -159,7 +163,7 @@ public final class Complex {
      * @return a {@link org.redfx.strange.Complex} object
      */
     public Complex mul(double b) {
-<span class="fc" id="L162">        return new Complex(this.r * b, this.i * b);</span>
+<span class="fc" id="L166">        return new Complex(this.r * b, this.i * b);</span>
     }
 
     /**
@@ -168,7 +172,7 @@ public final class Complex {
      * @return a double
      */
     public double abssqr() {
-<span class="fc" id="L171">        return (this.r * this.r + this.i * this.i);</span>
+<span class="fc" id="L175">        return (this.r * this.r + this.i * this.i);</span>
     }
 
     /**
@@ -178,18 +182,18 @@ public final class Complex {
      * @return  identity matrix
      */
     public static Complex[][] identityMatrix (int dim) {
-<span class="fc" id="L181">        Complex[][] answer = new Complex[dim][dim];</span>
-<span class="fc bfc" id="L182" title="All 2 branches covered.">        for (int i = 0; i &lt; dim; i++) {</span>
-<span class="fc bfc" id="L183" title="All 2 branches covered.">            for (int j = 0; j &lt; dim; j++) {</span>
-<span class="fc bfc" id="L184" title="All 2 branches covered.">                if (i == j) {</span>
-<span class="fc" id="L185">                    answer[i][j] = Complex.ONE;</span>
+<span class="fc" id="L185">        Complex[][] answer = new Complex[dim][dim];</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">        for (int i = 0; i &lt; dim; i++) {</span>
+<span class="fc bfc" id="L187" title="All 2 branches covered.">            for (int j = 0; j &lt; dim; j++) {</span>
+<span class="fc bfc" id="L188" title="All 2 branches covered.">                if (i == j) {</span>
+<span class="fc" id="L189">                    answer[i][j] = Complex.ONE;</span>
                 } else {
-<span class="fc" id="L187">                    answer[i][j] = Complex.ZERO;</span>
+<span class="fc" id="L191">                    answer[i][j] = Complex.ZERO;</span>
                 }
             }
                 
         }
-<span class="fc" id="L192">        return answer;</span>
+<span class="fc" id="L196">        return answer;</span>
     }
     /**
      * Calculate the tensor product of matrix a and matrix b
@@ -199,26 +203,26 @@ public final class Complex {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[][] tensor(Complex[][] a, Complex[][] b) {
-<span class="fc" id="L202">        int d1 = a.length;</span>
-<span class="fc" id="L203">        int d2 = b.length;</span>
-<span class="fc" id="L204">        Complex[][] result = new Complex[d1 * d2][d1 * d2];</span>
-<span class="fc bfc" id="L205" title="All 2 branches covered.">        for (int rowa = 0; rowa &lt; d1; rowa++) {</span>
-<span class="fc bfc" id="L206" title="All 2 branches covered.">            for (int cola = 0; cola &lt; d1; cola++) {</span>
-<span class="fc bfc" id="L207" title="All 2 branches covered.">                for (int rowb = 0; rowb &lt; d2; rowb++) {</span>
-<span class="fc bfc" id="L208" title="All 2 branches covered.">                    for (int colb = 0; colb &lt; d2; colb++) {</span>
-<span class="fc bfc" id="L209" title="All 4 branches covered.">                        if ((a[rowa][cola] == Complex.ZERO) || (b[rowb][colb] == Complex.ZERO)) {</span>
-<span class="fc" id="L210">                            result[d2 * rowa + rowb][d2 * cola + colb] = Complex.ZERO;</span>
+<span class="fc" id="L206">        int d1 = a.length;</span>
+<span class="fc" id="L207">        int d2 = b.length;</span>
+<span class="fc" id="L208">        Complex[][] result = new Complex[d1 * d2][d1 * d2];</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">        for (int rowa = 0; rowa &lt; d1; rowa++) {</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">            for (int cola = 0; cola &lt; d1; cola++) {</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">                for (int rowb = 0; rowb &lt; d2; rowb++) {</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">                    for (int colb = 0; colb &lt; d2; colb++) {</span>
+<span class="fc bfc" id="L213" title="All 4 branches covered.">                        if ((a[rowa][cola] == Complex.ZERO) || (b[rowb][colb] == Complex.ZERO)) {</span>
+<span class="fc" id="L214">                            result[d2 * rowa + rowb][d2 * cola + colb] = Complex.ZERO;</span>
                         } else {
-<span class="fc" id="L212">                            result[d2 * rowa + rowb][d2 * cola + colb] = a[rowa][cola].mul(b[rowb][colb]);</span>
+<span class="fc" id="L216">                            result[d2 * rowa + rowb][d2 * cola + colb] = a[rowa][cola].mul(b[rowb][colb]);</span>
                         }
                     }
                 }
             }
         }
-<span class="fc" id="L218">        return result;</span>
+<span class="fc" id="L222">        return result;</span>
     }
-<span class="fc" id="L220">    static int zCount = 0;</span>
-<span class="fc" id="L221">    static int nzCount = 0;</span>
+<span class="fc" id="L224">    static int zCount = 0;</span>
+<span class="fc" id="L225">    static int nzCount = 0;</span>
 
     /**
      * &lt;p&gt;mmul.&lt;/p&gt;
@@ -228,7 +232,7 @@ public final class Complex {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[][] mmul(Complex[][] a, Complex[][] b) {
-<span class="fc" id="L231">        return slowmmul (a, b);</span>
+<span class="fc" id="L235">        return slowmmul (a, b);</span>
     }
     
     /**
@@ -239,25 +243,25 @@ public final class Complex {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[][] slowmmul(Complex[][] a, Complex[][] b) {
-<span class="fc" id="L242">        int arow = a.length;</span>
-<span class="fc" id="L243">        int acol = a[0].length;</span>
-<span class="fc" id="L244">        int brow = b.length;</span>
-<span class="fc" id="L245">        int bcol = b[0].length;</span>
-<span class="pc bpc" id="L246" title="1 of 2 branches missed.">        if (acol != brow) {</span>
-<span class="nc" id="L247">            throw new RuntimeException(&quot;#cols a &quot; + acol + &quot; != #rows b &quot; + brow);</span>
+<span class="fc" id="L246">        int arow = a.length;</span>
+<span class="fc" id="L247">        int acol = a[0].length;</span>
+<span class="fc" id="L248">        int brow = b.length;</span>
+<span class="fc" id="L249">        int bcol = b[0].length;</span>
+<span class="pc bpc" id="L250" title="1 of 2 branches missed.">        if (acol != brow) {</span>
+<span class="nc" id="L251">            throw new RuntimeException(&quot;#cols a &quot; + acol + &quot; != #rows b &quot; + brow);</span>
         }
-<span class="fc" id="L249">        Complex[][] answer = new Complex[arow][bcol];</span>
-<span class="fc bfc" id="L250" title="All 2 branches covered.">        for (int i = 0; i &lt; arow; i++) {</span>
-<span class="fc bfc" id="L251" title="All 2 branches covered.">            for (int j = 0; j &lt; bcol; j++) {</span>
-<span class="fc" id="L252">                Complex el = Complex.ZERO;</span>
-<span class="fc bfc" id="L253" title="All 2 branches covered.">                for (int k = 0; k &lt; acol;k++) {</span>
-<span class="fc" id="L254">                    el = el.add(a[i][k].mul(b[k][j]));</span>
+<span class="fc" id="L253">        Complex[][] answer = new Complex[arow][bcol];</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        for (int i = 0; i &lt; arow; i++) {</span>
+<span class="fc bfc" id="L255" title="All 2 branches covered.">            for (int j = 0; j &lt; bcol; j++) {</span>
+<span class="fc" id="L256">                Complex el = Complex.ZERO;</span>
+<span class="fc bfc" id="L257" title="All 2 branches covered.">                for (int k = 0; k &lt; acol;k++) {</span>
+<span class="fc" id="L258">                    el = el.add(a[i][k].mul(b[k][j]));</span>
                 }
-<span class="fc" id="L256">                answer[i][j] = el;</span>
+<span class="fc" id="L260">                answer[i][j] = el;</span>
             }
         }
 
-<span class="fc" id="L260">        return answer;</span>
+<span class="fc" id="L264">        return answer;</span>
     }
 
     /**
@@ -267,16 +271,16 @@ public final class Complex {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[][] conjugateTranspose(Complex[][] src) {
-<span class="fc" id="L270">        int d0 = src.length;</span>
-<span class="fc" id="L271">        int d1 = src[0].length;</span>
-<span class="fc" id="L272">        Complex[][] answer = new Complex[d1][d0];</span>
-<span class="fc bfc" id="L273" title="All 2 branches covered.">        for (int i = 0; i &lt; d0; i++) {</span>
-<span class="fc bfc" id="L274" title="All 2 branches covered.">            for (int j = 0; j &lt; d1; j++) {</span>
-<span class="fc" id="L275">                Complex c = src[i][j];</span>
-<span class="fc" id="L276">                answer[j][i] = new Complex(c.r, -1 * c.i);</span>
+<span class="fc" id="L274">        int d0 = src.length;</span>
+<span class="fc" id="L275">        int d1 = src[0].length;</span>
+<span class="fc" id="L276">        Complex[][] answer = new Complex[d1][d0];</span>
+<span class="fc bfc" id="L277" title="All 2 branches covered.">        for (int i = 0; i &lt; d0; i++) {</span>
+<span class="fc bfc" id="L278" title="All 2 branches covered.">            for (int j = 0; j &lt; d1; j++) {</span>
+<span class="fc" id="L279">                Complex c = src[i][j];</span>
+<span class="fc" id="L280">                answer[j][i] = new Complex(c.r, -1 * c.i);</span>
             }
         }
-<span class="fc" id="L279">        return answer;</span>
+<span class="fc" id="L283">        return answer;</span>
     }
 
     /**
@@ -287,19 +291,19 @@ public final class Complex {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[][] permutate0(Complex[][] matrix, PermutationGate pg) {
-<span class="nc" id="L290">        Complex[][] p = pg.getMatrix();</span>
-<span class="nc" id="L291">        int dim = p.length;</span>
-<span class="nc" id="L292">        Complex[][] answer = new Complex[dim][dim];</span>
-<span class="nc bnc" id="L293" title="All 2 branches missed.">        for (int i = 0; i &lt; dim; i++) {</span>
-<span class="nc" id="L294">            int idx = 0;</span>
-<span class="nc bnc" id="L295" title="All 2 branches missed.">            while (p[i][idx].equals(Complex.ZERO)) {</span>
-<span class="nc" id="L296">                idx++;</span>
+<span class="nc" id="L294">        Complex[][] p = pg.getMatrix();</span>
+<span class="nc" id="L295">        int dim = p.length;</span>
+<span class="nc" id="L296">        Complex[][] answer = new Complex[dim][dim];</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">        for (int i = 0; i &lt; dim; i++) {</span>
+<span class="nc" id="L298">            int idx = 0;</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">            while (p[i][idx].equals(Complex.ZERO)) {</span>
+<span class="nc" id="L300">                idx++;</span>
             }
-<span class="nc bnc" id="L298" title="All 2 branches missed.">            for (int j = 0; j &lt; dim; j++) {</span>
-<span class="nc" id="L299">                answer[i][j] = matrix[idx][j];</span>
+<span class="nc bnc" id="L302" title="All 2 branches missed.">            for (int j = 0; j &lt; dim; j++) {</span>
+<span class="nc" id="L303">                answer[i][j] = matrix[idx][j];</span>
             }
         }
-<span class="nc" id="L302">        return answer;</span>
+<span class="nc" id="L306">        return answer;</span>
     }
 
     /**
@@ -310,32 +314,32 @@ public final class Complex {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[][] permutate(PermutationGate pg, Complex[][] matrix) {
-<span class="fc" id="L313">        int a = pg.getIndex1();</span>
-<span class="fc" id="L314">        int b = pg.getIndex2();</span>
-<span class="fc" id="L315">        int amask = 1 &lt;&lt; a;</span>
-<span class="fc" id="L316">        int bmask = 1 &lt;&lt; b;</span>
-<span class="fc" id="L317">        int dim = matrix.length;</span>
+<span class="fc" id="L317">        int a = pg.getIndex1();</span>
+<span class="fc" id="L318">        int b = pg.getIndex2();</span>
+<span class="fc" id="L319">        int amask = 1 &lt;&lt; a;</span>
+<span class="fc" id="L320">        int bmask = 1 &lt;&lt; b;</span>
+<span class="fc" id="L321">        int dim = matrix.length;</span>
         Complex cp;
-<span class="fc" id="L319">        List&lt;Integer&gt; swapped = new LinkedList&lt;&gt;();</span>
-<span class="fc bfc" id="L320" title="All 2 branches covered.">        for (int i = 0; i &lt; dim; i++) {</span>
-<span class="fc" id="L321">            int j = i;</span>
-<span class="fc" id="L322">            int x = (amask &amp; i) / amask;</span>
-<span class="fc" id="L323">            int y = (bmask &amp; i) / bmask;</span>
-<span class="fc bfc" id="L324" title="All 2 branches covered.">            if (x != y) {</span>
-<span class="fc" id="L325">                j ^= amask;</span>
-<span class="fc" id="L326">                j ^= bmask;</span>
-<span class="fc bfc" id="L327" title="All 2 branches covered.">                if (!swapped.contains(j)) {</span>
-<span class="fc" id="L328">                    swapped.add(j);</span>
-<span class="fc" id="L329">                    swapped.add(i);</span>
-<span class="fc bfc" id="L330" title="All 2 branches covered.">                    for (int k = 0; k &lt; dim; k++) {</span>
-<span class="fc" id="L331">                        cp = matrix[k][i];</span>
-<span class="fc" id="L332">                        matrix[k][i] = matrix[k][j];</span>
-<span class="fc" id="L333">                        matrix[k][j] = cp;</span>
+<span class="fc" id="L323">        List&lt;Integer&gt; swapped = new LinkedList&lt;&gt;();</span>
+<span class="fc bfc" id="L324" title="All 2 branches covered.">        for (int i = 0; i &lt; dim; i++) {</span>
+<span class="fc" id="L325">            int j = i;</span>
+<span class="fc" id="L326">            int x = (amask &amp; i) / amask;</span>
+<span class="fc" id="L327">            int y = (bmask &amp; i) / bmask;</span>
+<span class="fc bfc" id="L328" title="All 2 branches covered.">            if (x != y) {</span>
+<span class="fc" id="L329">                j ^= amask;</span>
+<span class="fc" id="L330">                j ^= bmask;</span>
+<span class="fc bfc" id="L331" title="All 2 branches covered.">                if (!swapped.contains(j)) {</span>
+<span class="fc" id="L332">                    swapped.add(j);</span>
+<span class="fc" id="L333">                    swapped.add(i);</span>
+<span class="fc bfc" id="L334" title="All 2 branches covered.">                    for (int k = 0; k &lt; dim; k++) {</span>
+<span class="fc" id="L335">                        cp = matrix[k][i];</span>
+<span class="fc" id="L336">                        matrix[k][i] = matrix[k][j];</span>
+<span class="fc" id="L337">                        matrix[k][j] = cp;</span>
                     }
                 }
             }
         }
-<span class="fc" id="L338">        return matrix;</span>
+<span class="fc" id="L342">        return matrix;</span>
         
     }
 
@@ -347,37 +351,37 @@ public final class Complex {
      * @return an array of {@link org.redfx.strange.Complex} objects
      */
     public static Complex[][] permutate(Complex[][] matrix, PermutationGate pg) {
-<span class="nc" id="L350">        int a = pg.getIndex1();</span>
-<span class="nc" id="L351">        int b = pg.getIndex2();</span>
-<span class="nc" id="L352">        int amask = 1 &lt;&lt; a;</span>
-<span class="nc" id="L353">        int bmask = 1 &lt;&lt; b;</span>
-<span class="nc" id="L354">        int dim = matrix.length;</span>
+<span class="nc" id="L354">        int a = pg.getIndex1();</span>
+<span class="nc" id="L355">        int b = pg.getIndex2();</span>
+<span class="nc" id="L356">        int amask = 1 &lt;&lt; a;</span>
+<span class="nc" id="L357">        int bmask = 1 &lt;&lt; b;</span>
+<span class="nc" id="L358">        int dim = matrix.length;</span>
    //            System.err.println(&quot;permutate &quot;+a+&quot; and &quot;+b+&quot; on matrix sized &quot;+dim);
 
-<span class="nc" id="L357">        List&lt;Integer&gt; swapped = new LinkedList&lt;&gt;();</span>
-<span class="nc bnc" id="L358" title="All 2 branches missed.">        for (int i = 0; i &lt; dim; i++) {</span>
-<span class="nc" id="L359">            int j = i;</span>
-<span class="nc" id="L360">            int x = (amask &amp; i) / amask;</span>
-<span class="nc" id="L361">            int y = (bmask &amp; i) / bmask;</span>
+<span class="nc" id="L361">        List&lt;Integer&gt; swapped = new LinkedList&lt;&gt;();</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">        for (int i = 0; i &lt; dim; i++) {</span>
+<span class="nc" id="L363">            int j = i;</span>
+<span class="nc" id="L364">            int x = (amask &amp; i) / amask;</span>
+<span class="nc" id="L365">            int y = (bmask &amp; i) / bmask;</span>
        //     System.err.println(&quot;x = &quot; + x + &quot;, y = &quot; + y);
-<span class="nc bnc" id="L363" title="All 2 branches missed.">            if (x != y) {</span>
-<span class="nc" id="L364">                j ^= amask;</span>
-<span class="nc" id="L365">                j ^= bmask;</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">            if (x != y) {</span>
+<span class="nc" id="L368">                j ^= amask;</span>
+<span class="nc" id="L369">                j ^= bmask;</span>
 
              //   System.err.println(&quot;need to swap rows &quot; + i + &quot; and &quot; + j);
-<span class="nc bnc" id="L368" title="All 2 branches missed.">                if (swapped.contains(j)) {</span>
+<span class="nc bnc" id="L372" title="All 2 branches missed.">                if (swapped.contains(j)) {</span>
              //       System.err.println(&quot;Already swapped those &quot;);
                 } else {
-<span class="nc" id="L371">                    swapped.add(j);</span>
-<span class="nc" id="L372">                    swapped.add(i);</span>
-<span class="nc" id="L373">                    Complex[] rowa = matrix[i];</span>
-<span class="nc" id="L374">                    matrix[i] = matrix[j];</span>
-<span class="nc" id="L375">                    matrix[j] = rowa;</span>
+<span class="nc" id="L375">                    swapped.add(j);</span>
+<span class="nc" id="L376">                    swapped.add(i);</span>
+<span class="nc" id="L377">                    Complex[] rowa = matrix[i];</span>
+<span class="nc" id="L378">                    matrix[i] = matrix[j];</span>
+<span class="nc" id="L379">                    matrix[j] = rowa;</span>
                 }
             }
         }
 
-<span class="nc" id="L380">        return matrix;</span>
+<span class="nc" id="L384">        return matrix;</span>
     }
 
     /**
@@ -389,7 +393,7 @@ public final class Complex {
         if (DEBUG) {
             printArray(ca, System.err);
         }
-<span class="fc" id="L392">    }</span>
+<span class="fc" id="L396">    }</span>
 
     /**
      * &lt;p&gt;printArray.&lt;/p&gt;
@@ -398,11 +402,11 @@ public final class Complex {
      * @param ps a {@link java.io.PrintStream} object
      */
     public static void printArray(Complex[] ca, PrintStream ps) {
-<span class="nc" id="L401">        ps.println(&quot;complex[&quot; + ca.length + &quot;]: &quot;);</span>
-<span class="nc bnc" id="L402" title="All 2 branches missed.">        for (Complex c : ca) {</span>
-<span class="nc" id="L403">            ps.println(&quot;-&gt; &quot; + c);</span>
+<span class="nc" id="L405">        ps.println(&quot;complex[&quot; + ca.length + &quot;]: &quot;);</span>
+<span class="nc bnc" id="L406" title="All 2 branches missed.">        for (Complex c : ca) {</span>
+<span class="nc" id="L407">            ps.println(&quot;-&gt; &quot; + c);</span>
         }
-<span class="nc" id="L405">    }</span>
+<span class="nc" id="L409">    }</span>
 
     /**
      * &lt;p&gt;printMatrix.&lt;/p&gt;
@@ -410,8 +414,8 @@ public final class Complex {
      * @param cm an array of {@link org.redfx.strange.Complex} objects
      */
     public static void printMatrix(Complex[][] cm) {
-<span class="nc" id="L413">        printMatrix(cm, System.err);</span>
-<span class="nc" id="L414">    }</span>
+<span class="nc" id="L417">        printMatrix(cm, System.err);</span>
+<span class="nc" id="L418">    }</span>
     
     /**
      * &lt;p&gt;dbg.&lt;/p&gt;
@@ -422,7 +426,7 @@ public final class Complex {
         if (DEBUG) {
         System.err.println(&quot;[DBG] &quot; + System.currentTimeMillis()%1000000+&quot;: &quot;+s);
         }
-<span class="nc" id="L425">    }</span>
+<span class="nc" id="L429">    }</span>
 
 
     /**
@@ -433,7 +437,7 @@ public final class Complex {
      */
     public static void printMatrix(Complex[][] cm, PrintStream ps) {
         if (!DEBUG) {
-<span class="nc" id="L436">            return;</span>
+<span class="nc" id="L440">            return;</span>
         }
        // Thread.dumpStack();
         ps.println(&quot;complex[&quot; + cm.length + &quot;]: &quot;);
@@ -451,13 +455,13 @@ public final class Complex {
     /** {@inheritDoc} */
     @Override
     public String toString() {
-<span class="fc" id="L454">        float mr = this.r;</span>
-<span class="fc" id="L455">        float mi = this.i;</span>
-<span class="pc bpc" id="L456" title="1 of 2 branches missed.">        if (Math.abs(mr) &lt; 1e-7) mr = 0;</span>
-<span class="pc bpc" id="L457" title="1 of 2 branches missed.">        if (Math.abs(mi) &lt; 1e-7) mi = 0;</span>
-<span class="pc bpc" id="L458" title="1 of 2 branches missed.">        if (Math.abs(mr) &gt; .999999) mr = 1;</span>
-<span class="pc bpc" id="L459" title="1 of 2 branches missed.">        if (Math.abs(mi) &gt; .999999) mi = 1;</span>
-<span class="fc" id="L460">        return &quot;(&quot; + mr + &quot;, &quot; + mi + &quot;)&quot;;</span>
+<span class="fc" id="L458">        float mr = this.r;</span>
+<span class="fc" id="L459">        float mi = this.i;</span>
+<span class="pc bpc" id="L460" title="1 of 2 branches missed.">        if (Math.abs(mr) &lt; 1e-7) mr = 0;</span>
+<span class="pc bpc" id="L461" title="1 of 2 branches missed.">        if (Math.abs(mi) &lt; 1e-7) mi = 0;</span>
+<span class="pc bpc" id="L462" title="1 of 2 branches missed.">        if (Math.abs(mr) &gt; .999999) mr = 1;</span>
+<span class="pc bpc" id="L463" title="1 of 2 branches missed.">        if (Math.abs(mi) &gt; .999999) mi = 1;</span>
+<span class="fc" id="L464">        return &quot;(&quot; + mr + &quot;, &quot; + mi + &quot;)&quot;;</span>
     }
 
 }
