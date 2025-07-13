@@ -98,7 +98,7 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
         Result result = new Result(nQubits, steps.size());
         int cnt = 0;
         result.setIntermediateProbability(0, probs);
-        LOG.fine("START RUN, number of steps = " + simpleSteps.size());
+        LOG.info("START RUN, number of steps = " + simpleSteps.size());
         for (Step step : simpleSteps) {
             if (!step.getGates().isEmpty()) {
                 LOG.finer("RUN STEP " + step + ", cnt = " + cnt);

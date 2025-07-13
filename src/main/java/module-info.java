@@ -1,5 +1,6 @@
 module org.redfx.strange {
     requires java.logging;
+    requires jmh.core;
 
     exports org.redfx.strange;
     exports org.redfx.strange.algorithm;
