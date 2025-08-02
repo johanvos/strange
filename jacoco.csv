@@ -7,7 +7,7 @@ Strange,org.redfx.strange,Result,75,292,8,32,16,65,10,24,5,9
 Strange,org.redfx.strange,Program,40,175,1,15,10,42,4,19,3,12
 Strange,org.redfx.strange,ControlledBlockGate,62,360,3,25,13,74,9,23,6,12
 Strange,org.redfx.strange,Block,43,262,9,31,8,59,12,21,4,9
-Strange,org.redfx.strange,Complex,245,550,19,41,47,96,20,35,8,17
+Strange,org.redfx.strange,Complex,260,576,19,41,54,105,21,35,9,17
 Strange,org.redfx.strange,Qubit,60,33,0,2,8,12,4,5,4,4
 Strange,org.redfx.strange,Qubits,69,107,4,4,11,17,7,10,4,9
 Strange,org.redfx.strange,Step,37,158,1,11,10,42,6,20,5,15
