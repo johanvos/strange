@@ -5,8 +5,10 @@ Strange,org.redfx.strange.algorithm,Classic,303,620,25,53,58,107,18,33,5,7
 Strange,org.redfx.strange,BlockGate,47,79,2,2,11,23,9,14,8,13
 Strange,org.redfx.strange,Result,75,292,8,32,16,65,10,24,5,9
 Strange,org.redfx.strange,Program,40,175,1,15,10,42,4,19,3,12
+Strange,org.redfx.strange,ControlledGate.new ControlledGate() {...},98,0,0,0,19,0,18,0,18,0
 Strange,org.redfx.strange,ControlledBlockGate,62,360,3,25,13,74,9,23,6,12
 Strange,org.redfx.strange,Block,43,262,9,31,8,59,12,21,4,9
+Strange,org.redfx.strange,ControlledGate,15,5,0,0,4,1,4,1,4,1
 Strange,org.redfx.strange,Complex,260,576,19,41,54,105,21,35,9,17
 Strange,org.redfx.strange,Qubit,60,33,0,2,8,12,4,5,4,4
 Strange,org.redfx.strange,Qubits,69,107,4,4,11,17,7,10,4,9
@@ -21,8 +23,8 @@ Strange,org.redfx.strange.gate,AddModulus,6,274,2,2,1,35,3,3,1,3
 Strange,org.redfx.strange.gate,Measurement,37,39,0,0,3,5,3,3,3,3
 Strange,org.redfx.strange.gate,Rotation.Axes,0,21,0,0,0,4,0,1,0,1
 Strange,org.redfx.strange.gate,Cr,97,257,2,6,2,23,3,7,1,5
-Strange,org.redfx.strange.gate,PermutationGate,43,52,2,4,10,15,12,7,10,6
 Strange,org.redfx.strange.gate,ProbabilitiesGate,10,8,0,0,5,4,5,2,5,2
+Strange,org.redfx.strange.gate,PermutationGate,43,52,2,4,10,15,12,7,10,6
 Strange,org.redfx.strange.gate,MulModulus,0,183,0,6,0,28,0,5,0,2
 Strange,org.redfx.strange.gate,Identity,0,72,0,0,0,6,0,4,0,4
 Strange,org.redfx.strange.gate,R,10,73,1,1,3,10,2,4,1,4
@@ -31,9 +33,9 @@ Strange,org.redfx.strange.gate,X,0,39,0,0,0,5,0,3,0,3
 Strange,org.redfx.strange.gate,Y,0,41,0,0,0,5,0,3,0,3
 Strange,org.redfx.strange.gate,Cz,93,100,0,0,2,6,1,3,1,3
 Strange,org.redfx.strange.gate,Mul,0,138,0,6,0,21,0,5,0,2
-Strange,org.redfx.strange.gate,Toffoli,0,314,0,0,0,7,0,5,0,5
 Strange,org.redfx.strange.gate,Rotation,16,190,1,3,4,13,3,4,2,2
-Strange,org.redfx.strange.gate,Cnot,91,98,0,0,2,5,1,3,1,3
+Strange,org.redfx.strange.gate,Toffoli,0,314,0,0,0,7,0,5,0,5
+Strange,org.redfx.strange.gate,Cnot,6,118,0,0,2,11,2,6,2,6
 Strange,org.redfx.strange.gate,Z,0,41,0,0,0,5,0,3,0,3
 Strange,org.redfx.strange.gate,Swap,94,95,0,0,3,4,2,2,2,2
 Strange,org.redfx.strange.gate,Add,2,153,2,6,1,21,3,5,1,3
@@ -44,9 +46,9 @@ Strange,org.redfx.strange.gate,SingleQubitMatrixGate,0,23,0,0,0,8,0,4,0,4
 Strange,org.redfx.strange.gate,Fourier,10,146,2,8,4,25,2,12,1,8
 Strange,org.redfx.strange.gate,Hadamard,0,39,0,0,0,5,0,3,0,3
 Strange,org.redfx.strange.gate,InformalGate,16,23,0,0,8,6,7,2,7,2
-Strange,org.redfx.strange.gate,Oracle,45,109,2,8,13,26,9,12,8,8
 Strange,org.redfx.strange.gate,ThreeQubitGate,42,59,8,0,12,11,11,7,7,7
+Strange,org.redfx.strange.gate,Oracle,45,109,2,8,13,26,9,12,8,8
 Strange,org.redfx.strange.gate,AddIntegerModulus,0,225,0,2,0,29,0,3,0,2
 Strange,org.redfx.strange.gate,AddInteger,22,162,4,10,3,29,5,6,1,3
-Strange,org.redfx.strange.local,Computations,356,1816,31,197,75,382,31,118,7,28
+Strange,org.redfx.strange.local,Computations,410,1842,35,215,84,392,35,127,7,30
 Strange,org.redfx.strange.local,SimpleQuantumExecutionEnvironment,133,370,15,33,28,81,14,22,6,6

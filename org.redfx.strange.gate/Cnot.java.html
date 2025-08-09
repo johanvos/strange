@@ -33,6 +33,8 @@
 package org.redfx.strange.gate;
 
 import org.redfx.strange.Complex;
+import org.redfx.strange.ControlledGate;
+import org.redfx.strange.Gate;
 
 /**
  * &lt;p&gt;Cnot class.&lt;/p&gt;
@@ -40,40 +42,62 @@ import org.redfx.strange.Complex;
  * @author johan
  * @version $Id: $Id
  */
-public class Cnot extends TwoQubitGate {
+public class Cnot extends TwoQubitGate implements ControlledGate {
     
-<span class="pc" id="L45">    Complex[][] matrix =  new Complex[][]{</span>
+    private final Gate rootGate;
+    private final int rootGateIndex;
+    private final int controlIndex;
+
+<span class="fc" id="L51">    Complex[][] matrix =  new Complex[][]{</span>
         {Complex.ONE,Complex.ZERO,Complex.ZERO,Complex.ZERO},
         {Complex.ZERO,Complex.ONE,Complex.ZERO,Complex.ZERO},
         {Complex.ZERO,Complex.ZERO,Complex.ZERO,Complex.ONE},
         {Complex.ZERO,Complex.ZERO,Complex.ONE,Complex.ZERO}
     };
-    
-    /**
-     * &lt;p&gt;Constructor for Cnot.&lt;/p&gt;
-     */
-<span class="nc" id="L55">    public Cnot() {    </span>
-<span class="nc" id="L56">    }</span>
-    
+
     /**
      * &lt;p&gt;Constructor for Cnot.&lt;/p&gt;
      *
-     * @param a a int
-     * @param b a int
+     * @param controlQubitIndex the index of the control qubit
+     * @param mainQubitIndex the index of the qubit we want to hit with a NOT gate
      */
-    public Cnot (int a, int b) {
-<span class="fc" id="L65">        super(a,b);</span>
-<span class="fc" id="L66">    }</span>
+    public Cnot (int controlQubitIndex, int mainQubitIndex) {
+<span class="fc" id="L65">        super(controlQubitIndex, mainQubitIndex);</span>
+<span class="fc" id="L66">        this.rootGateIndex = mainQubitIndex;</span>
+<span class="fc" id="L67">        this.controlIndex = controlQubitIndex;</span>
+<span class="fc" id="L68">        this.rootGate = new X(mainQubitIndex);</span>
+<span class="fc" id="L69">    }</span>
 
+<span class="fc" id="L71">    @Override public int getSize() {return 1;}</span>
     /** {@inheritDoc} */
     @Override
     public Complex[][] getMatrix() {
-<span class="fc" id="L71">        return matrix;</span>
+<span class="nc" id="L75">        return matrix;</span>
     }
 
     /** {@inheritDoc} */
     @Override public String getCaption() {
-<span class="fc" id="L76">        return &quot;Cnot&quot;;</span>
+<span class="fc" id="L80">        return &quot;Cnot&quot;;</span>
+    }
+
+    @Override
+    public int getControlQubitIndex() {
+<span class="fc" id="L85">        return controlIndex;</span>
+    }
+
+    @Override
+    public int getRootGateIndex() {
+<span class="nc" id="L90">        return rootGateIndex;</span>
+    }
+
+    @Override
+    public int getMainQubitIndex() {
+<span class="fc" id="L95">        return this.rootGateIndex;</span>
+    }
+
+    @Override
+    public Gate getRootGate() {
+<span class="fc" id="L100">        return rootGate;</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

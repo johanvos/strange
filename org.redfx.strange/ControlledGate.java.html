@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControlledGate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Strange</a> &gt; <a href="index.source.html" class="el_package">org.redfx.strange</a> &gt; <span class="el_source">ControlledGate.java</span></div><h1>ControlledGate.java</h1><pre class="source lang-java linenums">package org.redfx.strange;
+
+import java.util.List;
+
+/**
+ *
+ * @author johan
+ */
+public interface ControlledGate extends Gate {
+
+    public int getControlQubitIndex();
+
+    default public List&lt;Integer&gt; getControlIndexes() {
+<span class="fc" id="L14">        return List.of(getControlQubitIndex());</span>
+    }
+
+    public int getRootGateIndex();
+
+    public Gate getRootGate();
+
+<span class="nc" id="L21">    default public int getSecondControlQubitIndex() {return -1;};</span>
+
+<span class="nc" id="L23">    default void setRootGateIndex(int i) {}</span>
+
+    public static ControlledGate createControlledGate(Gate g, int idx) {
+<span class="nc" id="L26">        return createControlledGate(g, List.of(idx));</span>
+    }
+
+    public static ControlledGate createControlledGate(Gate g, List&lt;Integer&gt; idx) {
+<span class="nc" id="L30">        return new ControlledGate() {</span>
+
+            @Override
+            public int getControlQubitIndex() {
+<span class="nc" id="L34">                return idx.get(0);</span>
+            }
+
+            @Override
+            public List&lt;Integer&gt; getControlIndexes() {
+<span class="nc" id="L39">                return idx;</span>
+            }
+            public void setRootGateIndex(int i) {
+<span class="nc" id="L42">                g.setMainQubitIndex(i);</span>
+<span class="nc" id="L43">            }</span>
+            @Override
+            public int getRootGateIndex() {
+<span class="nc" id="L46">                return g.getMainQubitIndex();</span>
+            }
+
+            @Override
+            public Gate getRootGate() {
+<span class="nc" id="L51">                return g;</span>
+            }
+
+            @Override
+            public void setMainQubitIndex(int idx) {
+<span class="nc" id="L56">                throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</span>
+            }
+
+            @Override
+            public int getMainQubitIndex() {
+<span class="nc" id="L61">                return g.getMainQubitIndex();</span>
+            }
+
+            @Override
+            public void setAdditionalQubit(int idx, int cnt) {
+<span class="nc" id="L66">                throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</span>
+            }
+
+            @Override
+            public List&lt;Integer&gt; getAffectedQubitIndexes() {
+<span class="nc" id="L71">                throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</span>
+            }
+
+            @Override
+            public int getHighestAffectedQubitIndex() {
+<span class="nc" id="L76">                return Integer.max(g.getHighestAffectedQubitIndex(), idx.get(0));</span>
+            }
+
+            @Override
+            public String getCaption() {
+<span class="nc" id="L81">                throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</span>
+            }
+
+            @Override
+            public String getName() {
+<span class="nc" id="L86">                throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</span>
+            }
+
+            @Override
+            public String getGroup() {
+<span class="nc" id="L91">                throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</span>
+            }
+
+            @Override
+            public Complex[][] getMatrix() {
+<span class="nc" id="L96">                throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</span>
+            }
+
+            @Override
+            public int getSize() {
+<span class="nc" id="L101">                return (g.getSize());</span>
+            }
+
+            @Override
+            public void setInverse(boolean inv) {
+<span class="nc" id="L106">                throw new UnsupportedOperationException(&quot;Not supported yet.&quot;);</span>
+            }
+
+            @Override
+            public String toString() {
+<span class="nc" id="L111">                return &quot;ControlledGate with ctrl at &quot;+idx+&quot; and gate = &quot;+g;</span>
+            }
+        };
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
