@@ -33,6 +33,8 @@
 package org.redfx.strange.gate;
 
 import org.redfx.strange.Complex;
+import org.redfx.strange.ControlledGate;
+import org.redfx.strange.Gate;
 
 /**
  * &lt;p&gt;Cr class.&lt;/p&gt;
@@ -40,47 +42,47 @@ import org.redfx.strange.Complex;
  * @author johan
  * @version $Id: $Id
  */
-public class Cr extends TwoQubitGate {
-    
-<span class="pc" id="L45">    private Complex[][] matrix =  new Complex[][]{</span>
+public class Cr extends TwoQubitGate implements ControlledGate {
+    private Gate rootGate;
+    private final int rootGateIndex;
+    private final int controlIndex;
+
+<span class="fc" id="L50">    private Complex[][] matrix =  new Complex[][]{</span>
         {Complex.ONE,Complex.ZERO,Complex.ZERO,Complex.ZERO},
         {Complex.ZERO,Complex.ONE,Complex.ZERO,Complex.ZERO},
         {Complex.ZERO,Complex.ZERO,Complex.ONE,Complex.ZERO},
-<span class="pc" id="L49">        {Complex.ZERO,Complex.ZERO,Complex.ZERO,Complex.ONE.mul(-1)}</span>
+<span class="fc" id="L54">        {Complex.ZERO,Complex.ZERO,Complex.ZERO,Complex.ONE.mul(-1)}</span>
     };
-<span class="pc" id="L51">    private int pow = -1;</span>
-    
-    /**
-     * &lt;p&gt;Constructor for Cr.&lt;/p&gt;
-     */
-<span class="nc" id="L56">    public Cr() {    </span>
-<span class="nc" id="L57">    }</span>
+<span class="fc" id="L56">    private int pow = -1;</span>
     
     /**
      * Control-R gate
      *
-     * @param a target qubit
-     * @param b control qubit
+     * @param controlQubitIndex target qubit
+     * @param mainQubitIndex control qubit
      * @param exp exp
      */
-    public Cr (int a, int b, double exp) {
-<span class="fc" id="L67">        super(a,b);</span>
-<span class="fc" id="L68">        double ar = Math.cos(exp);</span>
-<span class="fc" id="L69">        double ai = Math.sin(exp);</span>
-<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (Math.abs(Math.PI -exp)  &lt; 1e-6) {</span>
-<span class="fc" id="L71">            ar = -1;</span>
-<span class="fc" id="L72">            ai = 0;</span>
-<span class="fc bfc" id="L73" title="All 2 branches covered.">        } else if (Math.abs(Math.PI/2 -exp)  &lt; 1e-6) {</span>
-<span class="fc" id="L74">            ar = 0;</span>
-<span class="fc" id="L75">            ai = 1;</span>
+    public Cr (int controlQubitIndex, int mainQubitIndex, double exp) {
+<span class="fc" id="L66">        super(controlQubitIndex,mainQubitIndex);</span>
+<span class="fc" id="L67">        this.rootGateIndex = mainQubitIndex;</span>
+<span class="fc" id="L68">        this.controlIndex = controlQubitIndex;</span>
+<span class="fc" id="L69">        this.rootGate = new R(exp, mainQubitIndex);</span>
+<span class="fc" id="L70">        double ar = Math.cos(exp);</span>
+<span class="fc" id="L71">        double ai = Math.sin(exp);</span>
+<span class="fc bfc" id="L72" title="All 2 branches covered.">        if (Math.abs(Math.PI -exp)  &lt; 1e-6) {</span>
+<span class="fc" id="L73">            ar = -1;</span>
+<span class="fc" id="L74">            ai = 0;</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        } else if (Math.abs(Math.PI/2 -exp)  &lt; 1e-6) {</span>
+<span class="fc" id="L76">            ar = 0;</span>
+<span class="fc" id="L77">            ai = 1;</span>
         }
-<span class="fc" id="L77">        matrix =  new Complex[][]{</span>
+<span class="fc" id="L79">        matrix =  new Complex[][]{</span>
                 {Complex.ONE,Complex.ZERO,Complex.ZERO,Complex.ZERO},
         {Complex.ZERO,Complex.ONE,Complex.ZERO,Complex.ZERO},
         {Complex.ZERO,Complex.ZERO,Complex.ONE,Complex.ZERO},
         {Complex.ZERO,Complex.ZERO,Complex.ZERO,new Complex(ar, ai)}        
         };
-<span class="fc" id="L83">    }</span>
+<span class="fc" id="L85">    }</span>
     /**
      * &lt;p&gt;Constructor for Cr.&lt;/p&gt;
      *
@@ -90,28 +92,45 @@ public class Cr extends TwoQubitGate {
      * @param pow a int
      */
     public Cr(int a, int b, int base, int pow) {
-<span class="fc" id="L93">        this(a,b, Math.PI*2/Math.pow(base, pow));</span>
-<span class="fc" id="L94">        this.pow = pow;</span>
-<span class="fc" id="L95">    }</span>
-    
+<span class="fc" id="L95">        this(a,b, Math.PI*2/Math.pow(base, pow));</span>
+<span class="fc" id="L96">        this.pow = pow;</span>
+<span class="fc" id="L97">    }</span>
     /** {@inheritDoc} */
     @Override
     public Complex[][] getMatrix() {
-<span class="fc" id="L100">        return matrix;</span>
+<span class="fc" id="L101">        return matrix;</span>
     }
-    
+
     /** {@inheritDoc} */
     @Override 
     public void setInverse(boolean inv) {
-<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (inv) {</span>
-<span class="fc" id="L107">            Complex[][] m = getMatrix();</span>
-<span class="fc" id="L108">            this.matrix = Complex.conjugateTranspose(m);</span>
-        }
-<span class="fc" id="L110">    }</span>
+<span class="fc" id="L107">        this.rootGate.setInverse(inv);</span>
+<span class="fc" id="L108">    }</span>
 
     /** {@inheritDoc} */
     @Override public String getCaption() {
-<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        return &quot;Cr&quot; + ((pow&gt; -1)? Integer.toString(pow): &quot;th&quot;);</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">        return &quot;Cr&quot; + ((pow&gt; -1)? Integer.toString(pow): &quot;th&quot;);</span>
+    }
+
+<span class="fc" id="L115">    @Override public int getSize() {return 1;}</span>
+
+    @Override
+    public int getControlQubitIndex() {
+<span class="fc" id="L119">        return this.controlIndex;</span>
+    }
+
+    @Override
+    public int getRootGateIndex() {
+<span class="nc" id="L124">        return this.getRootGateIndex();</span>
+    }
+
+    @Override
+    public int getMainQubitIndex() {
+<span class="fc" id="L129">        return this.rootGateIndex;</span>
+    }
+    @Override
+    public Gate getRootGate() {
+<span class="fc" id="L133">        return this.rootGate;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

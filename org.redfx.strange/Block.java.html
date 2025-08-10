@@ -123,8 +123,8 @@ public class Block {
 
 <span class="fc bfc" id="L124" title="All 2 branches covered.">            for (Step step : simpleSteps) {</span>
 <span class="fc" id="L125">                List&lt;Gate&gt; gates = step.getGates();</span>
-<span class="pc bpc" id="L126" title="1 of 6 branches missed.">                if ((matrix != null) &amp;&amp; (gates.size() == 1) &amp;&amp; (gates.get(0) instanceof PermutationGate)) {</span>
-<span class="fc" id="L127">                    matrix = Complex.permutate((PermutationGate) gates.get(0), matrix);</span>
+<span class="pc bpc" id="L126" title="2 of 6 branches missed.">                if ((matrix != null) &amp;&amp; (gates.size() == 1) &amp;&amp; (gates.get(0) instanceof PermutationGate)) {</span>
+<span class="nc" id="L127">                    matrix = Complex.permutate((PermutationGate) gates.get(0), matrix);</span>
                 } else {
 <span class="fc" id="L129">                    Complex[][] m = Computations.calculateStepMatrix(step.getGates(), nqubits, qee);</span>
 <span class="pc bpc" id="L130" title="1 of 2 branches missed.">                    if (matrix == null) {</span>
