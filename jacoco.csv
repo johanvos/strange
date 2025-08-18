@@ -9,7 +9,7 @@ Strange,org.redfx.strange,ControlledGate.new ControlledGate() {...},98,0,0,0,19,
 Strange,org.redfx.strange,ControlledBlockGate,62,360,3,25,13,74,9,23,6,12
 Strange,org.redfx.strange,Block,53,252,10,30,9,58,13,20,4,9
 Strange,org.redfx.strange,ControlledGate,15,5,0,0,4,1,4,1,4,1
-Strange,org.redfx.strange,Complex,260,576,19,41,54,105,21,35,9,17
+Strange,org.redfx.strange,Complex,262,576,19,41,54,105,21,35,9,17
 Strange,org.redfx.strange,Qubit,60,33,0,2,8,12,4,5,4,4
 Strange,org.redfx.strange,Qubits,69,107,4,4,11,17,7,10,4,9
 Strange,org.redfx.strange,Step,37,158,1,11,10,42,6,20,5,15
