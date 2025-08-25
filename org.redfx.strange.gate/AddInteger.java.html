@@ -38,6 +38,10 @@ import org.redfx.strange.Complex;
 import org.redfx.strange.Step;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Logger;
+import org.redfx.strange.Gate;
+import org.redfx.strange.local.Computations;
 
 /**
  * &lt;p&gt;AddInteger class.&lt;/p&gt;
@@ -48,8 +52,9 @@ import java.util.HashMap;
 public class AddInteger extends BlockGate&lt;AddInteger&gt; {
 
     Block block;
-<span class="fc" id="L51">    static HashMap&lt;Integer, Block&gt; cache = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L55">    static HashMap&lt;Integer, Block&gt; cache = new HashMap&lt;&gt;();</span>
 
+<span class="fc" id="L57">    static Logger LOG = Logger.getLogger(AddInteger.class.getName());</span>
     
     /**
      * Add the qubit in the x register and the y register, result is in x
@@ -61,19 +66,19 @@ public class AddInteger extends BlockGate&lt;AddInteger&gt; {
      * x_1 ----- y+1 + x_1
      */
     public AddInteger(int x0, int x1, int num) {
-<span class="fc" id="L64">        super();</span>
-<span class="fc" id="L65">        setIndex(x0);</span>
-<span class="fc" id="L66">        x1 = x1 - x0;</span>
-<span class="fc" id="L67">        x0 = 0;</span>
-<span class="fc" id="L68">        int hash = 1000000 * x0 + 10000*x1+ num;</span>
-<span class="fc" id="L69">        this.block = cache.get(hash);</span>
-<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (this.block == null) {</span>
-<span class="fc" id="L71">            this.block = createBlock(x0, x1, num);</span>
+<span class="fc" id="L69">        super();</span>
+<span class="fc" id="L70">        setIndex(x0);</span>
+<span class="fc" id="L71">        x1 = x1 - x0;</span>
+<span class="fc" id="L72">        x0 = 0;</span>
+<span class="fc" id="L73">        int hash = 1000000 * x0 + 10000*x1+ num;</span>
+<span class="fc" id="L74">        this.block = cache.get(hash);</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        if (this.block == null) {</span>
+<span class="fc" id="L76">            this.block = createBlock(x0, x1, num);</span>
    //         cache.put(hash, block);
         }
-<span class="fc" id="L74">        setBlock(block);</span>
+<span class="fc" id="L79">        setBlock(block);</span>
        
-<span class="fc" id="L76">    }</span>
+<span class="fc" id="L81">    }</span>
     
     /**
      * &lt;p&gt;createBlock.&lt;/p&gt;
@@ -84,38 +89,72 @@ public class AddInteger extends BlockGate&lt;AddInteger&gt; {
      * @return a {@link org.redfx.strange.Block} object
      */
     public Block createBlock(int x0, int x1, int num) {
-<span class="fc" id="L87">        boolean old = false;</span>
-<span class="fc" id="L88">        int m = x1-x0+1;</span>
-<span class="fc" id="L89">        Block answer = new Block(&quot;AddInteger &quot;, m);</span>
-<span class="fc" id="L90">        answer.addStep(new Step(new Fourier(m, 0)));</span>
-<span class="fc" id="L91">        Step pstep = new Step();</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">        for (int i = 0; i &lt; m; i++) {</span>
-<span class="fc" id="L93">            Complex[][] mat = Complex.identityMatrix(2);</span>
-<span class="fc bfc" id="L94" title="All 2 branches covered.">            for (int j = 0; j &lt; m-i ; j++) {</span>
-<span class="fc" id="L95">                int cr0 = m-j-i-1;</span>
-<span class="fc bfc" id="L96" title="All 2 branches covered.">                if ((num &gt;&gt; cr0 &amp; 1) == 1) {</span>
-<span class="fc" id="L97">                    mat = Complex.mmul(mat, new R(2, 1 + j, i).getMatrix());</span>
-<span class="pc bpc" id="L98" title="1 of 2 branches missed.">                    if (old) {</span>
-<span class="nc" id="L99">                        Step s = new Step(new R(2, 1 + j, i));</span>
-<span class="nc" id="L100">                        answer.addStep(s);</span>
+<span class="fc" id="L92">        boolean old = false;</span>
+<span class="fc" id="L93">        int m = x1-x0+1;</span>
+<span class="fc" id="L94">        Block answer = new Block(&quot;AddInteger &quot;, m);</span>
+<span class="fc" id="L95">        answer.addStep(new Step(new Fourier(m, 0)));</span>
+<span class="fc" id="L96">        Step pstep = new Step();</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        for (int i = 0; i &lt; m; i++) {</span>
+<span class="fc" id="L98">            Complex[][] mat = Complex.identityMatrix(2);</span>
+<span class="fc bfc" id="L99" title="All 2 branches covered.">            for (int j = 0; j &lt; m-i ; j++) {</span>
+<span class="fc" id="L100">                int cr0 = m-j-i-1;</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">                if ((num &gt;&gt; cr0 &amp; 1) == 1) {</span>
+<span class="fc" id="L102">                    Gate gate = new R(2, 1 + j, i);</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">                    if (inverse) gate.setInverse(true);</span>
+<span class="fc" id="L104">                    mat = Complex.mmul(mat,gate.getMatrix());</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">                    if (old) {</span>
+<span class="nc" id="L106">                        Step s = new Step(new R(2, 1 + j, i));</span>
+<span class="nc" id="L107">                        answer.addStep(s);</span>
                     }
                 }
             }
-<span class="pc bpc" id="L104" title="1 of 2 branches missed.">            if (!old) {</span>
-<span class="fc" id="L105">                pstep.addGate(new SingleQubitMatrixGate(i, mat));</span>
+<span class="pc bpc" id="L111" title="1 of 2 branches missed.">            if (!old) {</span>
+<span class="fc" id="L112">                pstep.addGate(new SingleQubitMatrixGate(i, mat));</span>
             }
         }
-<span class="pc bpc" id="L108" title="1 of 2 branches missed.">        if (!old) {</span>
-<span class="fc" id="L109">            answer.addStep(pstep);</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if (!old) {</span>
+<span class="fc" id="L116">            answer.addStep(pstep);</span>
         }
-<span class="fc" id="L111">        answer.addStep(new Step(new InvFourier(m, 0)));</span>
-<span class="fc" id="L112">        return answer;</span>
+<span class="fc" id="L118">        answer.addStep(new Step(new Fourier(m, 0).inverse()));</span>
+<span class="fc" id="L119">        return answer;</span>
+    }
+
+    @Override
+    public void setInverse(boolean inv) {
+<span class="fc" id="L124">        super.setInverse(inv);</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">        if (this.block != null) {</span>
+<span class="fc" id="L126">            List&lt;Step&gt; steps = this.block.getSteps();</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">            for (int i = 1; i &lt; steps.size() - 1; i++) {</span>
+<span class="fc" id="L128">                steps.get(i).setInverse(inv);</span>
+            }
+<span class="fc" id="L130">        } else {</span>
+<span class="nc" id="L131">            LOG.finest(&quot;Inverse required for &quot; + this + &quot;, but we don't have a block yet. createBlock will take care of this.&quot;);</span>
+        }
+<span class="fc" id="L133">    }</span>
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasOptimization() {
+<span class="fc" id="L137">        return true;</span>
+    }
+    @Override
+    public Complex[] applyOptimize(Complex[] v) {
+<span class="fc" id="L141">        List&lt;Step&gt; steps = block.getSteps();</span>
+<span class="fc" id="L142">        Step s0 = steps.get(0);</span>
+<span class="fc" id="L143">        Step sn = steps.getLast();</span>
+<span class="fc" id="L144">        Complex[] answer = Computations.calculateNewState(s0.getGates(), v, block.getNQubits());</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        for (int i = 1; i &lt; steps.size() - 1; i++) {</span>
+<span class="fc" id="L146">            answer = Computations.calculateNewState(steps.get(i).getGates(), answer, block.getNQubits());</span>
+        }
+
+<span class="fc" id="L149">        answer = Computations.calculateNewState(sn.getGates(), answer, block.getNQubits());</span>
+
+<span class="fc" id="L151">        return answer;</span>
     }
 
     /** {@inheritDoc} */
     @Override
     public String getCaption() {
-<span class="nc" id="L118">        return &quot;A\nD\nD\nI&quot;;</span>
+<span class="nc" id="L157">        return &quot;A\nD\nD\nI&quot;;</span>
     }
 
 }

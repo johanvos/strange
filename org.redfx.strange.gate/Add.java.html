@@ -37,6 +37,10 @@ import org.redfx.strange.BlockGate;
 import org.redfx.strange.Step;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Logger;
+import org.redfx.strange.Complex;
+import org.redfx.strange.local.Computations;
 
 /**
  * &lt;p&gt;Add class.&lt;/p&gt;
@@ -47,8 +51,9 @@ import java.util.HashMap;
 public class Add extends BlockGate&lt;Add&gt; {
 
     Block block;
-<span class="fc" id="L50">    static HashMap&lt;Integer, Block&gt; cache = new HashMap&lt;&gt;();</span>
-    
+<span class="fc" id="L54">    static HashMap&lt;Integer, Block&gt; cache = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L55">    static Logger LOG = Logger.getLogger(Add.class.getName());</span>
+
     /**
      * Add the qubit in the x register and the y register, result is in x
      *
@@ -62,17 +67,17 @@ public class Add extends BlockGate&lt;Add&gt; {
      * y_1 ----- y_1
      */
     public Add(int x0, int x1, int y0, int y1) {
-<span class="fc" id="L65">        super();</span>
-<span class="fc" id="L66">        this.setIndex(x0);</span>
-<span class="fc" id="L67">        int hash = 1000000 * x0 + 10000*x1+ 100*y0 + y1;</span>
-<span class="fc" id="L68">        this.block = cache.get(hash);</span>
-<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (this.block == null) {</span>
-<span class="fc" id="L70">            this.block = createBlock(x0, x1, y0, y1);</span>
+<span class="fc" id="L70">        super();</span>
+<span class="fc" id="L71">        this.setIndex(x0);</span>
+<span class="fc" id="L72">        int hash = 1000000 * x0 + 10000*x1+ 100*y0 + y1;</span>
+<span class="fc" id="L73">        this.block = cache.get(hash);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (this.block == null) {</span>
+<span class="fc" id="L75">            this.block = createBlock(x0, x1, y0, y1);</span>
         //    cache.put(hash, block);
         } 
-<span class="fc" id="L73">        setBlock(block);</span>
+<span class="fc" id="L78">        setBlock(block);</span>
        
-<span class="fc" id="L75">    }</span>
+<span class="fc" id="L80">    }</span>
     
     /**
      * &lt;p&gt;createBlock.&lt;/p&gt;
@@ -84,27 +89,57 @@ public class Add extends BlockGate&lt;Add&gt; {
      * @return a {@link org.redfx.strange.Block} object
      */
     public Block createBlock(int x0, int x1, int y0, int y1) {
-<span class="fc" id="L87">        Block answer = new Block(&quot;Add&quot;, y1-x0+1);</span>
-<span class="fc" id="L88">        int m = x1-x0+1;</span>
-<span class="fc" id="L89">        int n = y1 - y0 + 1;</span>
-<span class="fc" id="L90">        answer.addStep(new Step(new Fourier(m, 0)));</span>
-<span class="fc bfc" id="L91" title="All 2 branches covered.">        for (int i = 0; i &lt; m; i++) {</span>
-<span class="fc bfc" id="L92" title="All 2 branches covered.">            for (int j = 0; j &lt; m-i ; j++) {</span>
-<span class="fc" id="L93">                int cr0 = 2 *m-j-i-1;</span>
-<span class="pc bpc" id="L94" title="1 of 2 branches missed.">                if (cr0 &lt; m + n) {</span>
-<span class="fc" id="L95">                    Step s = new Step(new Cr(i, cr0,2,1+j));</span>
-<span class="fc" id="L96">                    answer.addStep(s);</span>
+<span class="fc" id="L92">        Block answer = new Block(&quot;Add&quot;, y1-x0+1);</span>
+<span class="fc" id="L93">        int m = x1-x0+1;</span>
+<span class="fc" id="L94">        int n = y1 - y0 + 1;</span>
+<span class="fc" id="L95">        answer.addStep(new Step(new Fourier(m, 0)));</span>
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        for (int i = 0; i &lt; m; i++) {</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            for (int j = 0; j &lt; m-i ; j++) {</span>
+<span class="fc" id="L98">                int cr0 = 2 *m-j-i-1;</span>
+<span class="pc bpc" id="L99" title="1 of 2 branches missed.">                if (cr0 &lt; m + n) {</span>
+<span class="fc" id="L100">                    Step s = new Step(new Cr(i, cr0,2,1+j));</span>
+<span class="fc" id="L101">                    answer.addStep(s);</span>
                 }
             }
         }
-<span class="fc" id="L100">        answer.addStep(new Step(new InvFourier(m, 0)));</span>
-<span class="fc" id="L101">        return answer;</span>
+<span class="fc" id="L105">        answer.addStep(new Step(new Fourier(m, 0).inverse()));</span>
+<span class="fc" id="L106">        return answer;</span>
+    }
+    /** {@inheritDoc} */
+    @Override
+    public boolean hasOptimization() {
+<span class="fc" id="L111">        return true;</span>
+    }
+    @Override
+    public void setInverse(boolean inv) {
+<span class="fc" id="L115">        super.setInverse(inv);</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">        if (this.block != null) {</span>
+<span class="fc" id="L117">            List&lt;Step&gt; steps = this.block.getSteps();</span>
+<span class="fc bfc" id="L118" title="All 2 branches covered.">            for (int i = 1; i &lt; steps.size() - 1; i++) {</span>
+<span class="fc" id="L119">                steps.get(i).setInverse(inv);</span>
+            }
+        }
+<span class="fc" id="L122">    }</span>
+
+    @Override
+    public Complex[] applyOptimize(Complex[] v) {
+<span class="fc" id="L126">        List&lt;Step&gt; steps = block.getSteps();</span>
+<span class="fc" id="L127">        Step s0 = steps.get(0);</span>
+<span class="fc" id="L128">        Step sn = steps.getLast();</span>
+<span class="fc" id="L129">        Complex[] answer = Computations.calculateNewState(s0.getGates(), v, block.getNQubits());</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        for (int i = 1; i &lt; steps.size() - 1; i++) {</span>
+<span class="fc" id="L131">            answer = Computations.calculateNewState(steps.get(i).getGates(), answer, block.getNQubits());</span>
+        }
+
+<span class="fc" id="L134">        answer = Computations.calculateNewState(sn.getGates(), answer, block.getNQubits());</span>
+
+<span class="fc" id="L136">        return answer;</span>
     }
 
     /** {@inheritDoc} */
     @Override
     public String getCaption() {
-<span class="nc" id="L107">        return &quot;A\nD\nD&quot;;</span>
+<span class="nc" id="L142">        return &quot;A\nD\nD&quot;;</span>
     }
 
 }

@@ -476,9 +476,9 @@ public final class Complex {
     public String toString() {
 <span class="fc" id="L477">        float mr = this.r;</span>
 <span class="fc" id="L478">        float mi = this.i;</span>
-<span class="pc bpc" id="L479" title="1 of 2 branches missed.">        if (Math.abs(mr) &lt; 1e-7) mr = 0;</span>
-<span class="pc bpc" id="L480" title="1 of 2 branches missed.">        if (Math.abs(mi) &lt; 1e-7) mi = 0;</span>
-<span class="pc bpc" id="L481" title="1 of 2 branches missed.">        if (Math.abs(mr) &gt; .999999) mr = Math.signum(mr);</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">        if (Math.abs(mr) &lt; 1e-7) mr = 0;</span>
+<span class="fc bfc" id="L480" title="All 2 branches covered.">        if (Math.abs(mi) &lt; 1e-7) mi = 0;</span>
+<span class="fc bfc" id="L481" title="All 2 branches covered.">        if (Math.abs(mr) &gt; .999999) mr = Math.signum(mr);</span>
 <span class="pc bpc" id="L482" title="1 of 2 branches missed.">        if (Math.abs(mi) &gt; .999999) mi = Math.signum(mi);</span>
 <span class="fc" id="L483">        return &quot;(&quot; + mr + &quot;, &quot; + mi + &quot;)&quot;;</span>
     }

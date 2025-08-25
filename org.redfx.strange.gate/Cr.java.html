@@ -86,13 +86,13 @@ public class Cr extends TwoQubitGate implements ControlledGate {
     /**
      * &lt;p&gt;Constructor for Cr.&lt;/p&gt;
      *
-     * @param a a int
-     * @param b a int
+     * @param controlQubitIndex a int
+     * @param mainQubitIndex a int
      * @param base a int
      * @param pow a int
      */
-    public Cr(int a, int b, int base, int pow) {
-<span class="fc" id="L95">        this(a,b, Math.PI*2/Math.pow(base, pow));</span>
+    public Cr(int controlQubitIndex, int mainQubitIndex, int base, int pow) {
+<span class="fc" id="L95">        this(controlQubitIndex,mainQubitIndex, Math.PI*2/Math.pow(base, pow));</span>
 <span class="fc" id="L96">        this.pow = pow;</span>
 <span class="fc" id="L97">    }</span>
     /** {@inheritDoc} */
