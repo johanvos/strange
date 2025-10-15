@@ -32,6 +32,7 @@
  */
 package org.redfx.strange.test;
 
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -53,7 +54,31 @@ public class SingleQubitGateTests extends BaseGateTests {
     @Test
     public void empty() {
     }
-        
+
+    @Test
+    public void namedQubit() {
+        Qubit q0 = new Qubit();
+        Program p = new Program(q0);
+        X x = new X(q0);
+        p.addStep(new Step(x));
+
+        Result res = runProgram(p);
+        Complex[] probs = res.getProbability();
+        System.err.println("probs = "+Arrays.toString(probs));
+    }
+
+    @Test
+    public void namedQubit2() {
+        Qubit q0 = new Qubit();
+        Qubit q1 = new Qubit();
+        Program p = new Program(q0, q1);
+        X x = new X(q0);
+        p.addSteps(new Step(x), new Step(new X(q1)));
+
+        Result res = runProgram(p);
+        Complex[] probs = res.getProbability();
+        System.err.println("probs = "+Arrays.toString(probs));
+    }
     @Test
     public void simpleIGate() {
         Program p = new Program(1, new Step(new Identity(0)));

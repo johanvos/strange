@@ -37,6 +37,7 @@ import org.redfx.strange.Gate;
 
 import java.util.Collections;
 import java.util.List;
+import org.redfx.strange.Qubit;
 
 /**
  *
@@ -48,13 +49,17 @@ import java.util.List;
 public abstract class SingleQubitGate implements Gate {
     
     protected int idx;
+    Qubit qubit;
     private boolean inverse;
     
     /**
      * <p>Constructor for SingleQubitGate.</p>
      */
     public SingleQubitGate() {}
-    
+
+    public SingleQubitGate(Qubit q) {
+        this.qubit = q;
+    }
     /**
      * <p>Constructor for SingleQubitGate.</p>
      *
@@ -62,6 +67,10 @@ public abstract class SingleQubitGate implements Gate {
      */
     public SingleQubitGate (int idx) {
         this.idx = idx;
+    }
+
+    public Qubit getQubit() {
+        return qubit;
     }
 
     /** {@inheritDoc} */

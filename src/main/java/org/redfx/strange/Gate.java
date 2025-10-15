@@ -199,6 +199,8 @@ public interface Gate {
      */
     public int getMainQubitIndex();
     
+    default Qubit getQubit() {return null;}
+
     /**
      * <p>setAdditionalQubit.</p>
      *

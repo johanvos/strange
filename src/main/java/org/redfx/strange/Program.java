@@ -56,6 +56,7 @@ public class Program {
     private Result result;
     private double[] initAlpha;
 
+    private Qubit[] qubits;
     private final ArrayList<Step> steps = new ArrayList<>();
 
     // cache decomposedSteps
@@ -72,9 +73,24 @@ public class Program {
      */
     public Program(int nQubits, Step... moreSteps) {
         this.numberQubits = nQubits;
+        this.qubits = new Qubit[nQubits];
+        for (int i = 0; i < nQubits; i++) {
+            this.qubits[i] = new Qubit();
+        }
         this.initAlpha = new double[numberQubits];
         Arrays.fill(initAlpha, 1d);
         addSteps(moreSteps);
+    }
+
+    public Program(Qubit... qubits) {
+        this.qubits = qubits;
+        this.numberQubits = qubits.length;
+        this.initAlpha = new double[numberQubits];
+        Arrays.fill(initAlpha, 1d);
+    }
+
+    public Qubit[] getQubits() {
+        return this.qubits;
     }
 
     /**
@@ -117,6 +133,23 @@ public class Program {
     public void addStep(Step step) {
         if (!ensureMeasuresafe( Objects.requireNonNull(step)) ) {
             throw new IllegalArgumentException ("Adding a superposition step to a measured qubit");
+        }
+        List<Gate> gates = step.getGates();
+        System.err.println("gates = "+gates);
+        for (Gate gate : gates) {
+            System.err.println("gate = "+gate);
+            Qubit candidate = gate.getQubit();
+            if (candidate != null) {
+                System.err.println("candidate = "+candidate);
+                if (this.qubits != null) {
+                    for (int i = 0; i < this.qubits.length; i++) {
+                        if (candidate.equals(this.qubits[i])) {
+                            System.err.println("this is qubit "+i);
+                            gate.setMainQubitIndex(i);
+                        }
+                    }
+                }
+            }
         }
         step.setIndex(steps.size());
         step.setProgram(this);

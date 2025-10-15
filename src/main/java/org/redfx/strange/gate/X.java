@@ -33,6 +33,7 @@
 package org.redfx.strange.gate;
 
 import org.redfx.strange.Complex;
+import org.redfx.strange.Qubit;
 
 /**
  * <p>X class.</p>
@@ -51,6 +52,10 @@ public class X extends SingleQubitGate {
      */
     public X (int idx) {
         super(idx);
+    }
+
+    public X(Qubit q) {
+        super(q);
     }
 
     /** {@inheritDoc} */
