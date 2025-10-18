@@ -208,8 +208,8 @@ public class Computations {
             } else if (gate instanceof ThreeQubitGate) {
                 ThreeQubitGate tqg = (ThreeQubitGate) gate;
                 int first = tqg.getMainQubit();
-                int second = tqg.getSecondQubit();
-                int third = tqg.getThirdQubit();
+                int second = tqg.getSecondQubitIndex();
+                int third = tqg.getThirdQubitIndex();
                 int sFirst = first;
                 int sSecond = second;
                 int sThird = third;

@@ -37,6 +37,7 @@ import org.redfx.strange.Gate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.redfx.strange.Qubit;
 
 /**
  *
@@ -51,7 +52,11 @@ public abstract class ThreeQubitGate implements Gate {
     private int first;
     private int second;
     private int third;
-    
+
+    private Qubit mainQubit;
+    private Qubit secondQubit;
+    private Qubit thirdQubit;
+
     /**
      * <p>Constructor for ThreeQubitGate.</p>
      */
@@ -69,7 +74,28 @@ public abstract class ThreeQubitGate implements Gate {
         this.second = second;
         this.third = third;
     }
+    @Override
+    public Qubit getQubit() {
+        return mainQubit;
+    }
 
+    @Override
+    public Qubit getSecondQubit() {
+        return secondQubit;
+    }
+
+    @Override
+    public Qubit getThirdQubit() {
+        return thirdQubit;
+    }
+
+    public ThreeQubitGate (Qubit mainQubit, Qubit secondQubit, Qubit thirdQubit) {
+        this.mainQubit = mainQubit;
+        this.secondQubit = secondQubit;
+        this.thirdQubit = thirdQubit;
+    }
+
+    
     /** {@inheritDoc} */
     @Override
     public void setMainQubitIndex(int idx) {
@@ -106,7 +132,7 @@ public abstract class ThreeQubitGate implements Gate {
      *
      * @return a int
      */
-    public int getSecondQubit() {
+    public int getSecondQubitIndex() {
         return this.second;
     }
     
@@ -115,7 +141,7 @@ public abstract class ThreeQubitGate implements Gate {
      *
      * @return a int
      */
-    public int getThirdQubit() {
+    public int getThirdQubitIndex() {
         return this.third;
     }
         

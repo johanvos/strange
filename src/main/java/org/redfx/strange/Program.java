@@ -140,21 +140,40 @@ public class Program {
             System.err.println("gate = "+gate);
             Qubit candidate = gate.getQubit();
             if (candidate != null) {
-                System.err.println("candidate = "+candidate);
-                if (this.qubits != null) {
-                    for (int i = 0; i < this.qubits.length; i++) {
-                        if (candidate.equals(this.qubits[i])) {
-                            System.err.println("this is qubit "+i);
-                            gate.setMainQubitIndex(i);
-                        }
-                    }
-                }
+                getIndexByQubit(candidate);
+                gate.setMainQubitIndex(getIndexByQubit(candidate));
+            } else {
+                continue;
+            }
+            candidate = gate.getSecondQubit();
+            if (candidate != null) {
+                getIndexByQubit(candidate);
+                gate.setAdditionalQubit(getIndexByQubit(candidate), 1);
+            } else {
+                continue;
+            }
+            candidate = gate.getThirdQubit();
+            if (candidate != null) {
+                getIndexByQubit(candidate);
+                gate.setAdditionalQubit(getIndexByQubit(candidate), 2);
+            } else {
+                continue;
             }
         }
         step.setIndex(steps.size());
         step.setProgram(this);
         steps.add(step);
         this.decomposedSteps = null;
+    }
+
+    private int getIndexByQubit(Qubit q) {
+        if (this.qubits == null) return -1;
+        for (int i = 0; i < this.qubits.length; i++) {
+            if (q.equals(this.qubits[i])) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**

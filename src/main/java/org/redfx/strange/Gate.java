@@ -200,6 +200,8 @@ public interface Gate {
     public int getMainQubitIndex();
     
     default Qubit getQubit() {return null;}
+    default Qubit getSecondQubit() {return null;}
+    default Qubit getThirdQubit() {return null;}
 
     /**
      * <p>setAdditionalQubit.</p>
