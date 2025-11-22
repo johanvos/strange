@@ -135,13 +135,12 @@ public class Program {
             throw new IllegalArgumentException ("Adding a superposition step to a measured qubit");
         }
         List<Gate> gates = step.getGates();
-        System.err.println("gates = "+gates);
         for (Gate gate : gates) {
             System.err.println("gate = "+gate);
             Qubit candidate = gate.getQubit();
             if (candidate != null) {
-                getIndexByQubit(candidate);
-                gate.setMainQubitIndex(getIndexByQubit(candidate));
+                int ibq = getIndexByQubit(candidate);
+                gate.setMainQubitIndex(ibq);
             } else {
                 continue;
             }

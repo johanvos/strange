@@ -33,6 +33,7 @@
 package org.redfx.strange.gate;
 
 import org.redfx.strange.Complex;
+import org.redfx.strange.Qubit;
 
 /**
  * <p>Hadamard class.</p>
@@ -53,6 +54,9 @@ public class Hadamard extends SingleQubitGate {
         super(idx);
     }
 
+    public Hadamard (Qubit q) {
+        super(q);
+    }
     /** {@inheritDoc} */
     @Override
     public Complex[][] getMatrix() {

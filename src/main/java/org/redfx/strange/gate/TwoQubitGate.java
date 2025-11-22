@@ -93,6 +93,9 @@ public abstract class TwoQubitGate implements Gate {
     @Override
     public void setMainQubitIndex(int idx) {
         this.first = idx;
+        if (idx > highest) {
+            this.highest = idx;
+        }
     }
     
     /** {@inheritDoc} */
@@ -105,6 +108,9 @@ public abstract class TwoQubitGate implements Gate {
     @Override
     public void setAdditionalQubit(int idx, int cnt) {
         this.second = idx;
+        if (idx > highest) {
+            this.highest = idx;
+        }
     }
 
 

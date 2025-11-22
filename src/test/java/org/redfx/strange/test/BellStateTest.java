@@ -93,6 +93,29 @@ public class BellStateTest extends BaseGateTests {
         assertTrue(zeroCount < RUNS);
     }
 
+    @Test
+    public void multimeasurementNamedQubit() {
+        Qubit controlQubit = new Qubit();
+        Qubit targetQubit = new Qubit();
+        Program p = new Program(controlQubit, targetQubit);
+        p.addSteps(new Step(new Hadamard(controlQubit)),
+            new Step(new Cnot(targetQubit, controlQubit))
+        );
+        Result res = runProgram(p);
+        int zeroCount = 0;
+        final int RUNS = 100;
+        for (int i = 0; i < 100; i++) {
+            res.measureSystem();
+            Qubit[] qubits = res.getQubits();
+            int q0 = qubits[0].measure();
+            int q1 = qubits[1].measure();
+            assertEquals(q0,q1);
+            if (q0 == 0) zeroCount++;
+        }
+        assertTrue(zeroCount > 0);
+        assertTrue(zeroCount < RUNS);
+    }
+
     /**
      * BellState with a third qubit that is sent through a H gate
      */

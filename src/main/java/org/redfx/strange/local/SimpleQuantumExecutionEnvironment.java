@@ -155,7 +155,7 @@ public class SimpleQuantumExecutionEnvironment implements QuantumExecutionEnviro
             PermutationGate pg = (PermutationGate)gates.get(0);
             return Computations.permutateVector (vector, pg.getIndex1(), pg.getIndex2());
         }
-      
+
         Complex[] result = new Complex[vector.length];
         boolean vdd = true;
         result = Computations.calculateNewState(gates, vector, qubits.length);
