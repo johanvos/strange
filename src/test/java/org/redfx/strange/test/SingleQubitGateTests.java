@@ -109,7 +109,7 @@ public class SingleQubitGateTests extends BaseGateTests {
         Program p = new Program(2, new Step(new X(1)));
         Result res = runProgram(p);
         Qubit[] qubits = res.getQubits();
-        assertEquals(1, qubits[1].measure());
+        assertEquals(0, qubits[0].measure());
         assertEquals(1, qubits[1].measure());
     }    
 

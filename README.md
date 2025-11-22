@@ -15,6 +15,49 @@ You can read more about Java and QuantumComputing in [Quantum Computing in Actio
 <a href="https://www.manning.com/books/quantum-computing-for-java-developers?a_aid=quantumjava&a_bid=e5166ab9">
 ![qcj](https://github.com/redfx-quantum/strange/assets/767876/324f682d-eaaf-4829-b411-4ab2abc104cc)</a>
 
+## Core Concepts
+
+The following diagram depicts the core components of the Strange quantum computing library. A `QuantumExecutionEnvironment`
+executes a `Program`, which is composed of `Step`s and uses some `Qubit`s. Each `Step` contains `Gate`s that operate on
+the `Qubit`s defined for the `Program`.
+
+```mermaid
+classDiagram
+  direction LR
+
+  class QuantumExecutionEnvironment {
+    <<interface>>
+    +runProgram(Program) Result
+  }
+
+  class Program {
+    -numberQubits: int
+    -steps: List~Step~
+    +addStep(Step)
+  }
+
+  QuantumExecutionEnvironment ..> Program : executes
+  Program "1" o-- "0..*" Step
+
+  class Step {
+    -gates: List~Gate~
+    +addGate(Gate)
+  }
+
+  Step "1" o-- "0..*" Gate
+
+  class Gate {
+    <<interface>>
+    +getAffectedQubitIndexes() List~Integer~
+  }
+
+  Program "1" -- "1..*" Qubit : operates on
+  Gate "1" -- "1..*" Qubit : operates on
+
+  class Qubit {
+  }
+```
+
 # Getting Started
 
 Strange is distributed via Maven Central and can thus easily be used leveraging maven or gradle build software.
